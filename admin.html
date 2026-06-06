@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAYAND | Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Link to your external CSS file -->
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="bg-gray-50 text-black antialiased min-h-screen flex flex-col overflow-x-hidden">
+
+    <nav class="bg-white border-b border-gray-200 px-4 md:px-8 py-4 flex justify-between items-center sticky top-0 z-10">
+        <h1 class="text-lg md:text-xl font-black tracking-tighter">SAYAND <span class="text-gray-400 font-medium hidden sm:inline">| CMS DASHBOARD</span></h1>
+        <a href="index.html" class="text-xs tracking-[0.2em] font-bold text-gray-500 hover:text-black transition-colors">VIEW STOREFRONT &rarr;</a>
+    </nav>
+
+    <div class="flex-1 flex flex-col md:flex-row gap-6 p-4 md:p-6 max-w-[1600px] mx-auto w-full">
+        
+        <!-- LEFT SIDEBAR: Tabs + Forms -->
+        <div class="w-full md:w-[420px] bg-white border border-gray-200 shadow-sm h-fit flex-shrink-0">
+            <!-- Tab Navigation -->
+            <div class="flex border-b border-gray-100 overflow-x-auto hide-scrollbar">
+                <button class="tab-btn active pb-3 pt-4 px-4 text-[10px] tracking-[0.1em] font-bold whitespace-nowrap" onclick="switchTab('products')" data-tab="products">PRODUCTS</button>
+                <button class="tab-btn pb-3 pt-4 px-4 text-[10px] tracking-[0.1em] font-bold whitespace-nowrap" onclick="switchTab('sales')" data-tab="sales">SALES</button>
+                <button class="tab-btn pb-3 pt-4 px-4 text-[10px] tracking-[0.1em] font-bold whitespace-nowrap" onclick="switchTab('design')" data-tab="design">PAGE DESIGN</button>
+                <button class="tab-btn pb-3 pt-4 px-4 text-[10px] tracking-[0.1em] font-bold whitespace-nowrap" onclick="switchTab('contact')" data-tab="contact">CONTACT</button>
+            </div>
+
+            <!-- ==================== PRODUCTS TAB ==================== -->
+            <div id="section-products" class="p-5">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 id="formTitle" class="text-[10px] tracking-[0.2em] font-bold text-gray-400">ADD / EDIT PRODUCT</h2>
+                    <button id="cancelEditBtn" class="text-[10px] text-red-500 font-bold hidden" onclick="cancelEdit()">CANCEL</button>
+                </div>
+                <form id="addProductForm" class="space-y-3 max-h-[75vh] overflow-y-auto hide-scrollbar pr-1">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[10px] font-bold tracking-wider text-gray-500 mb-1">SECTION</label>
+                            <select id="prodSection" class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black bg-white">
+                                <option value="newArrivals">New Arrivals</option>
+                                <option value="trending">Trending Now</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold tracking-wider text-gray-500 mb-1">CATEGORY</label>
+                            <select id="prodCategory" class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black bg-white">
+                                <option value="women">Women</option>
+                                <option value="men">Men</option>
+                                <option value="accessories">Accessories</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold tracking-wider text-gray-500 mb-1">PRODUCT NAME</label>
+                        <input type="text" id="prodName" required placeholder="OVERSIZED WOOL COAT" class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black uppercase">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold tracking-wider text-gray-500 mb-1">PRICE ($)</label>
+                        <input type="number" id="prodPrice" required placeholder="289" class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black">
+                    </div>
+                    
+                    <div class="grid grid-cols-1 gap-3">
+                        <div>
+                            <label class="block text-[10px] font-bold tracking-wider text-gray-500 mb-1">COLORS (Comma separated)</label>
+                            <input type="text" id="prodColors" placeholder="Black, White" class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black">
+                        </div>
+                    </div>
+
+                    <!-- NEW: SIZES & INVENTORY -->
+                    <div class="border-t border-gray-100 pt-3 mb-2">
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="block text-[10px] font-bold tracking-wider text-gray-500">SIZES & INVENTORY</label>
+                            <button type="button" onclick="addSizeRow()" class="text-[10px] text-blue-600 font-bold hover:underline">+ ADD SIZE</button>
+                        </div>
+                        <p class="text-[9px] text-gray-400 mb-2">Total quantity is calculated automatically.</p>
+                        <div id="sizes-inputs" class="space-y-2"></div>
+                    </div>
+
+                    <!-- OUT OF STOCK TOGGLE -->
+                    <div class="mb-2 flex items-center gap-2 border border-gray-300 p-3 bg-red-50/50">
+                        <input type="checkbox" id="prodOutOfStock" class="w-4 h-4 text-black focus:ring-black cursor-pointer">
+                        <label for="prodOutOfStock" class="text-[10px] font-bold tracking-wider text-red-600 cursor-pointer">FORCE "OUT OF STOCK" (MAKES UNCLICKABLE)</label>
+                    </div>
+
+                    <!-- Description with AI Button -->
+                    <div class="border-t border-gray-100 pt-3">
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="block text-[10px] font-bold tracking-wider text-gray-500">DESCRIPTION</label>
+                            <button type="button" id="aiDescBtn" onclick="generateAIDescription()" class="text-[10px] bg-purple-100 text-purple-700 px-2 py-1 font-bold tracking-wider hover:bg-purple-200 transition-colors border border-purple-200">✨ AI GENERATE</button>
+                        </div>
+                        <textarea id="prodDesc" placeholder="Full product description for the description tab..." class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black h-16"></textarea>
+                    </div>
+
+                    <!-- Details (collapsible) -->
+                    <div class="border-t border-gray-100 pt-2">
+                        <button type="button" class="flex justify-between items-center w-full py-2 text-[10px] font-bold tracking-wider text-gray-500 hover:text-black" onclick="toggleCollapsible('details-collapsible', this)">
+                            <span>PRODUCT DETAILS (MATERIAL, FIT, CARE)</span>
+                            <span class="collapsible-icon transition-transform">+</span>
+                        </button>
+                        <div id="details-collapsible" class="collapsible space-y-2">
+                            <input type="text" id="detailMaterial" placeholder="Material (e.g. 100% Wool)" class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black">
+                            <input type="text" id="detailFit" placeholder="Fit (e.g. Regular)" class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black">
+                            <input type="text" id="detailCare" placeholder="Care (e.g. Dry clean only)" class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black">
+                            <input type="text" id="detailOrigin" placeholder="Origin (e.g. Made in Italy)" class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black">
+                        </div>
+                    </div>
+
+                    <!-- Measurements (collapsible) -->
+                    <div class="border-t border-gray-100 pt-2">
+                        <button type="button" class="flex justify-between items-center w-full py-2 text-[10px] font-bold tracking-wider text-gray-500 hover:text-black" onclick="toggleCollapsible('measurements-collapsible', this)">
+                            <span>MEASUREMENTS PER SIZE</span>
+                            <span class="collapsible-icon transition-transform">+</span>
+                        </button>
+                        <div id="measurements-collapsible" class="collapsible">
+                            <p class="text-[10px] text-gray-400 mb-2">Enter as: Chest:96cm, Waist:82cm, Length:148cm</p>
+                            <div id="measurements-inputs" class="space-y-2"></div>
+                            <button type="button" onclick="addMeasurementRow()" class="text-[10px] text-blue-600 font-bold mt-2 hover:underline">+ ADD SIZE</button>
+                        </div>
+                    </div>
+
+                    <!-- Related Products (collapsible) -->
+                    <div class="border-t border-gray-100 pt-2">
+                        <button type="button" class="flex justify-between items-center w-full py-2 text-[10px] font-bold tracking-wider text-gray-500 hover:text-black" onclick="toggleCollapsible('related-collapsible', this)">
+                            <span>COMPLETE YOUR LOOK (RELATED PRODUCTS)</span>
+                            <span class="collapsible-icon transition-transform">+</span>
+                        </button>
+                        <div id="related-collapsible" class="collapsible">
+                            <p class="text-[10px] text-gray-400 mb-2">Type product names (comma separated)</p>
+                            <input type="text" id="prodRelated" placeholder="e.g. BLACK HAT, LEATHER BELT" class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black">
+                        </div>
+                    </div>
+
+                    <!-- Images -->
+                    <div class="pt-2 border-t border-gray-100">
+                        <label class="block text-[10px] font-bold tracking-wider text-gray-500 mb-1">IMAGES</label>
+                        <p class="text-[10px] text-gray-400 mb-2">Images are automatically embedded as base64. No external hosting needed.</p>
+                        <div class="mb-2">
+                            <label class="block text-[10px] text-gray-400 font-bold tracking-wider mb-1">UPLOAD FROM DEVICE (Multiple)</label>
+                            <input type="file" id="prodImageFile" accept="image/*" multiple class="w-full text-[10px] text-gray-500 file:mr-3 file:py-2 file:px-3 file:border-0 file:text-[10px] file:font-semibold file:bg-gray-100 file:text-black hover:file:bg-gray-200">
+                        </div>
+                        <div class="text-center text-[10px] text-gray-400 font-bold mb-2">- OR -</div>
+                        <div>
+                            <label class="block text-[10px] text-gray-400 font-bold tracking-wider mb-1">PASTE IMAGE URLs</label>
+                            <textarea id="prodImgUrl" placeholder="https://img1.jpg, https://img2.jpg..." class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black h-12"></textarea>
+                        </div>
+                        <div id="uploaded-preview" class="flex gap-2 mt-2 flex-wrap"></div>
+                    </div>
+
+                    <button type="submit" id="submitBtn" class="w-full bg-black text-white py-3 mt-4 text-xs tracking-[0.2em] font-bold hover:bg-gray-800 transition-colors">+ ADD PRODUCT</button>
+                </form>
+            </div>
+
+            <!-- ==================== SALES TAB ==================== -->
+            <div id="section-sales" class="p-5 hidden">
+                <div class="space-y-6 max-h-[75vh] overflow-y-auto hide-scrollbar pr-1">
+                    
+                    <!-- Convert to Sale -->
+                    <div>
+                        <h3 class="text-[10px] tracking-[0.2em] font-bold text-gray-400 mb-3">CONVERT PRODUCT TO SALE</h3>
+                        <p class="text-[10px] text-gray-500 mb-3">Select a product and set sale price to auto-calculate the discount.</p>
+                        <div class="mb-2">
+                            <label class="block text-[10px] font-bold tracking-wider text-gray-500 mb-1">SELECT PRODUCT</label>
+                            <select id="saleProductSelect" class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black bg-white"></select>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 mb-2">
+                            <div>
+                                <label class="block text-[10px] font-bold tracking-wider text-gray-500 mb-1">ORIGINAL PRICE</label>
+                                <input type="text" id="saleOriginalPrice" readonly class="w-full border border-gray-200 p-2 text-xs bg-gray-50 text-gray-500 cursor-not-allowed">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold tracking-wider text-gray-500 mb-1">SALE PRICE ($)</label>
+                                <input type="number" id="salePriceInput" placeholder="199" class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black" oninput="calculateSalePercent()">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="block text-[10px] font-bold tracking-wider text-gray-500 mb-1">DISCOUNT % (AUTO-CALCULATED)</label>
+                            <input type="number" id="salePercentInput" readonly placeholder="Auto" class="w-full border border-gray-200 p-2 text-xs bg-gray-50 text-gray-500 cursor-not-allowed font-bold">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="block text-[10px] font-bold tracking-wider text-gray-500 mb-1">SALE END DATE (Countdown)</label>
+                            <input type="datetime-local" id="saleEndDateInput" class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black bg-white">
+                        </div>
+
+                        <button onclick="addToSales()" class="w-full bg-red-600 text-white py-3 text-xs tracking-[0.2em] font-bold hover:bg-red-700 transition-colors">ADD TO SALE</button>
+                    </div>
+
+                    <!-- Remove from Sale -->
+                    <div class="border-t border-gray-100 pt-4">
+                        <h3 class="text-[10px] tracking-[0.2em] font-bold text-gray-400 mb-3">REMOVE FROM SALE</h3>
+                        <div id="current-sales-list" class="space-y-2"></div>
+                    </div>
+
+                    <!-- Upcoming Sales -->
+                    <div class="border-t border-gray-100 pt-4">
+                        <h3 class="text-[10px] tracking-[0.2em] font-bold text-gray-400 mb-3">UPCOMING SALE TEASERS</h3>
+                        <p class="text-[10px] text-gray-500 mb-3">Post preview images without prices for upcoming sales.</p>
+                        <div class="mb-2">
+                            <label class="block text-[10px] font-bold tracking-wider text-gray-500 mb-1">TEASER NAME</label>
+                            <input type="text" id="upcomingName" placeholder="Summer Collection Preview" class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black">
+                        </div>
+                        <div class="mb-2">
+                            <label class="block text-[10px] font-bold tracking-wider text-gray-500 mb-1">TEASER IMAGE</label>
+                            <input type="file" id="upcomingImageFile" accept="image/*" class="w-full text-[10px] text-gray-500 file:mr-3 file:py-2 file:px-3 file:border-0 file:text-[10px] file:font-semibold file:bg-gray-100 file:text-black hover:file:bg-gray-200 mb-2">
+                            <input type="text" id="upcomingImageUrl" placeholder="...or paste image URL" class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black">
+                        </div>
+                        <div class="mb-2">
+                            <label class="block text-[10px] font-bold tracking-wider text-gray-500 mb-1">CATEGORY</label>
+                            <select id="upcomingCategory" class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black bg-white">
+                                <option value="women">Women</option>
+                                <option value="men">Men</option>
+                                <option value="accessories">Accessories</option>
+                                <option value="general">General</option>
+                            </select>
+                        </div>
+                        <button onclick="addUpcomingSale()" class="w-full bg-gray-800 text-white py-3 text-xs tracking-[0.2em] font-bold hover:bg-gray-900 transition-colors">POST TEASER</button>
+                        <div id="upcoming-list" class="mt-4 space-y-2"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== PAGE DESIGN TAB ==================== -->
+            <div id="section-design" class="hidden p-5">
+                <p class="text-[10px] text-gray-500 mb-4 leading-relaxed font-semibold">Update text and images for the homepage. Changes instantly update the code generator.</p>
+                <form id="designForm" class="space-y-5 max-h-[75vh] overflow-y-auto hide-scrollbar pr-2">
+                    <div class="space-y-2 bg-gray-50 p-4 border border-gray-100">
+                        <h3 class="text-[10px] font-black tracking-[0.2em]">HERO SECTION</h3>
+                        <input type="text" id="heroSubtitle" placeholder="Subtitle" class="w-full border border-gray-300 p-2 text-xs focus:border-black" oninput="updateDesign()">
+                        <textarea id="heroTitle" placeholder="Main Title (Use &lt;br&gt; for new line)" class="w-full border border-gray-300 p-2 text-xs focus:border-black h-14" oninput="updateDesign()"></textarea>
+                        <label class="block text-[10px] text-gray-400 font-bold tracking-wider mt-2">HERO IMAGE</label>
+                        <input type="file" accept="image/*" class="w-full text-[10px] text-gray-500 file:mr-3 file:py-2 file:px-3 file:border-0 file:text-[10px] file:font-semibold file:bg-gray-100 hover:file:bg-gray-200 mb-1" onchange="handleDesignImageUpload(event, 'heroImg')">
+                        <input type="url" id="heroImg" placeholder="...or paste URL" class="w-full border border-gray-300 p-2 text-xs focus:border-black" oninput="updateDesign()">
+                    </div>
+                    <div class="space-y-2 bg-gray-50 p-4 border border-gray-100">
+                        <h3 class="text-[10px] font-black tracking-[0.2em]">CATEGORY IMAGES</h3>
+                        <label class="block text-[10px] text-gray-400 font-bold tracking-wider">WOMEN</label>
+                        <input type="file" accept="image/*" class="w-full text-[10px] text-gray-500 file:mr-3 file:py-2 file:px-3 file:border-0 file:text-[10px] file:font-semibold file:bg-gray-100 hover:file:bg-gray-200 mb-1" onchange="handleDesignImageUpload(event, 'womenImg')">
+                        <input type="url" id="womenImg" placeholder="...or paste URL" class="w-full border border-gray-300 p-2 text-xs focus:border-black mb-3" oninput="updateDesign()">
+                        <label class="block text-[10px] text-gray-400 font-bold tracking-wider">MEN</label>
+                        <input type="file" accept="image/*" class="w-full text-[10px] text-gray-500 file:mr-3 file:py-2 file:px-3 file:border-0 file:text-[10px] file:font-semibold file:bg-gray-100 hover:file:bg-gray-200 mb-1" onchange="handleDesignImageUpload(event, 'menImg')">
+                        <input type="url" id="menImg" placeholder="...or paste URL" class="w-full border border-gray-300 p-2 text-xs focus:border-black mb-3" oninput="updateDesign()">
+                        <label class="block text-[10px] text-gray-400 font-bold tracking-wider">ACCESSORIES</label>
+                        <input type="file" accept="image/*" class="w-full text-[10px] text-gray-500 file:mr-3 file:py-2 file:px-3 file:border-0 file:text-[10px] file:font-semibold file:bg-gray-100 hover:file:bg-gray-200 mb-1" onchange="handleDesignImageUpload(event, 'accImg')">
+                        <input type="url" id="accImg" placeholder="...or paste URL" class="w-full border border-gray-300 p-2 text-xs focus:border-black" oninput="updateDesign()">
+                    </div>
+                    <div class="space-y-2 bg-gray-50 p-4 border border-gray-100">
+                        <h3 class="text-[10px] font-black tracking-[0.2em]">EDITORIAL SECTION</h3>
+                        <input type="text" id="editSubtitle" placeholder="Subtitle" class="w-full border border-gray-300 p-2 text-xs focus:border-black" oninput="updateDesign()">
+                        <textarea id="editTitle" placeholder="Title" class="w-full border border-gray-300 p-2 text-xs focus:border-black h-14" oninput="updateDesign()"></textarea>
+                        <textarea id="editDesc" placeholder="Description" class="w-full border border-gray-300 p-2 text-xs focus:border-black h-14" oninput="updateDesign()"></textarea>
+                        <label class="block text-[10px] text-gray-400 font-bold tracking-wider mt-2">EDITORIAL IMAGE</label>
+                        <input type="file" accept="image/*" class="w-full text-[10px] text-gray-500 file:mr-3 file:py-2 file:px-3 file:border-0 file:text-[10px] file:font-semibold file:bg-gray-100 hover:file:bg-gray-200 mb-1" onchange="handleDesignImageUpload(event, 'editImg')">
+                        <input type="url" id="editImg" placeholder="...or paste URL" class="w-full border border-gray-300 p-2 text-xs focus:border-black" oninput="updateDesign()">
+                    </div>
+                </form>
+            </div>
+
+            <!-- ==================== CONTACT TAB ==================== -->
+            <div id="section-contact" class="hidden p-5">
+                <h3 class="text-[10px] tracking-[0.2em] font-bold text-gray-400 mb-4">CONTACT INFORMATION</h3>
+                <div class="space-y-3 max-h-[75vh] overflow-y-auto hide-scrollbar pr-1">
+                    <div>
+                        <label class="block text-[10px] font-bold tracking-wider text-gray-500 mb-1">EMAIL</label>
+                        <input type="email" id="contactEmail" class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black" oninput="updateContact()">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold tracking-wider text-gray-500 mb-1">WHATSAPP NUMBER</label>
+                        <input type="text" id="contactWhatsapp" class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black" oninput="updateContact()">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold tracking-wider text-gray-500 mb-1">INSTAGRAM URL</label>
+                        <input type="url" id="contactInstagram" class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black" oninput="updateContact()">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold tracking-wider text-gray-500 mb-1">TIKTOK URL</label>
+                        <input type="url" id="contactTiktok" class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black" oninput="updateContact()">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold tracking-wider text-gray-500 mb-1">PINTEREST URL</label>
+                        <input type="url" id="contactPinterest" class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black" oninput="updateContact()">
+                        <button class="tab-btn pb-3 pt-4 px-4 text-[10px] tracking-[0.1em] font-bold whitespace-nowrap" onclick="switchTab('footer')" data-tab="footer">FOOTER</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ==================== FOOTER TAB ==================== -->
+<div id="section-footer" class="hidden p-5">
+    <h2 class="text-[10px] tracking-[0.2em] font-bold text-gray-400 mb-2">FOOTER PAGE CONTENT</h2>
+    <p class="text-[10px] text-gray-500 mb-4">Edit content for each footer link. HTML is supported. Changes sync instantly.</p>
+    <div class="space-y-3 max-h-[75vh] overflow-y-auto hide-scrollbar pr-1" id="footer-edit-list"></div>
+    
+    <div class="border-t border-gray-100 pt-4 mt-4">
+        <p class="text-[10px] font-bold text-gray-500 mb-2">ADD NEW PAGE</p>
+        <div class="flex gap-2 mb-2">
+            <input type="text" id="newFooterKey" placeholder="page-key (e.g. faq)" class="w-1/2 border border-gray-300 p-2 text-xs focus:outline-none focus:border-black lowercase">
+            <input type="text" id="newFooterTitle" placeholder="Page Title" class="w-1/2 border border-gray-300 p-2 text-xs focus:outline-none focus:border-black">
+        </div>
+        <button onclick="addFooterPage()" class="w-full bg-gray-800 text-white py-2 text-[10px] tracking-[0.2em] font-bold hover:bg-gray-900 transition-colors">+ ADD FOOTER PAGE</button>
+        <button class="tab-btn pb-3 pt-4 px-4 text-[10px] tracking-[0.1em] font-bold whitespace-nowrap" onclick="switchTab('subscribers')" data-tab="subscribers">SUBSCRIBERS</button>
+    </div>
+</div>
+<!-- ==================== SUBSCRIBERS TAB ==================== -->
+<div id="section-subscribers" class="hidden p-5">
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="text-[10px] tracking-[0.2em] font-bold text-gray-400">NEWSLETTER SUBSCRIBERS</h2>
+        <button onclick="exportSubscribers()" class="text-[10px] bg-black text-white px-3 py-2 font-bold tracking-wider hover:bg-gray-800 transition-colors">EXPORT CSV</button>
+    </div>
+    <div class="max-h-[75vh] overflow-y-auto hide-scrollbar pr-1">
+        <table class="w-full text-[10px]">
+            <thead class="bg-gray-50 text-gray-500 font-bold tracking-wider border-b border-gray-200">
+                <tr>
+                    <th class="text-left p-3">EMAIL</th>
+                    <th class="text-left p-3">DATE</th>
+                    <th class="text-right p-3">ACTION</th>
+                </tr>
+            </thead>
+            <tbody id="subscribers-list"></tbody>
+        </table>
+        <p id="subscribers-empty" class="text-[10px] text-gray-400 italic text-center py-8">No subscribers yet.</p>
+    </div>
+</div>
+
+        <!-- RIGHT: Inventory + Code Output -->
+        <div class="w-full flex flex-col gap-6 min-w-0">
+            <div id="inventory-panel" class="bg-white p-5 border border-gray-200 shadow-sm flex-1 overflow-y-auto max-h-[500px]">
+                <h2 class="text-[10px] tracking-[0.2em] font-bold mb-3 border-b border-gray-100 pb-2">CURRENT INVENTORY</h2>
+                <h3 class="text-[10px] font-bold text-gray-400 mb-2 mt-3 tracking-widest">NEW ARRIVALS</h3>
+                <div id="list-newArrivals" class="space-y-2 mb-5"></div>
+                <h3 class="text-[10px] font-bold text-gray-400 mb-2 tracking-widest">TRENDING NOW</h3>
+                <div id="list-trending" class="space-y-2 mb-5"></div>
+                
+                <h3 class="text-[10px] font-bold text-gray-400 mb-2 tracking-widest">UPCOMING TEASERS</h3>
+                <div id="list-upcoming" class="space-y-2"></div>
+            </div>
+
+            <div class="bg-black text-white p-5 shadow-sm hidden">
+                <textarea id="codeOutput"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION FOR SUCCESSFUL UPLOADS -->
+    <div id="admin-toast" class="fixed bottom-6 right-6 bg-green-600 text-white px-6 py-4 text-[10px] tracking-[0.2em] font-bold transform translate-y-24 opacity-0 transition-all duration-300 z-50 shadow-xl flex items-center gap-3">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+        <span id="admin-toast-text">LIVE STORE UPDATED!</span>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    
+    <!-- Link to your external JS files -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/admin.js"></script>
+
+       <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script src="js/main.js"></script>
+
+</body>
+</html>

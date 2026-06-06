@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cookie Policy | SAYAND</title>
+    <meta name="description" content="SAYAND Cookie Policy. Learn how we use cookies and similar technologies.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>*{font-family:'Inter',sans-serif;}</style>
+</head>
+<body class="bg-white text-black antialiased">
+
+    <nav class="border-b border-gray-100 px-6 py-4 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-sm z-50">
+        <a href="/" class="text-2xl font-black tracking-tighter">SAYAND</a>
+        <a href="/" class="text-xs tracking-[0.2em] font-medium text-gray-500 hover:text-black transition-colors">← BACK TO STORE</a>
+    </nav>
+
+    <main class="max-w-3xl mx-auto px-6 py-16 md:py-24">
+        <h1 class="text-3xl md:text-5xl font-black tracking-tighter mb-8">COOKIE POLICY</h1>
+        <div id="legal-content" class="text-sm md:text-base text-gray-600 leading-relaxed space-y-6">
+            <p>SAYAND uses cookies and similar technologies to enhance your browsing experience and analyze site traffic.</p>
+            <div>
+                <h4 class="text-black font-bold text-sm tracking-wider mb-2">WHAT ARE COOKIES?</h4>
+                <p>Cookies are small text files stored on your device when you visit a website. They help us remember your preferences and understand how you interact with our site.</p>
+            </div>
+            <div>
+                <h4 class="text-black font-bold text-sm tracking-wider mb-2">TYPES OF COOKIES WE USE</h4>
+                <ul class="list-disc list-inside space-y-2">
+                    <li><strong>Essential:</strong> Required for the website to function properly.</li>
+                    <li><strong>Analytics:</strong> Help us understand how visitors interact with our site.</li>
+                    <li><strong>Marketing:</strong> Used to deliver relevant advertisements and track their performance.</li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-black font-bold text-sm tracking-wider mb-2">MANAGING COOKIES</h4>
+                <p>You can manage or disable cookies through your browser settings. Please note that disabling certain cookies may affect the functionality of the website.</p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="border-t border-gray-100 py-8 px-6 text-center">
+        <p class="text-[10px] tracking-[0.2em] text-gray-400">© 2026 SAYAND. ALL RIGHTS RESERVED.</p>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script>
+        if (typeof db !== 'undefined') {
+            db.ref("mainStore/footer/cookie").once("value").then(snap => {
+                if (snap.exists()) {
+                    const data = snap.val();
+                    if (data.title) document.querySelector('h1').innerText = data.title;
+                    if (data.content && data.content.trim().length > 10) {
+                        document.getElementById('legal-content').innerHTML = data.content;
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

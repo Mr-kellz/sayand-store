@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Use | SAYAND</title>
+    <meta name="description" content="SAYAND Terms of Use. By accessing our website, you agree to be bound by these terms and conditions.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>*{font-family:'Inter',sans-serif;}</style>
+</head>
+<body class="bg-white text-black antialiased">
+
+    <nav class="border-b border-gray-100 px-6 py-4 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-sm z-50">
+        <a href="/" class="text-2xl font-black tracking-tighter">SAYAND</a>
+        <a href="/" class="text-xs tracking-[0.2em] font-medium text-gray-500 hover:text-black transition-colors">← BACK TO STORE</a>
+    </nav>
+
+    <main class="max-w-3xl mx-auto px-6 py-16 md:py-24">
+        <h1 class="text-3xl md:text-5xl font-black tracking-tighter mb-8">TERMS OF USE</h1>
+        <div id="legal-content" class="text-sm md:text-base text-gray-600 leading-relaxed space-y-6">
+            <p>By accessing and using the SAYAND website, you accept and agree to be bound by these terms and conditions.</p>
+            <div>
+                <h4 class="text-black font-bold text-sm tracking-wider mb-2">ORDERS & PAYMENT</h4>
+                <p>All prices are listed in USD and include VAT where applicable. We reserve the right to refuse or cancel any order for any reason. Payment must be received before items are shipped.</p>
+            </div>
+            <div>
+                <h4 class="text-black font-bold text-sm tracking-wider mb-2">INTELLECTUAL PROPERTY</h4>
+                <p>All content on this website, including images, text, and designs, is the property of SAYAND and is protected by copyright and trademark laws. Unauthorized use is strictly prohibited.</p>
+            </div>
+            <div>
+                <h4 class="text-black font-bold text-sm tracking-wider mb-2">LIABILITY</h4>
+                <p>SAYAND is not liable for any indirect, incidental, or consequential damages arising from the use of our products or website. Our liability is limited to the purchase price of the item.</p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="border-t border-gray-100 py-8 px-6 text-center">
+        <p class="text-[10px] tracking-[0.2em] text-gray-400">© 2026 SAYAND. ALL RIGHTS RESERVED.</p>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script>
+        if (typeof db !== 'undefined') {
+            db.ref("mainStore/footer/terms").once("value").then(snap => {
+                if (snap.exists()) {
+                    const data = snap.val();
+                    if (data.title) document.querySelector('h1').innerText = data.title;
+                    if (data.content && data.content.trim().length > 10) {
+                        document.getElementById('legal-content').innerHTML = data.content;
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

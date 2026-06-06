@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAYAND | Modern Essentials</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-white text-black antialiased overflow-x-hidden">
+
+    <div id="toast" class="toast">ADDED TO BAG</div>
+
+    <nav class="fixed top-0 left-0 w-full z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100">
+        <div class="w-full px-4 sm:px-6 lg:px-8 xl:px-12">
+            <div class="flex justify-between items-center h-16 md:h-20 relative">
+                <div class="flex items-center flex-1">
+                    <button id="menuBtn" class="md:hidden flex flex-col space-y-1.5 p-2 mr-4 z-50">
+                        <span class="w-6 h-0.5 bg-black transition-all duration-300"></span>
+                        <span class="w-6 h-0.5 bg-black transition-all duration-300"></span>
+                    </button>
+                    <div class="hidden md:flex space-x-8 text-xs tracking-[0.2em] font-medium">
+                        <a href="#" onclick="openCollection('women','WOMEN');return false;" class="hover:text-gray-500 transition-colors duration-300">WOMEN</a>
+                        <a href="#" onclick="openCollection('men','MEN');return false;" class="hover:text-gray-500 transition-colors duration-300">MEN</a>
+                        <a href="#" onclick="openCollection('accessories','ACCESSORIES');return false;" class="hover:text-gray-500 transition-colors duration-300">ACCESSORIES</a>
+                        <a href="#" onclick="openSalesPage();return false;" class="text-red-600 hover:text-red-400 transition-colors duration-300">SALE</a>
+                        <a href="login.html" class="nav-account-link hover:text-gray-500 transition-colors duration-300">LOG IN</a>
+                    </div>
+                </div>
+                <div class="absolute left-1/2 transform -translate-x-1/2 z-50 pointer-events-none">
+                    <h1 class="text-2xl md:text-3xl lg:text-4xl font-black tracking-tighter leading-none pointer-events-auto">SAYAND</h1>
+                </div>
+                <div class="flex items-center justify-end space-x-4 md:space-x-6 flex-1">
+                    
+                    <button onclick="openSearch()" class="hidden md:flex items-center justify-center hover:opacity-70 transition-opacity">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </button>
+                    
+                    <button id="wishlist-toggle" class="relative hover:opacity-70 transition-opacity flex items-center">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                        <span id="wishlist-count" class="absolute -top-2 -right-3 w-4 h-4 bg-black text-white text-[10px] flex items-center justify-center rounded-full hidden">0</span>
+                    </button>
+
+                    <button id="cart-toggle" class="relative text-xs tracking-[0.2em] font-medium hover:text-gray-500 transition-colors">
+                        BAG <span id="cart-count" class="absolute -top-2 -right-3 w-4 h-4 bg-black text-white text-[10px] flex items-center justify-center rounded-full hidden">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div id="mobileMenu" class="menu-overlay fixed inset-0 bg-white z-40 flex flex-col justify-center items-center space-y-8">
+        <a href="#" onclick="openCollection('women','WOMEN');toggleMenu();return false;" class="text-3xl font-bold tracking-tighter hover:text-gray-500 transition-colors">WOMEN</a>
+        <a href="#" onclick="openCollection('men','MEN');toggleMenu();return false;" class="text-3xl font-bold tracking-tighter hover:text-gray-500 transition-colors">MEN</a>
+        <a href="#" onclick="openCollection('accessories','ACCESSORIES');toggleMenu();return false;" class="text-3xl font-bold tracking-tighter hover:text-gray-500 transition-colors">ACCESSORIES</a>
+        <a href="#" onclick="openSalesPage();toggleMenu();return false;" class="text-3xl font-bold tracking-tighter text-red-600 hover:text-red-400 transition-colors">SALE</a>
+        <a href="login.html" class="nav-account-link text-3xl font-bold tracking-tighter hover:text-gray-500 transition-colors">LOG IN</a>
+    </div>
+
+    <div id="product-detail" class="fixed inset-0 bg-black z-[80] transform translate-y-full transition-transform duration-500 overflow-hidden">
+        <div class="fixed top-0 left-0 right-0 z-50 flex justify-between items-center p-4 md:p-6 bg-gradient-to-b from-black/50 to-transparent pointer-events-none">
+            <button onclick="closeProductDetail()" class="text-white text-3xl leading-none hover:opacity-70 transition-opacity pointer-events-auto">&times;</button>
+            <div class="flex items-center space-x-4 pointer-events-auto">
+                <button id="detail-heart" class="heart-btn text-white hover:opacity-70 transition-opacity" onclick="toggleWishlistCurrent()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                </button>
+                <div class="relative">
+                    <button id="detail-share-btn" class="text-white hover:opacity-70 transition-opacity" onclick="toggleShareMenu()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                    </button>
+                    <div id="detail-share-menu" class="share-menu">
+                        <button onclick="shareProduct('copy')">Copy Link</button>
+                        <button onclick="shareProduct('whatsapp')">Share on WhatsApp</button>
+                        <button onclick="shareProduct('email')">Share via Email</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="detail-scroll" class="h-full overflow-y-auto hide-scrollbar bg-black">
+            <div class="relative w-full bg-[#f5f5f5]">
+                <div class="w-full aspect-[3/4] md:aspect-[4/5] relative overflow-hidden" id="detail-image-container" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEnd(event)">
+                    <img id="detail-hero-img" src="" class="w-full h-full object-cover transition-transform duration-300">
+                    <div class="swipe-hint" id="swipe-hint">SWIPE FOR MORE</div>
+                    <div id="detail-dots" class="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-20"></div>
+                </div>
+                <div id="detail-thumbs" class="flex gap-2 p-4 overflow-x-auto thumb-scroll"></div>
+            </div>
+
+            <div class="bg-black text-white px-4 md:px-8 py-6">
+                <p id="detail-stock" class="text-[11px] tracking-[0.15em] mb-2 font-bold"></p>
+                <h2 id="detail-name" class="text-lg md:text-xl font-medium tracking-wide mb-2 uppercase"></h2>
+                
+                <div class="mb-2 flex items-center gap-2">
+                    <span id="detail-original-price" class="price-original text-sm hidden"></span>
+                    <span id="detail-price" class="text-base"></span>
+                </div>
+                
+                <div id="sale-countdown-container" class="hidden mb-4 mt-2">
+                    <span class="inline-block text-[10px] tracking-[0.2em] text-red-500 font-bold border border-red-500 px-3 py-1">
+                        SALE ENDS IN: <span id="sale-countdown"></span>
+                    </span>
+                </div>
+
+                <p class="text-xs text-gray-500 mb-6">VAT included / excl Shipping cost</p>
+
+                <div class="mb-6">
+                    <div id="detail-sizes" class="flex flex-wrap gap-6"></div>
+                </div>
+
+                <div class="mb-6 flex items-center justify-between border border-gray-800 p-2">
+                    <span class="text-xs tracking-[0.2em] font-medium text-gray-400 ml-2">QTY</span>
+                    <div class="flex items-center text-white">
+                        <button type="button" onclick="document.getElementById('customer-qty').stepDown()" class="px-3 py-1 hover:text-gray-400 transition-colors">-</button>
+                        <input type="number" id="customer-qty" min="1" value="1" class="w-10 text-center text-sm focus:outline-none hide-scrollbar bg-transparent text-white">
+                        <button type="button" onclick="document.getElementById('customer-qty').stepUp()" class="px-3 py-1 hover:text-gray-400 transition-colors">+</button>
+                    </div>
+                </div>
+
+                <button id="detail-add-btn" class="w-full bg-transparent border border-white text-white py-4 text-sm tracking-[0.2em] font-medium hover:bg-white hover:text-black transition-all duration-300 mb-6">
+                    ADD TO BAG
+                </button>
+
+                <div class="flex items-center gap-3 mb-8 pb-6 border-b border-gray-800">
+                    <span id="detail-color" class="text-sm text-gray-300"></span>
+                    <span class="text-gray-600">|</span>
+                    <span id="detail-sku" class="text-sm text-gray-500 font-mono"></span>
+                </div>
+
+                <div class="flex gap-6 mb-6 text-xs tracking-[0.2em]">
+                    <button class="detail-tab active" onclick="switchDetailTab('description')" data-tab="description">DESCRIPTION</button>
+                    <button class="detail-tab" onclick="switchDetailTab('details')" data-tab="details">DETAILS</button>
+                    <button class="detail-tab" onclick="switchDetailTab('measurements')" data-tab="measurements">MEASUREMENTS</button>
+                </div>
+
+                <div id="tab-description" class="detail-tab-content detail-content-enter">
+                    <p id="detail-description" class="text-sm text-gray-300 leading-relaxed mb-4"></p>
+                </div>
+                <div id="tab-details" class="detail-tab-content hidden">
+                    <div id="detail-details-list" class="space-y-0 text-sm text-gray-300"></div>
+                </div>
+                <div id="tab-measurements" class="detail-tab-content hidden">
+                    <div id="detail-measurements-list" class="space-y-4"></div>
+                </div>
+
+                <div id="detail-model-img-container" class="mt-8 mb-4">
+                    <img id="detail-model-img" src="" class="w-full object-cover" style="display:none;">
+                </div>
+
+                <div class="mt-8 border-t border-gray-800">
+                    <div class="accordion-item">
+                        <div class="accordion-header" onclick="toggleAccordion(this)">
+                            <span class="text-xs tracking-[0.2em]">SHIPPING AND RETURNS</span>
+                            <span class="accordion-icon">+</span>
+                        </div>
+                        <div class="accordion-body">
+                            <p class="text-sm text-gray-400 leading-relaxed">Standard delivery within 3-5 business days. Express delivery available for select locations. Free returns within 30 days of purchase. Items must be in original condition with tags attached.</p>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <div class="accordion-header" onclick="toggleAccordion(this)">
+                            <span class="text-xs tracking-[0.2em]">IN-STORE AVAILABILITY</span>
+                            <span class="accordion-icon">+</span>
+                        </div>
+                        <div class="accordion-body">
+                            <p class="text-sm text-gray-400 leading-relaxed">Check availability at your nearest SAYAND store. Reserve online and pick up in store within 24 hours.</p>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <div class="accordion-header" onclick="toggleAccordion(this)">
+                            <span class="text-xs tracking-[0.2em]">CAN WE HELP YOU?</span>
+                            <span class="accordion-icon">+</span>
+                        </div>
+                        <div class="accordion-body">
+                            <p class="text-sm text-gray-400 leading-relaxed mb-3">Our customer service team is available Monday to Friday, 9am - 6pm.</p>
+                            <a id="contact-link" href="#" class="text-sm text-white underline hover:no-underline">Contact Us</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-12 mb-8">
+                    <h3 class="text-xs tracking-[0.2em] text-gray-400 mb-6">COMPLETE YOUR LOOK</h3>
+                    <div id="detail-related" class="grid grid-cols-3 gap-3"></div>
+                </div>
+                <div class="mt-8 mb-24">
+                    <h3 class="text-xs tracking-[0.2em] text-gray-400 mb-6">YOU MIGHT BE INTERESTED IN</h3>
+                    <div id="detail-interested" class="grid grid-cols-3 gap-3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="wishlist-page" class="fixed inset-0 bg-white z-[75] transform translate-x-full transition-transform duration-500 overflow-hidden flex flex-col">
+        <div class="flex justify-between items-center p-6 border-b border-gray-100">
+            <h3 class="text-2xl md:text-3xl font-black tracking-tighter">SAVED ITEMS</h3>
+            <button onclick="closeWishlist()" class="text-3xl leading-none text-gray-400 hover:text-black transition-colors">&times;</button>
+        </div>
+        <div id="wishlist-content" class="flex-1 overflow-y-auto p-6 hide-scrollbar">
+            <div id="wishlist-empty" class="wishlist-empty">
+                <p class="text-gray-400 text-sm tracking-wide mb-4">You haven't saved any items yet.</p>
+                <button onclick="closeWishlist()" class="bg-black text-white px-8 py-3 text-xs tracking-[0.2em] font-semibold hover:bg-gray-800 transition-colors">START SHOPPING</button>
+            </div>
+            <div id="wishlist-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4 hidden"></div>
+        </div>
+    </div>
+
+    <div id="sales-page" class="fixed inset-0 bg-white z-[75] transform translate-y-full transition-transform duration-500 overflow-hidden flex flex-col">
+        <div class="flex justify-between items-center p-6 border-b border-gray-100 sticky top-0 bg-white z-10">
+            <h3 class="text-3xl md:text-5xl font-black tracking-tighter text-red-600">SALE</h3>
+            <button onclick="closeSalesPage()" class="text-4xl leading-none text-gray-400 hover:text-black transition-colors">&times;</button>
+        </div>
+        <div id="sales-scroll" class="flex-1 overflow-y-auto hide-scrollbar">
+            <div id="sales-active-section" class="p-6 md:p-12">
+                <p class="text-xs tracking-[0.3em] text-gray-500 mb-2">LIMITED TIME</p>
+                <h2 class="text-2xl md:text-4xl font-bold tracking-tighter mb-8">ON SALE NOW</h2>
+                <div id="sales-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8"></div>
+            </div>
+            <div id="sales-upcoming-section" class="p-6 md:p-12 border-t border-gray-100">
+                <p class="text-xs tracking-[0.3em] text-gray-500 mb-2">COMING SOON</p>
+                <h2 class="text-2xl md:text-4xl font-bold tracking-tighter mb-8">UPCOMING DROPS</h2>
+                <div id="upcoming-sales-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="cart-overlay" class="fixed inset-0 bg-black/30 z-[55] hidden opacity-0 transition-opacity duration-300 backdrop-blur-sm"></div>
+    <div id="shopping-bag" class="fixed top-0 right-0 h-full w-full sm:w-[400px] bg-white z-[60] transform translate-x-full transition-transform duration-500 flex flex-col shadow-2xl">
+        <div class="flex justify-between items-center p-6 border-b border-gray-100">
+            <h3 class="text-xs tracking-[0.2em] font-bold">YOUR SHOPPING BAG</h3>
+            <button id="close-cart" class="text-2xl leading-none text-gray-400 hover:text-black transition-colors">&times;</button>
+        </div>
+        <div id="cart-items" class="flex-1 overflow-y-auto p-6 space-y-6 hide-scrollbar">
+            <p class="text-xs text-gray-500 text-center mt-10">Your bag is currently empty.</p>
+        </div>
+        <div class="p-6 border-t border-gray-100 bg-gray-50">
+            <div class="flex justify-between text-sm font-bold mb-6">
+                <span>TOTAL:</span>
+                <span id="cart-total">$0.00 USD</span>
+            </div>
+            <button id="whatsapp-checkout-btn" class="w-full bg-black text-white py-4 text-xs tracking-[0.2em] font-bold hover:bg-gray-800 transition-colors">PROCEED TO CHECKOUT</button>
+        </div>
+    </div>
+
+    <div id="collection-folder" class="fixed inset-0 bg-white z-[70] transform translate-y-full transition-transform duration-500 flex flex-col">
+        <div class="flex justify-between items-center p-6 border-b border-gray-100 bg-white sticky top-0 z-10">
+            <h3 id="collection-title" class="text-3xl md:text-5xl font-black tracking-tighter">COLLECTION</h3>
+            <button onclick="closeCollection()" class="text-4xl leading-none text-gray-400 hover:text-black transition-colors">&times;</button>
+        </div>
+        <div class="p-6 md:p-12 overflow-y-auto flex-1 bg-white hide-scrollbar">
+            <div id="collection-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8"></div>
+        </div>
+    </div>
+
+    <div id="editorial-page" class="fixed inset-0 bg-white z-[75] transform translate-y-full transition-transform duration-500 flex flex-col overflow-hidden">
+        <div class="absolute top-0 left-0 w-full flex justify-between items-center p-6 z-20 pointer-events-none">
+            <h3 class="text-xl md:text-2xl font-black tracking-[0.2em] pointer-events-auto blend-diff">THE EDIT</h3>
+            <button onclick="closeEditorial()" class="text-4xl leading-none pointer-events-auto hover:opacity-70 transition-opacity blend-diff">&times;</button>
+        </div>
+        
+        <div class="flex-1 overflow-y-auto hide-scrollbar bg-white pb-24">
+            <div class="relative w-full h-[70vh] md:h-[90vh] bg-black">
+                <img id="editorial-hero-img" src="" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-6 md:p-16 text-white text-center md:text-left">
+                    <p class="text-xs tracking-[0.4em] font-semibold mb-3 fade-in">SPRING / SUMMER</p>
+                    <h1 class="text-4xl md:text-6xl lg:text-7xl font-black tracking-tighter leading-[0.9] mb-4 fade-in stagger-1">ESSENTIAL<br>MODERNITY</h1>
+                    <p class="text-sm md:text-base text-white/90 max-w-md mx-auto md:mx-0 fade-in stagger-2">Precision cuts, premium textures, designed to transcend seasons.</p>
+                </div>
+            </div>
+            
+            <div class="px-4 sm:px-6 lg:px-8 xl:px-12 py-16 md:py-24 max-w-7xl mx-auto">
+                <div class="text-center mb-16 max-w-2xl mx-auto">
+                    <h2 class="text-2xl md:text-3xl font-bold tracking-tighter mb-4">SHOP THE LOOKBOOK</h2>
+                    <p class="text-gray-500 text-sm leading-relaxed">Discover the pieces that define the new standard of minimalism. Carefully curated to build a wardrobe of effortless sophistication.</p>
+                </div>
+                <div id="editorial-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8"></div>
+            </div>
+        </div>
+    </div>
+
+    <section class="relative w-full h-screen pt-16 md:pt-20 overflow-hidden bg-black">
+        <div class="absolute inset-0">
+            <img src="" alt="Editorial" class="w-full h-full object-cover image-hover parallax scale-105" id="heroImage">
+        </div>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
+        <div class="relative h-full flex flex-col justify-end pb-12 md:pb-20 px-4 sm:px-6 lg:px-8 xl:px-12">
+            <div class="max-w-4xl text-white">
+                <p id="heroSubtitle" class="text-sm tracking-[0.3em] mb-4 fade-in">SPRING / SUMMER 2026</p>
+                <h2 id="heroTitle" class="text-5xl md:text-7xl lg:text-8xl font-black leading-[0.9] tracking-tighter mb-6 fade-in stagger-1">ESSENTIAL<br>MODERNITY</h2>
+                <div class="flex space-x-4 fade-in stagger-2">
+                    <button onclick="openCollection('women','WOMEN')" class="bg-white text-black px-8 py-4 text-xs tracking-[0.2em] font-semibold hover:bg-black hover:text-white transition-all duration-300">SHOP WOMEN</button>
+                    <button onclick="openCollection('men','MEN')" class="border border-white px-8 py-4 text-xs tracking-[0.2em] font-semibold hover:bg-white hover:text-black transition-all duration-300">SHOP MEN</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="w-full py-2">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+            <div class="relative aspect-[3/4] overflow-hidden group cursor-pointer" onclick="openCollection('women','WOMEN')">
+                <img id="womenImg" src="" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                <div class="absolute inset-0 bg-black/20 md:bg-black/0 md:group-hover:bg-black/20 transition-all duration-500"></div>
+                <div class="absolute bottom-0 left-0 p-6">
+                    <h3 class="text-white text-2xl font-bold tracking-tighter mb-2">WOMEN</h3>
+                    <p class="text-white/90 text-xs tracking-[0.2em]">VIEW COLLECTION &rarr;</p>
+                </div>
+            </div>
+            <div class="relative aspect-[3/4] overflow-hidden group cursor-pointer" onclick="openCollection('men','MEN')">
+                <img id="menImg" src="" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                <div class="absolute inset-0 bg-black/20 md:bg-black/0 md:group-hover:bg-black/20 transition-all duration-500"></div>
+                <div class="absolute bottom-0 left-0 p-6">
+                    <h3 class="text-white text-2xl font-bold tracking-tighter mb-2">MEN</h3>
+                    <p class="text-white/90 text-xs tracking-[0.2em]">VIEW COLLECTION &rarr;</p>
+                </div>
+            </div>
+            <div class="relative aspect-[3/4] overflow-hidden group cursor-pointer" onclick="openCollection('accessories','ACCESSORIES')">
+                <img id="accImg" src="" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                <div class="absolute inset-0 bg-black/20 md:bg-black/0 md:group-hover:bg-black/20 transition-all duration-500"></div>
+                <div class="absolute bottom-0 left-0 p-6">
+                    <h3 class="text-white text-2xl font-bold tracking-tighter mb-2">ACCESSORIES</h3>
+                    <p class="text-white/90 text-xs tracking-[0.2em]">VIEW COLLECTION &rarr;</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="new-arrivals-section" class="w-full py-16 md:py-24 px-4 sm:px-6 lg:px-8 xl:px-12">
+        <div class="flex justify-between items-end mb-8">
+            <div>
+                <p class="text-xs tracking-[0.3em] text-gray-500 mb-2">JUST LANDED</p>
+                <h2 class="text-3xl md:text-5xl font-bold tracking-tighter">NEW ARRIVALS</h2>
+            </div>
+            <div class="hidden md:flex space-x-2">
+                <button id="scrollLeft" class="w-12 h-12 border border-black flex items-center justify-center hover:bg-black hover:text-white transition-all duration-300">&larr;</button>
+                <button id="scrollRight" class="w-12 h-12 border border-black flex items-center justify-center hover:bg-black hover:text-white transition-all duration-300">&rarr;</button>
+            </div>
+        </div>
+        <div id="new-arrivals-grid" class="flex space-x-4 overflow-x-auto hide-scrollbar pb-4 snap-x snap-mandatory"></div>
+    </section>
+
+    <section class="w-full py-2 px-4 sm:px-6 lg:px-8 xl:px-12">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div class="relative aspect-[9/16] md:aspect-[4/5] overflow-hidden bg-black group" ontouchstart="editTouchStart(event)" ontouchmove="editTouchMove(event)" ontouchend="editTouchEnd(event)">
+                <img id="editImg" src="" alt="Editorial" class="absolute inset-0 w-full h-full object-cover scale-105">
+                
+                <div id="editorial-dots" class="absolute bottom-6 left-0 right-0 flex justify-center gap-2 z-20 pointer-events-none"></div>
+            </div>
+            
+            <div class="relative flex flex-col justify-center bg-gray-50 p-8 md:p-16 lg:p-24">
+                <p id="editSubtitle" class="text-xs tracking-[0.3em] text-gray-500 mb-4">THE EDIT</p>
+                <h2 id="editTitle" class="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter leading-[0.9] mb-6">LESS IS<br>ALWAYS<br>MORE</h2>
+                <p id="editDesc" class="text-gray-600 text-sm md:text-base leading-relaxed mb-8 max-w-md">Our design philosophy centers on precision cutting and premium materials. Each piece is crafted to transcend seasons, not chase them.</p>
+                <a href="#" onclick="openEditorial(); return false;" class="inline-block text-xs tracking-[0.2em] font-semibold border-b-2 border-black pb-1 hover:text-gray-600 hover:border-gray-600 transition-colors w-max">READ THE EDITORIAL</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="trending-section" class="w-full py-16 px-4 sm:px-6 lg:px-8 xl:px-12">
+        <div class="text-center mb-12">
+            <p class="text-xs tracking-[0.3em] text-gray-500 mb-2">CURATED FOR YOU</p>
+            <h2 class="text-3xl md:text-5xl font-bold tracking-tighter">TRENDING NOW</h2>
+        </div>
+        <div id="trending-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6"></div>
+    </section>
+
+    <section class="w-full bg-black text-white py-16 md:py-24 px-4 sm:px-6 lg:px-8 xl:px-12">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-3xl md:text-5xl lg:text-6xl font-bold tracking-tighter mb-4">JOIN SAYAND</h2>
+            <p class="text-white/60 text-sm md:text-base mb-8 tracking-wide">Subscribe for early access to new arrivals and exclusive offers.</p>
+           <form id="subscribe-form" class="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto" onsubmit="handleSubscribe(event)">
+    <input type="email" id="subscribe-email" placeholder="Enter your email" class="flex-1 bg-transparent border-b-2 border-white/30 py-3 text-white placeholder-white/40 focus:outline-none focus:border-white transition-colors text-sm tracking-wide" required>
+    <button type="submit" class="bg-white text-black px-8 py-3 text-xs tracking-[0.2em] font-semibold hover:bg-gray-200 transition-colors">SUBSCRIBE</button>
+</form>
+        </div>
+    </section>
+
+    <footer class="w-full bg-white border-t border-gray-100 pt-16 pb-8 px-4 sm:px-6 lg:px-8 xl:px-12">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+            <div>
+                <h4 class="text-xs tracking-[0.2em] font-bold mb-6">HELP</h4>
+                <ul class="space-y-3 text-xs text-gray-600">
+                    <li><a href="#" onclick="showContact();return false;" class="hover:text-black transition-colors">Contact Us</a></li>
+                    <li><a href="privacy.html" class="hover:text-black transition-colors">Privacy Policy</a></li>
+                    <li><a href="terms.html" class="hover:text-black transition-colors">Terms of Use</a></li>
+                    <li><a href="cookie.html" class="hover:text-black transition-colors">Cookie Policy</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-xs tracking-[0.2em] font-bold mb-6">COMPANY</h4>
+                <ul class="space-y-3 text-xs text-gray-600">
+                    <li><a href="#" onclick="openInfoPage('about');return false;" class="hover:text-black transition-colors">About Us</a></li>
+                    <li><a href="#" onclick="openInfoPage('careers');return false;" class="hover:text-black transition-colors">Careers</a></li>
+                    <li><a href="#" onclick="openInfoPage('sustainability');return false;" class="hover:text-black transition-colors">Sustainability</a></li>
+                    <li><a href="#" onclick="openInfoPage('press');return false;" class="hover:text-black transition-colors">Press</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-xs tracking-[0.2em] font-bold mb-6">LEGAL</h4>
+                <ul class="space-y-3 text-xs text-gray-600">
+                    <li><a href="#" onclick="openInfoPage('privacy');return false;" class="hover:text-black transition-colors">Privacy Policy</a></li>
+                    <li><a href="#" onclick="openInfoPage('terms');return false;" class="hover:text-black transition-colors">Terms of Use</a></li>
+                    <li><a href="#" onclick="openInfoPage('cookie');return false;" class="hover:text-black transition-colors">Cookie Policy</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-xs tracking-[0.2em] font-bold mb-6">FOLLOW US</h4>
+                <div class="flex space-x-4">
+                    <a id="social-ig" href="https://instagram.com/thesayand_" target="_blank" class="w-10 h-10 border border-gray-200 flex items-center justify-center hover:bg-black hover:text-white transition-all duration-300">IG</a>
+                    <a id="social-tk" href="https://tiktok.com/@thesayand_" target="_blank" class="w-10 h-10 border border-gray-200 flex items-center justify-center hover:bg-black hover:text-white transition-all duration-300">TK</a>
+                    <a id="social-pt" href="https://pinterest.com/thesayand_" target="_blank" class="w-10 h-10 border border-gray-200 flex items-center justify-center hover:bg-black hover:text-white transition-all duration-300">PT</a>
+                </div>
+                <p id="social-handle" class="text-xs text-gray-500 mt-4">@thesayand_</p>
+            </div>
+        </div>
+        <div class="border-t border-gray-100 pt-8 flex flex-col md:flex-row justify-between items-center">
+            <p class="text-[10px] tracking-[0.2em] text-gray-400">&copy; 2026 SAYAND. ALL RIGHTS RESERVED.</p>
+            <div class="flex space-x-6 mt-4 md:mt-0">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" class="h-4 opacity-50">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" class="h-4 opacity-50">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" class="h-4 opacity-50">
+            </div>
+        </div>
+    </footer>
+
+    <div id="contact-modal" class="fixed inset-0 bg-black/40 z-[90] hidden items-center justify-center" onclick="if(event.target===this)closeContact()">
+        <div class="bg-white p-8 max-w-md w-full mx-4 relative">
+            <button onclick="closeContact()" class="absolute top-4 right-4 text-2xl text-gray-400 hover:text-black">&times;</button>
+            <h3 class="text-xl font-black tracking-tighter mb-6">CONTACT US</h3>
+            <div class="space-y-4 text-sm">
+                <p><span class="text-gray-500">Email:</span> <a id="contact-email" href="mailto:thesayand0@gmail.com" class="hover:underline">thesayand0@gmail.com</a></p>
+                <p><span class="text-gray-500">WhatsApp:</span> <a id="contact-whatsapp" href="https://wa.me/393299716798" target="_blank" class="hover:underline">+39 329 971 6798</a></p>
+                <p><span class="text-gray-500">Instagram:</span> <a id="contact-ig" href="https://instagram.com/thesayand_" target="_blank" class="hover:underline">@thesayand_</a></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="search-overlay" class="fixed inset-0 bg-white z-[100] transform -translate-y-full transition-transform duration-500 flex flex-col">
+        <div class="flex justify-between items-center p-6 md:p-8 border-b border-gray-100">
+            <input type="text" id="search-input" placeholder="SEARCH PRODUCTS..." class="w-full text-2xl md:text-5xl font-black tracking-tighter uppercase focus:outline-none placeholder-gray-300" oninput="handleSearch()">
+            <button onclick="closeSearch()" class="text-4xl leading-none text-gray-400 hover:text-black transition-colors ml-4">&times;</button>
+        </div>
+        <div class="p-6 md:p-12 overflow-y-auto flex-1 hide-scrollbar">
+            <div id="search-results-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
+                <p class="text-gray-400 text-sm tracking-wide col-span-full">Start typing to search for products...</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="info-page" class="fixed inset-0 bg-white z-[85] transform translate-y-full transition-transform duration-500 overflow-hidden flex flex-col">
+        <div class="flex justify-between items-center p-6 md:p-8 border-b border-gray-100 sticky top-0 bg-white z-10">
+            <h3 id="info-title" class="text-2xl md:text-4xl font-black tracking-tighter">TITLE</h3>
+            <button onclick="closeInfoPage()" class="text-4xl leading-none text-gray-400 hover:text-black transition-colors">&times;</button>
+        </div>
+        <div class="p-6 md:p-12 overflow-y-auto flex-1 hide-scrollbar max-w-4xl mx-auto w-full">
+            <div id="info-content" class="text-sm md:text-base text-gray-600 leading-relaxed space-y-6">
+                </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+
+    <script src="js/firebase-config.js"></script>
+    <script src="js/main.js"></script>
+
+    <script>
+        // Once the page loads, check if the user is already logged in
+        firebase.auth().onAuthStateChanged((user) => {
+            const accountLinks = document.querySelectorAll('.nav-account-link');
+            
+            accountLinks.forEach(link => {
+                if (user) {
+                    // They are logged in
+                    link.textContent = "DASHBOARD";
+                    link.href = "dashboard.html";
+                } else {
+                    // They are NOT logged in
+                    link.textContent = "LOG IN";
+                    link.href = "login.html";
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>

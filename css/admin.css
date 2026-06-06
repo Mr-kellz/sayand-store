@@ -1,0 +1,29 @@
+* { 
+    font-family: 'Inter', sans-serif; 
+} 
+.hide-scrollbar::-webkit-scrollbar { 
+    display: none; 
+} 
+.hide-scrollbar { 
+    -ms-overflow-style: none; 
+    scrollbar-width: none; 
+} 
+.tab-btn.active { 
+    border-bottom-color: #000; 
+    color: #000; 
+} 
+.tab-btn { 
+    border-bottom: 2px solid transparent; 
+    color: #9ca3af; 
+} 
+.collapsible { 
+    max-height: 0; 
+    overflow: hidden; 
+    transition: max-height 0.3s ease; 
+} 
+.collapsible.open { 
+    max-height: 2000px; 
+} 
+.sale-card { 
+    border-left: 3px solid #dc2626; 
+}

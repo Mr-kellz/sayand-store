@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy | SAYAND</title>
+    <meta name="description" content="SAYAND Privacy Policy. Learn how we collect, use, and safeguard your personal data.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>*{font-family:'Inter',sans-serif;}</style>
+</head>
+<body class="bg-white text-black antialiased">
+
+    <nav class="border-b border-gray-100 px-6 py-4 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-sm z-50">
+        <a href="/" class="text-2xl font-black tracking-tighter">SAYAND</a>
+        <a href="/" class="text-xs tracking-[0.2em] font-medium text-gray-500 hover:text-black transition-colors">← BACK TO STORE</a>
+    </nav>
+
+    <main class="max-w-3xl mx-auto px-6 py-16 md:py-24">
+        <h1 class="text-3xl md:text-5xl font-black tracking-tighter mb-8">PRIVACY POLICY</h1>
+        <div id="legal-content" class="text-sm md:text-base text-gray-600 leading-relaxed space-y-6">
+            <p>Last updated: June 2026</p>
+            <p>SAYAND respects your privacy and is committed to protecting your personal data. This policy explains how we collect, use, and safeguard your information.</p>
+            <div>
+                <h4 class="text-black font-bold text-sm tracking-wider mb-2">1. INFORMATION WE COLLECT</h4>
+                <p>We collect personal information you provide directly (name, email, shipping address, payment details) and technical data automatically (IP address, browser type, device information).</p>
+            </div>
+            <div>
+                <h4 class="text-black font-bold text-sm tracking-wider mb-2">2. HOW WE USE YOUR DATA</h4>
+                <p>Your data is used to process orders, communicate with you, improve our services, and send marketing communications (if you have opted in). We do not sell your personal data to third parties.</p>
+            </div>
+            <div>
+                <h4 class="text-black font-bold text-sm tracking-wider mb-2">3. YOUR RIGHTS</h4>
+                <p>You have the right to access, correct, or delete your personal data. To exercise these rights, contact us at <a href="mailto:privacy@sayand.com" class="underline hover:text-black transition-colors">privacy@sayand.com</a>.</p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="border-t border-gray-100 py-8 px-6 text-center">
+        <p class="text-[10px] tracking-[0.2em] text-gray-400">© 2026 SAYAND. ALL RIGHTS RESERVED.</p>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script>
+        if (typeof db !== 'undefined') {
+            db.ref("mainStore/footer/privacy").once("value").then(snap => {
+                if (snap.exists()) {
+                    const data = snap.val();
+                    if (data.title) document.querySelector('h1').innerText = data.title;
+                    if (data.content && data.content.trim().length > 10) {
+                        document.getElementById('legal-content').innerHTML = data.content;
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+* { font-family: 'Inter', sans-serif; }
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.fade-in { animation: fadeIn 0.8s ease-out forwards; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.stagger-1 { animation-delay: 0.1s; }
+.stagger-2 { animation-delay: 0.2s; }
+.image-hover { transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+.image-hover:hover { transform: scale(1.03); }
+.menu-overlay { clip-path: circle(0% at calc(100% - 40px) 40px); transition: clip-path 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+.menu-overlay.active { clip-path: circle(150% at calc(100% - 40px) 40px); }
+.parallax { transform: translateZ(0); will-change: transform; }
+
+.detail-tab { position: relative; cursor: pointer; transition: opacity 0.3s; }
+.detail-tab::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 0; height: 1px; background: white; transition: width 0.3s; }
+.detail-tab.active::after { width: 100%; }
+.detail-tab.active { opacity: 1; }
+.detail-tab:not(.active) { opacity: 0.5; }
+
+.accordion-item { border-bottom: 1px solid #333; }
+.accordion-header { cursor: pointer; display: flex; justify-content: space-between; align-items: center; padding: 16px 0; transition: opacity 0.2s; }
+.accordion-header:hover { opacity: 0.7; }
+.accordion-body { max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), padding 0.4s; }
+.accordion-body.open { max-height: 500px; padding-bottom: 16px; }
+.accordion-icon { transition: transform 0.3s; font-size: 18px; font-weight: 300; }
+.accordion-icon.open { transform: rotate(45deg); }
+
+.size-option { position: relative; cursor: pointer; transition: all 0.2s; }
+.size-option:not(.disabled):hover { opacity: 0.7; }
+.size-option.selected { font-weight: 600; }
+.size-option.disabled { opacity: 0.3; cursor: not-allowed; text-decoration: line-through; }
+.size-stock { font-size: 11px; color: #888; margin-top: 2px; }
+
+.thumb-scroll { scrollbar-width: none; -ms-overflow-style: none; }
+.thumb-scroll::-webkit-scrollbar { display: none; }
+
+.detail-content-enter { animation: contentFadeIn 0.4s ease-out forwards; }
+@keyframes contentFadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: white; color: black; padding: 12px 24px; font-size: 12px; font-weight: 500; letter-spacing: 0.1em; z-index: 200; box-shadow: 0 4px 20px rgba(0,0,0,0.15); border-radius: 2px; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); opacity: 0; }
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+.heart-btn { transition: all 0.2s; }
+.heart-btn.liked svg { fill: white; stroke: white; }
+.heart-btn:active { transform: scale(0.85); }
+
+.share-menu { position: absolute; top: 100%; right: 0; background: white; border: 1px solid #e5e5e5; padding: 8px 0; min-width: 160px; display: none; z-index: 60; }
+.share-menu.open { display: block; }
+.share-menu button { display: block; width: 100%; text-align: left; padding: 8px 16px; font-size: 12px; color: #333; background: none; border: none; cursor: pointer; transition: background 0.15s; }
+.share-menu button:hover { background: #f5f5f5; }
+
+.swipe-hint { position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.4); color: white; padding: 4px 12px; border-radius: 20px; font-size: 10px; letter-spacing: 0.1em; pointer-events: none; opacity: 0.7; }
+.sale-badge { position: absolute; top: 12px; left: 12px; background: #dc2626; color: white; font-size: 10px; font-weight: 700; letter-spacing: 0.1em; padding: 4px 8px; z-index: 20; }
+.price-original { text-decoration: line-through; color: #888; margin-right: 8px; }
+.price-sale { color: #dc2626; font-weight: 600; }
+.wishlist-empty { text-align: center; padding: 60px 20px; }
+.blend-diff { mix-blend-mode: difference; color: white; }
