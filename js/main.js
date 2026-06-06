@@ -248,7 +248,9 @@ window.prevCardImg = function(e, btn) {
 function createProductCardHTML(p, isNewArrival = false) {
     const imgArray = p.images ? p.images : (p.img ? [p.img] : []);
     const imgArrayStr = JSON.stringify(imgArray).replace(/"/g, '&quot;');
-    const prodDataStr = encodeURIComponent(JSON.stringify(p));
+    
+    // THIS IS THE MAGIC: It makes the product name safe for the URL!
+    const safeName = encodeURIComponent(p.name);
     
     const activeSale = isSaleActive(p);
     
@@ -292,15 +294,16 @@ function createProductCardHTML(p, isNewArrival = false) {
         oosHTML = `<div class="absolute inset-0 bg-white/60 z-10 flex items-center justify-center pointer-events-none"><span class="bg-black text-white text-[10px] tracking-widest px-3 py-1 font-bold">SOLD OUT</span></div>`;
     }
 
+    // NEW LOGIC: Clicking the image, the title, or the button now redirects to product.html
     return `
         <div class="product-card relative aspect-[3/4] overflow-hidden mb-3 bg-gray-100 group/card w-full" data-images="${imgArrayStr}" data-current-index="0" onmouseenter="hoverCard(this)" onmouseleave="unhoverCard(this)">
-            <img src="${imgArray[0]}" class="main-img w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105">
+            <img src="${imgArray[0]}" onclick="window.location.href='product.html?item=${safeName}'" class="main-img w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105 cursor-pointer">
             ${oosHTML}
             ${carouselHTML}
             ${badgeHTML}
-            <button onclick="openProductDetail('${prodDataStr}')" class="absolute bottom-4 left-4 right-4 bg-white py-3 text-[10px] md:text-xs tracking-[0.2em] font-semibold opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 translate-y-2 group-hover/card:translate-y-0 z-30 shadow-lg">CHOOSE OPTIONS</button>
+            <button onclick="window.location.href='product.html?item=${safeName}'" class="absolute bottom-4 left-4 right-4 bg-white py-3 text-[10px] md:text-xs tracking-[0.2em] font-semibold opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 translate-y-2 group-hover/card:translate-y-0 z-30 shadow-lg">CHOOSE OPTIONS</button>
         </div>
-        <h4 class="text-xs font-medium tracking-wide mt-2">${p.name}</h4>
+        <h4 class="text-xs font-medium tracking-wide mt-2 cursor-pointer hover:text-gray-500" onclick="window.location.href='product.html?item=${safeName}'">${p.name}</h4>
         <p class="text-xs ${activeSale ? 'text-red-600 font-semibold' : 'text-gray-500'} mt-1">${priceHTML}</p>`;
 }
 let currentDetailProduct = null;
