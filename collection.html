@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAYAND | Collection</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-white text-black antialiased overflow-x-hidden flex flex-col min-h-screen">
+
+    <div id="toast" class="toast">ADDED TO BAG</div>
+
+    <nav class="fixed top-0 left-0 w-full z-[999] bg-white/95 backdrop-blur-sm border-b border-gray-100">
+        <div class="w-full px-4 sm:px-6 lg:px-8 xl:px-12">
+            <div class="flex justify-between items-center h-16 md:h-20 relative">
+                <div class="flex items-center flex-1">
+                    <button id="menuBtn" class="md:hidden flex flex-col space-y-1.5 p-2 mr-4 z-50">
+                        <span class="w-6 h-0.5 bg-black transition-all duration-300"></span>
+                        <span class="w-6 h-0.5 bg-black transition-all duration-300"></span>
+                    </button>
+                    <div class="hidden md:flex space-x-8 text-xs tracking-[0.2em] font-medium">
+                        <a href="collection.html?category=women" class="hover:text-gray-500 transition-colors duration-300">WOMEN</a>
+                        <a href="collection.html?category=men" class="hover:text-gray-500 transition-colors duration-300">MEN</a>
+                        <a href="collection.html?category=accessories" class="hover:text-gray-500 transition-colors duration-300">ACCESSORIES</a>
+                        <a href="#" onclick="openSalesPage();return false;" class="text-red-600 hover:text-red-400 transition-colors duration-300">SALE</a>
+                        <a href="login.html" id="desktop-account-link" class="hidden md:flex items-center justify-center hover:opacity-70 transition-opacity">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                <div class="absolute left-1/2 transform -translate-x-1/2 z-50 pointer-events-none">
+                    <a href="index.html" class="text-2xl md:text-3xl lg:text-4xl font-black tracking-tighter leading-none pointer-events-auto">SAYAND</a>
+                </div>
+                <div class="flex items-center justify-end space-x-4 md:space-x-6 flex-1">
+                    <button onclick="openSearch()" class="hidden md:flex items-center justify-center hover:opacity-70 transition-opacity">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </button>
+                    <button id="cart-toggle" class="relative text-xs tracking-[0.2em] font-medium hover:text-gray-500 transition-colors">
+                        BAG <span id="cart-count" class="absolute -top-2 -right-3 w-4 h-4 bg-black text-white text-[10px] flex items-center justify-center rounded-full hidden">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div id="mobileMenu" class="menu-overlay fixed inset-0 bg-white z-40 flex flex-col justify-center items-center space-y-8">
+        <a href="collection.html?category=women" class="text-3xl font-bold tracking-tighter hover:text-gray-500 transition-colors">WOMEN</a>
+        <a href="collection.html?category=men" class="text-3xl font-bold tracking-tighter hover:text-gray-500 transition-colors">MEN</a>
+        <a href="collection.html?category=accessories" class="text-3xl font-bold tracking-tighter hover:text-gray-500 transition-colors">ACCESSORIES</a>
+        <a href="#" onclick="openSalesPage();toggleMenu();return false;" class="text-3xl font-bold tracking-tighter text-red-600 hover:text-red-400 transition-colors">SALE</a>
+        <a href="login.html" id="mobile-account-link" class="text-3xl font-bold tracking-tighter hover:text-gray-500 transition-colors">LOG IN</a>
+    </div>
+
+    <main class="flex-1 pt-24 md:pt-32 pb-24">
+        <div class="px-4 sm:px-6 lg:px-8 xl:px-12 mb-12">
+            <h1 id="page-collection-title" class="text-4xl md:text-6xl font-black tracking-tighter uppercase">COLLECTION</h1>
+        </div>
+        <div id="standalone-collection-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 px-4 sm:px-6 lg:px-8 xl:px-12">
+            </div>
+    </main>
+
+    <footer class="w-full bg-white border-t border-gray-100 pt-16 pb-8 px-4 sm:px-6 lg:px-8 xl:px-12 mt-auto">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+            <div>
+                <h4 class="text-xs tracking-[0.2em] font-bold mb-6">HELP</h4>
+                <ul class="space-y-3 text-xs text-gray-600">
+                    <li><a href="#" onclick="showContact();return false;" class="hover:text-black transition-colors">Contact Us</a></li>
+                    <li><a href="privacy.html" class="hover:text-black transition-colors">Privacy Policy</a></li>
+                    <li><a href="terms.html" class="hover:text-black transition-colors">Terms of Use</a></li>
+                    <li><a href="cookie.html" class="hover:text-black transition-colors">Cookie Policy</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-xs tracking-[0.2em] font-bold mb-6">COMPANY</h4>
+                <ul class="space-y-3 text-xs text-gray-600">
+                    <li><a href="#" onclick="openInfoPage('about');return false;" class="hover:text-black transition-colors">About Us</a></li>
+                    <li><a href="#" onclick="openInfoPage('careers');return false;" class="hover:text-black transition-colors">Careers</a></li>
+                    <li><a href="#" onclick="openInfoPage('sustainability');return false;" class="hover:text-black transition-colors">Sustainability</a></li>
+                    <li><a href="#" onclick="openInfoPage('press');return false;" class="hover:text-black transition-colors">Press</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-xs tracking-[0.2em] font-bold mb-6">LEGAL</h4>
+                <ul class="space-y-3 text-xs text-gray-600">
+                    <li><a href="#" onclick="openInfoPage('privacy');return false;" class="hover:text-black transition-colors">Privacy Policy</a></li>
+                    <li><a href="#" onclick="openInfoPage('terms');return false;" class="hover:text-black transition-colors">Terms of Use</a></li>
+                    <li><a href="#" onclick="openInfoPage('cookie');return false;" class="hover:text-black transition-colors">Cookie Policy</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-xs tracking-[0.2em] font-bold mb-6">FOLLOW US</h4>
+                <div class="flex space-x-4">
+                    <a id="social-ig" href="https://instagram.com/thesayand_" target="_blank" class="w-10 h-10 border border-gray-200 flex items-center justify-center hover:bg-black hover:text-white transition-all duration-300">IG</a>
+                    <a id="social-tk" href="https://tiktok.com/@thesayand_" target="_blank" class="w-10 h-10 border border-gray-200 flex items-center justify-center hover:bg-black hover:text-white transition-all duration-300">TK</a>
+                    <a id="social-pt" href="https://pinterest.com/thesayand_" target="_blank" class="w-10 h-10 border border-gray-200 flex items-center justify-center hover:bg-black hover:text-white transition-all duration-300">PT</a>
+                </div>
+                <p id="social-handle" class="text-xs text-gray-500 mt-4">@thesayand_</p>
+            </div>
+        </div>
+        <div class="border-t border-gray-100 pt-8 flex flex-col md:flex-row justify-between items-center">
+            <p class="text-[10px] tracking-[0.2em] text-gray-400">&copy; 2026 SAYAND. ALL RIGHTS RESERVED.</p>
+            <div class="flex space-x-6 mt-4 md:mt-0">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" class="h-4 opacity-50">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" class="h-4 opacity-50">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" class="h-4 opacity-50">
+            </div>
+        </div>
+    </footer>
+
+    <div id="cart-overlay" class="fixed inset-0 bg-black/30 z-[55] hidden opacity-0 transition-opacity duration-300 backdrop-blur-sm"></div>
+    <div id="shopping-bag" class="fixed top-0 right-0 h-full w-full sm:w-[400px] bg-white z-[60] transform translate-x-full transition-transform duration-500 flex flex-col shadow-2xl">
+        <div class="flex justify-between items-center p-6 border-b border-gray-100">
+            <h3 class="text-xs tracking-[0.2em] font-bold">YOUR SHOPPING BAG</h3>
+            <button id="close-cart" class="text-2xl leading-none text-gray-400 hover:text-black transition-colors">&times;</button>
+        </div>
+        <div id="cart-items" class="flex-1 overflow-y-auto p-6 space-y-6 hide-scrollbar"></div>
+        <div class="p-6 border-t border-gray-100 bg-gray-50">
+            <div class="flex justify-between text-sm font-bold mb-6">
+                <span>TOTAL:</span>
+                <span id="cart-total">$0.00 USD</span>
+            </div>
+            <button id="whatsapp-checkout-btn" class="w-full bg-black text-white py-4 text-xs tracking-[0.2em] font-bold hover:bg-gray-800 transition-colors">PROCEED TO CHECKOUT</button>
+        </div>
+    </div>
+
+    <div id="product-detail" class="fixed inset-0 bg-black z-[80] transform translate-y-full transition-transform duration-500 overflow-hidden">
+        <div class="fixed top-0 left-0 right-0 z-50 flex justify-between items-center p-4 md:p-6 bg-gradient-to-b from-black/50 to-transparent pointer-events-none">
+            <button onclick="closeProductDetail()" class="text-white text-3xl leading-none hover:opacity-70 transition-opacity pointer-events-auto">&times;</button>
+            <div class="flex items-center space-x-4 pointer-events-auto">
+                <div class="relative">
+                    <button id="detail-share-btn" class="text-white hover:opacity-70 transition-opacity" onclick="toggleShareMenu()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div id="detail-scroll" class="h-full overflow-y-auto hide-scrollbar bg-black">
+            <div class="relative w-full bg-[#f5f5f5]">
+                <div class="w-full aspect-[3/4] md:aspect-[4/5] relative overflow-hidden" id="detail-image-container">
+                    <img id="detail-hero-img" src="" class="w-full h-full object-cover transition-transform duration-300">
+                    <div id="detail-dots" class="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-20"></div>
+                </div>
+                <div id="detail-thumbs" class="flex gap-2 p-4 overflow-x-auto thumb-scroll"></div>
+            </div>
+            <div class="bg-black text-white px-4 md:px-8 py-6">
+                <p id="detail-stock" class="text-[11px] tracking-[0.15em] mb-2 font-bold"></p>
+                <h2 id="detail-name" class="text-lg md:text-xl font-medium tracking-wide mb-2 uppercase"></h2>
+                <div class="mb-2 flex items-center gap-2">
+                    <span id="detail-price" class="text-base"></span>
+                </div>
+                <div class="mb-6"><div id="detail-sizes" class="flex flex-wrap gap-6"></div></div>
+                <div class="mb-6 flex items-center justify-between border border-gray-800 p-2">
+                    <span class="text-xs tracking-[0.2em] font-medium text-gray-400 ml-2">QTY</span>
+                    <div class="flex items-center text-white">
+                        <button type="button" onclick="document.getElementById('customer-qty').stepDown()" class="px-3 py-1 hover:text-gray-400">-</button>
+                        <input type="number" id="customer-qty" min="1" value="1" class="w-10 text-center text-sm focus:outline-none bg-transparent text-white">
+                        <button type="button" onclick="document.getElementById('customer-qty').stepUp()" class="px-3 py-1 hover:text-gray-400">+</button>
+                    </div>
+                </div>
+                <button id="detail-add-btn" class="w-full bg-transparent border border-white text-white py-4 text-sm tracking-[0.2em] font-medium hover:bg-white hover:text-black transition-all duration-300 mb-6">ADD TO BAG</button>
+                <div class="flex items-center gap-3 mb-8 pb-6 border-b border-gray-800">
+                    <span id="detail-color" class="text-sm text-gray-300"></span>
+                    <span class="text-gray-600">|</span>
+                    <span id="detail-sku" class="text-sm text-gray-500 font-mono"></span>
+                </div>
+                <div id="tab-description" class="detail-tab-content detail-content-enter"><p id="detail-description" class="text-sm text-gray-300 leading-relaxed mb-4"></p></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="search-overlay" class="fixed inset-0 bg-white z-[100] transform -translate-y-full transition-transform duration-500 flex flex-col">
+        <div class="flex justify-between items-center p-6 md:p-8 border-b border-gray-100">
+            <input type="text" id="search-input" placeholder="SEARCH PRODUCTS..." class="w-full text-2xl md:text-5xl font-black tracking-tighter uppercase focus:outline-none placeholder-gray-300" oninput="handleSearch()">
+            <button onclick="closeSearch()" class="text-4xl leading-none text-gray-400 hover:text-black transition-colors ml-4">&times;</button>
+        </div>
+        <div class="p-6 md:p-12 overflow-y-auto flex-1 hide-scrollbar">
+            <div id="search-results-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8"></div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/main.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Read the URL to find out what category we are looking at
+            const urlParams = new URLSearchParams(window.location.search);
+            const category = urlParams.get('category') || 'all';
+
+            // 2. Set the Page Title dynamically
+            const titleEl = document.getElementById('page-collection-title');
+            if (category.toLowerCase() === 'women') titleEl.innerText = 'WOMEN';
+            else if (category.toLowerCase() === 'men') titleEl.innerText = 'MEN';
+            else if (category.toLowerCase() === 'accessories') titleEl.innerText = 'ACCESSORIES';
+            else titleEl.innerText = 'ALL COLLECTION';
+
+            // 3. Wait for Firebase data to load, then render the specific items
+            const renderTimer = setInterval(() => {
+                if (typeof window.SAYAND_PRODUCTS !== 'undefined') {
+                    clearInterval(renderTimer);
+                    
+                    const grid = document.getElementById('standalone-collection-grid');
+                    grid.innerHTML = ''; // Clear out loading state
+
+                    let allProducts = [];
+                    if (SAYAND_PRODUCTS.newArrivals) allProducts = allProducts.concat(SAYAND_PRODUCTS.newArrivals);
+                    if (SAYAND_PRODUCTS.trending) allProducts = allProducts.concat(SAYAND_PRODUCTS.trending);
+
+                    // Filter products to ONLY show the ones matching the URL category
+                    const filtered = category === 'all' ? allProducts : allProducts.filter(p => p.category && p.category.toLowerCase() === category.toLowerCase());
+
+                    if (filtered.length === 0) {
+                        grid.innerHTML = '<p class="text-sm tracking-wide text-gray-500 col-span-full">Products coming soon.</p>';
+                    } else {
+                        // Use your exact main.js function to draw the cards perfectly!
+                        filtered.forEach(p => {
+                            const el = document.createElement('div');
+                            el.className = 'group cursor-pointer';
+                            el.innerHTML = createProductCardHTML(p, false);
+                            grid.appendChild(el);
+                        });
+                    }
+                }
+            }, 100);
+        });
+
+        firebase.auth().onAuthStateChanged((user) => {
+            const desktopLink = document.getElementById('desktop-account-link');
+            const mobileLink = document.getElementById('mobile-account-link');
+            if (user) {
+                if(desktopLink) desktopLink.href = "dashboard.html";
+                if(mobileLink) { mobileLink.href = "dashboard.html"; mobileLink.textContent = "ACCOUNT"; }
+            } else {
+                if(desktopLink) desktopLink.href = "login.html";
+                if(mobileLink) { mobileLink.href = "login.html"; mobileLink.textContent = "LOG IN"; }
+            }
+        });
+    </script>
+</body>
+</html>
