@@ -734,77 +734,7 @@ document.getElementById('detail-add-btn').addEventListener('click', () => {
     setTimeout(() => toggleCart(true), 400);
 });
 
-let cart = [];
-const cartSidebar = document.getElementById('shopping-bag');
-const cartOverlay = document.getElementById('cart-overlay');
-const cartCount = document.getElementById('cart-count');
-const cartItemsContainer = document.getElementById('cart-items');
-const cartTotalSpan = document.getElementById('cart-total');
-
-function toggleCart(open) {
-    cartSidebar.style.transform = open ? 'translateX(0)' : 'translateX(100%)';
-    cartOverlay.classList.toggle('hidden', !open);
-    setTimeout(() => cartOverlay.classList.toggle('opacity-0', !open), 10);
-}
-document.getElementById('cart-toggle').addEventListener('click', (e) => { e.preventDefault(); toggleCart(true); });
-document.getElementById('close-cart').addEventListener('click', () => toggleCart(false));
-cartOverlay.addEventListener('click', () => toggleCart(false));
-
-function updateCartUI() {
-    let totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
-    cartCount.innerText = totalItems;
-    cartCount.classList.toggle('hidden', cart.length === 0);
-    if (cart.length === 0) {
-        cartItemsContainer.innerHTML = '<p class="text-xs text-gray-500 text-center mt-10">Your bag is currently empty.</p>';
-        cartTotalSpan.innerText = '$0.00 USD'; return;
-    }
-    cartItemsContainer.innerHTML = '';
-    let total = 0;
-    cart.forEach((item, i) => {
-        total += (item.price * item.qty);
-        const row = document.createElement('div');
-        row.className = 'flex justify-between items-center pb-6 border-b border-gray-100';
-        row.innerHTML = `
-            <div class="flex items-center gap-4">
-                <img src="${item.img}" class="w-16 h-20 object-cover bg-gray-100">
-                <div>
-                    <h4 class="text-xs font-bold mb-1">${item.name}</h4>
-                    <p class="text-[10px] text-gray-500 font-medium tracking-wide mb-1">SIZE: ${item.size} | COLOR: ${item.color}</p>
-                    <div class="flex items-center gap-3">
-                        <button onclick="changeCartQty(${i},-1)" class="w-6 h-6 border border-gray-200 flex items-center justify-center text-xs hover:bg-gray-100">-</button>
-                        <span class="text-xs font-semibold">${item.qty}</span>
-                        <button onclick="changeCartQty(${i},1)" class="w-6 h-6 border border-gray-200 flex items-center justify-center text-xs hover:bg-gray-100">+</button>
-                    </div>
-                    <p class="text-xs font-semibold mt-1">$${(item.price * item.qty).toFixed(2)} USD</p>
-                </div>
-            </div>
-            <button class="text-gray-400 hover:text-red-500 text-xl transition-colors" onclick="removeItem(${i})">&times;</button>`;
-        cartItemsContainer.appendChild(row);
-    });
-    cartTotalSpan.innerText = `$${total.toFixed(2)} USD`;
-}
-window.removeItem = function(i) { cart.splice(i, 1); updateCartUI(); }
-window.changeCartQty = function(i, delta) {
-    if (delta > 0 && cart[i].qty >= cart[i].maxQty) {
-        alert(`You cannot add more! Only ${cart[i].maxQty} available in stock.`);
-        return;
-    }
-    cart[i].qty += delta;
-    if (cart[i].qty < 1) cart.splice(i, 1);
-    updateCartUI();
-}
-
-document.getElementById('whatsapp-checkout-btn').addEventListener('click', () => {
-    if (cart.length === 0) return alert("Your bag is empty!");
-    let orderMessage = "Hi! I'd like to order the following from SAYAND:\n\n";
-    cart.forEach(item => { orderMessage += `- ${item.qty}x ${item.name} ($${(item.price * item.qty).toFixed(2)})\n  Size: ${item.size}\n  Color: ${item.color}\n\n`; });
-    const totalAmount = document.getElementById('cart-total').innerText;
-    orderMessage += `Total: ${totalAmount}\n\nPlease let me know how to pay!`;
-    const waNum = CONTACT.whatsapp ? CONTACT.whatsapp.replace(/\+/g, '') : '393299716798';
-    const whatsappUrl = `https://wa.me/${waNum}?text=${encodeURIComponent(orderMessage)}`;
-    window.open(whatsappUrl, '_blank');
-});
-
+// ==================== EDITORIAL, SALES & COLLECTION LOGIC ====================
 window.openEditorial = function() {
     const grid = document.getElementById('editorial-grid');
     grid.innerHTML = '';
@@ -936,7 +866,6 @@ document.addEventListener('click', (e) => {
 window.openSearch = function() {
     document.getElementById('search-overlay').style.transform = 'translateY(0)';
     document.body.style.overflow = 'hidden';
-    // Focus the input automatically after the slide animation
     setTimeout(() => document.getElementById('search-input').focus(), 500);
 };
 
@@ -951,20 +880,17 @@ window.handleSearch = function() {
     const query = document.getElementById('search-input').value.toLowerCase().trim();
     const resultsGrid = document.getElementById('search-results-grid');
     
-    // If search is empty, show the default message
     if (query.length === 0) {
         resultsGrid.innerHTML = '<p class="text-gray-400 text-sm tracking-wide col-span-full">Start typing to search for products...</p>';
         return;
     }
 
-    // Gather all products from the database
     let allProducts = [];
     if (typeof SAYAND_PRODUCTS !== 'undefined') {
         if (SAYAND_PRODUCTS.newArrivals) allProducts = allProducts.concat(SAYAND_PRODUCTS.newArrivals);
         if (SAYAND_PRODUCTS.trending) allProducts = allProducts.concat(SAYAND_PRODUCTS.trending);
     }
 
-    // Remove duplicates (just in case a product is in both lists)
     const uniqueProducts = [];
     const seen = new Set();
     for (const p of allProducts) {
@@ -974,18 +900,15 @@ window.handleSearch = function() {
         }
     }
 
-    // Filter products based on name, category, or description
     const filtered = uniqueProducts.filter(p => 
         p.name.toLowerCase().includes(query) || 
         (p.category && p.category.toLowerCase().includes(query)) ||
         (p.description && p.description.toLowerCase().includes(query))
     );
 
-    // Display the results
     if (filtered.length === 0) {
         resultsGrid.innerHTML = '<p class="text-gray-400 text-sm tracking-wide col-span-full">No products found matching your search.</p>';
     } else {
-        // We use the existing createProductCardHTML function to draw the cards
         resultsGrid.innerHTML = filtered.map(p => {
             const el = document.createElement('div');
             el.className = 'group cursor-pointer';
@@ -994,7 +917,8 @@ window.handleSearch = function() {
         }).join('');
     }
 };
-// ==================== INFO PAGES (Footer Links) ====================
+
+// ==================== INFO PAGES & FOOTER LOGIC ====================
 const LEGAL_PAGES = ['privacy', 'terms', 'cookie'];
 
 function getFooterPage(page) {
@@ -1005,7 +929,6 @@ function getFooterPage(page) {
 }
 
 window.openInfoPage = function(page) {
-    // Legal pages navigate to static HTML (crawlable by Google / Meta / payment processors)
     if (LEGAL_PAGES.includes(page)) {
         window.location.href = page + '.html';
         return;
@@ -1014,7 +937,6 @@ window.openInfoPage = function(page) {
     const data = getFooterPage(page);
     if (!data) return;
     
-    // Push hash for shareable links and back-button support (does NOT trigger hashchange)
     history.pushState({page: page, overlay: true}, '', '#' + page);
     
     document.getElementById('info-title').innerText = data.title;
@@ -1022,7 +944,6 @@ window.openInfoPage = function(page) {
     document.getElementById('info-page').style.transform = 'translateY(0)';
     document.body.style.overflow = 'hidden';
     
-    // Reset scroll to top
     const scrollContainer = document.querySelector('#info-page .overflow-y-auto');
     if (scrollContainer) scrollContainer.scrollTop = 0;
 };
@@ -1031,23 +952,19 @@ window.closeInfoPage = function() {
     document.getElementById('info-page').style.transform = 'translateY(100%)';
     document.body.style.overflow = '';
     
-    // Remove hash without adding a new history entry (replaceState)
     if (window.location.hash) {
         history.replaceState(null, document.title, window.location.pathname + window.location.search);
     }
 };
 
-// Handle browser Back / Forward buttons
 window.addEventListener('popstate', function(e) {
     const hash = window.location.hash.replace('#', '');
     const overlay = document.getElementById('info-page');
     
     if (!hash) {
-        // Back button pressed: close overlay if open
         overlay.style.transform = 'translateY(100%)';
         document.body.style.overflow = '';
     } else if (!LEGAL_PAGES.includes(hash)) {
-        // Forward button pressed: reopen overlay
         const data = getFooterPage(hash);
         if (data) {
             document.getElementById('info-title').innerText = data.title;
@@ -1058,11 +975,9 @@ window.addEventListener('popstate', function(e) {
     }
 });
 
-// Auto-open overlay if user visits with a hash (e.g. yoursite.com/#shipping)
 function handleHashRoute() {
     const hash = window.location.hash.replace('#', '');
     if (hash && !LEGAL_PAGES.includes(hash)) {
-        // Wait for Firebase data to be ready
         setTimeout(() => {
             const data = getFooterPage(hash);
             if (data && data.content.includes('Content loading') === false) {
@@ -1074,12 +989,12 @@ function handleHashRoute() {
         }, 600);
     }
 }
-// ==================== EMAILJS CONFIG ====================
-const EMAILJS_PUBLIC_KEY = 'YOUR_PUBLIC_KEY_HERE'; // Get from emailjs.com
-const EMAILJS_SERVICE_ID = 'YOUR_SERVICE_ID_HERE'; // e.g. 'service_abc123'
-const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID_HERE'; // e.g. 'template_welcome'
 
-// Initialize EmailJS
+// ==================== EMAILJS CONFIG ====================
+const EMAILJS_PUBLIC_KEY = 'YOUR_PUBLIC_KEY_HERE'; 
+const EMAILJS_SERVICE_ID = 'YOUR_SERVICE_ID_HERE'; 
+const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID_HERE'; 
+
 (function() {
     if (typeof emailjs !== 'undefined' && EMAILJS_PUBLIC_KEY !== 'YOUR_PUBLIC_KEY_HERE') {
         emailjs.init(EMAILJS_PUBLIC_KEY);
@@ -1109,7 +1024,6 @@ window.handleSubscribe = function(e) {
         return;
     }
     
-    // Check if already subscribed
     db.ref('subscribers').orderByChild('email').equalTo(email).once('value')
     .then((snapshot) => {
         if (snapshot.exists()) {
@@ -1145,26 +1059,22 @@ window.handleSubscribe = function(e) {
 
 // ==================== SCROLL RESET ON LOAD ====================
 (function forceTop() {
-    // Immediate
     window.scrollTo(0, 0);
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
     
-    // After a tick
     requestAnimationFrame(() => {
         window.scrollTo(0, 0);
         document.documentElement.scrollTop = 0;
         document.body.scrollTop = 0;
     });
     
-    // After layout settles
     setTimeout(() => {
         window.scrollTo(0, 0);
         document.documentElement.scrollTop = 0;
         document.body.scrollTop = 0;
     }, 0);
     
-    // Final safety after browser restore attempt
     setTimeout(() => {
         window.scrollTo(0, 0);
         document.documentElement.scrollTop = 0;
@@ -1172,7 +1082,6 @@ window.handleSubscribe = function(e) {
     }, 100);
 })();
 
-// Close any stuck overlays
 window.addEventListener('load', function() {
     const overlays = [
         { id: 'product-detail', hide: 'translateY(100%)' },
@@ -1195,3 +1104,247 @@ window.addEventListener('load', function() {
         history.replaceState(null, document.title, window.location.pathname + window.location.search);
     }
 });
+
+// ==================== SHOPPING BAG UI TOGGLES ====================
+const cartSidebar = document.getElementById('shopping-bag');
+const cartOverlay = document.getElementById('cart-overlay');
+
+function toggleCart(open) {
+    if(cartSidebar) cartSidebar.style.transform = open ? 'translateX(0)' : 'translateX(100%)';
+    if(cartOverlay) {
+        cartOverlay.classList.toggle('hidden', !open);
+        setTimeout(() => cartOverlay.classList.toggle('opacity-0', !open), 10);
+    }
+}
+
+const cartToggleBtn = document.getElementById('cart-toggle');
+if(cartToggleBtn) cartToggleBtn.addEventListener('click', (e) => { e.preventDefault(); toggleCart(true); });
+
+const closeCartBtn = document.getElementById('close-cart');
+if(closeCartBtn) closeCartBtn.addEventListener('click', () => toggleCart(false));
+
+if(cartOverlay) cartOverlay.addEventListener('click', () => toggleCart(false));
+
+// ==================== FIREBASE: ADD TO BAG ====================
+const addToBagBtn = document.getElementById('detail-add-btn');
+
+if (addToBagBtn) {
+    addToBagBtn.addEventListener('click', () => {
+        const user = firebase.auth().currentUser;
+
+        if (!user) {
+            alert("Please log in to add items to your bag.");
+            window.location.href = "login.html";
+            return;
+        }
+
+        const productName = document.getElementById('detail-name').innerText;
+        const productPriceStr = document.getElementById('detail-price').innerText;
+        const productQty = parseInt(document.getElementById('customer-qty').value) || 1;
+        const productImage = document.getElementById('detail-hero-img').src;
+
+        let size = 'OS';
+        const sizeBtns = document.querySelectorAll('#detail-sizes .size-option');
+        sizeBtns.forEach(btn => {
+            if (btn.classList.contains('selected')) {
+                size = btn.querySelector('.text-sm').innerText; 
+            }
+        });
+
+        const colorElement = document.getElementById('detail-color');
+        const color = colorElement && colorElement.innerText ? colorElement.innerText : 'Default';
+
+        const stockText = document.getElementById('detail-stock').innerText;
+        const maxStock = parseInt(stockText.replace(/[^0-9]/g, '')) || 10; 
+
+        const numericPrice = parseFloat(productPriceStr.replace(/[^0-9.]/g, ''));
+        const itemKey = `${productName}_${size}_${color}`.replace(/[^a-zA-Z0-9]/g, '_');
+        const itemRef = firebase.database().ref(`users/${user.uid}/cart/${itemKey}`);
+
+        itemRef.once('value').then((snapshot) => {
+            if (snapshot.exists()) {
+                const currentQty = snapshot.val().quantity;
+                if (currentQty + productQty > maxStock) {
+                    alert(`Sorry, only ${maxStock} in stock for this size!`);
+                    return;
+                }
+                itemRef.update({ quantity: currentQty + productQty });
+            } else {
+                if (productQty > maxStock) {
+                    alert(`Sorry, only ${maxStock} in stock for this size!`);
+                    return;
+                }
+                itemRef.set({
+                    name: productName,
+                    price: numericPrice,
+                    quantity: productQty,
+                    maxStock: maxStock, 
+                    image: productImage,
+                    size: size,
+                    color: color,
+                    addedAt: firebase.database.ServerValue.TIMESTAMP
+                });
+            }
+
+            const toast = document.getElementById('toast');
+            if (toast) {
+                toast.innerText = 'ADDED TO BAG';
+                toast.style.display = 'block'; 
+                toast.style.animation = 'fadeIn 0.3s ease-in, fadeOut 0.3s ease-out 2.7s';
+                setTimeout(() => { toast.style.display = 'none'; }, 3000);
+            }
+            toggleCart(true); 
+        });
+    });
+}
+
+// ==================== FIREBASE: FETCH & DISPLAY CART ====================
+firebase.auth().onAuthStateChanged((user) => {
+    const cartItemsContainer = document.getElementById('cart-items');
+    const cartCountBadge = document.getElementById('cart-count');
+    const cartTotalDisplay = document.getElementById('cart-total');
+
+    if (user) {
+        const cartRef = firebase.database().ref(`users/${user.uid}/cart`);
+        
+        cartRef.on('value', (snapshot) => {
+            const cartData = snapshot.val();
+            
+            if (cartData) {
+                let totalItems = 0;
+                let totalPrice = 0;
+                let html = '';
+
+                Object.keys(cartData).forEach(key => {
+                    const item = cartData[key];
+                    totalItems += item.quantity;
+                    totalPrice += (item.price * item.quantity);
+                    
+                    const safeName = item.name.replace(/'/g, "\\'");
+
+                    html += `
+                        <div class="flex relative border-b border-gray-100 pb-6 mb-6">
+                            <img src="${item.image}" alt="${item.name}" class="w-20 h-28 object-cover cursor-pointer hover:opacity-80 transition-opacity" onclick="goToProduct('${safeName}')">
+                            
+                            <div class="flex-1 ml-4 flex flex-col justify-between">
+                                <div>
+                                    <h4 class="text-xs tracking-[0.1em] font-bold uppercase cursor-pointer hover:text-gray-500 transition-colors w-11/12" onclick="goToProduct('${safeName}')">${item.name}</h4>
+                                    <p class="text-[10px] text-gray-500 mt-1 uppercase">SIZE: ${item.size} | COLOR: ${item.color}</p>
+                                    
+                                    <div class="inline-flex items-center mt-3 border border-gray-300 bg-transparent text-gray-600">
+                                        <button onclick="updateCartQty('${key}', -1)" class="w-8 h-8 flex items-center justify-center hover:bg-gray-100 transition-colors">-</button>
+                                        <span class="w-8 h-8 flex items-center justify-center text-xs font-medium border-x border-gray-300">${item.quantity}</span>
+                                        <button onclick="updateCartQty('${key}', 1)" class="w-8 h-8 flex items-center justify-center hover:bg-gray-100 transition-colors">+</button>
+                                    </div>
+                                </div>
+                                
+                                <p class="text-xs font-bold mt-3">$${(item.price * item.quantity).toFixed(2)} USD</p>
+                            </div>
+                            
+                            <button onclick="removeFromBag('${key}')" class="absolute top-0 right-0 text-gray-400 hover:text-black text-xl leading-none">&times;</button>
+                        </div>
+                    `;
+                });
+
+                if(cartItemsContainer) cartItemsContainer.innerHTML = html;
+                if(cartCountBadge) { cartCountBadge.textContent = totalItems; cartCountBadge.classList.remove('hidden'); }
+                if(cartTotalDisplay) cartTotalDisplay.textContent = `$${totalPrice.toFixed(2)} USD`;
+
+            } else {
+                if(cartItemsContainer) cartItemsContainer.innerHTML = '<p class="text-xs text-gray-500 text-center mt-10">Your bag is currently empty.</p>';
+                if(cartCountBadge) cartCountBadge.classList.add('hidden');
+                if(cartTotalDisplay) cartTotalDisplay.textContent = '$0.00 USD';
+            }
+        });
+    } else {
+        if(cartItemsContainer) cartItemsContainer.innerHTML = '<p class="text-xs text-gray-500 text-center mt-10">Please sign in to view your bag.</p>';
+        if(cartCountBadge) cartCountBadge.classList.add('hidden');
+        if(cartTotalDisplay) cartTotalDisplay.textContent = '$0.00 USD';
+    }
+});
+
+// ==================== FIREBASE: CART HELPERS ====================
+window.updateCartQty = function(itemKey, change) {
+    const user = firebase.auth().currentUser;
+    if (user) {
+        const itemRef = firebase.database().ref(`users/${user.uid}/cart/${itemKey}`);
+        itemRef.once('value').then(snapshot => {
+            if(snapshot.exists()) {
+                const itemData = snapshot.val();
+                let newQty = itemData.quantity + change;
+                
+                if (newQty < 1) { return; }
+
+                if (newQty > itemData.maxStock) {
+                    alert(`Sorry, only ${itemData.maxStock} in stock!`);
+                    return;
+                }
+
+                itemRef.update({ quantity: newQty }); 
+            }
+        });
+    }
+};
+
+window.removeFromBag = function(itemKey) {
+    const user = firebase.auth().currentUser;
+    if (user) {
+        firebase.database().ref(`users/${user.uid}/cart/${itemKey}`).remove();
+    }
+};
+
+window.goToProduct = function(productName) {
+    toggleCart(false); 
+    
+    let foundProduct = null;
+    let allProducts = [];
+    
+    if (typeof SAYAND_PRODUCTS !== 'undefined') {
+        if (SAYAND_PRODUCTS.newArrivals) allProducts = allProducts.concat(SAYAND_PRODUCTS.newArrivals);
+        if (SAYAND_PRODUCTS.trending) allProducts = allProducts.concat(SAYAND_PRODUCTS.trending);
+        if (SAYAND_PRODUCTS.sales) allProducts = allProducts.concat(SAYAND_PRODUCTS.sales);
+    }
+    
+    foundProduct = allProducts.find(p => p.name === productName);
+    
+    if (foundProduct) {
+        const encoded = encodeURIComponent(JSON.stringify(foundProduct));
+        openProductDetail(encoded);
+    } else {
+        alert("Sorry, we couldn't load the details for this product.");
+    }
+};
+
+// ==================== WHATSAPP CHECKOUT ====================
+const whatsappBtn = document.getElementById('whatsapp-checkout-btn');
+if(whatsappBtn) {
+    whatsappBtn.addEventListener('click', () => {
+        const user = firebase.auth().currentUser;
+        if (!user) {
+            alert("Please sign in to proceed to checkout.");
+            return;
+        }
+
+        firebase.database().ref(`users/${user.uid}/cart`).once('value').then(snapshot => {
+            const cartData = snapshot.val();
+            if (!cartData) {
+                alert("Your bag is empty!");
+                return;
+            }
+
+            let orderMessage = "Hi! I'd like to order the following from SAYAND:\n\n";
+            let total = 0;
+
+            Object.values(cartData).forEach(item => { 
+                orderMessage += `- ${item.quantity}x ${item.name} ($${(item.price * item.quantity).toFixed(2)})\n  Size: ${item.size}\n  Color: ${item.color}\n\n`; 
+                total += (item.price * item.quantity);
+            });
+
+            orderMessage += `Total: $${total.toFixed(2)} USD\n\nPlease let me know how to pay!`;
+            
+            const waNum = CONTACT.whatsapp ? CONTACT.whatsapp.replace(/\+/g, '') : '393299716798';
+            const whatsappUrl = `https://wa.me/${waNum}?text=${encodeURIComponent(orderMessage)}`;
+            window.open(whatsappUrl, '_blank');
+        });
+    });
+}

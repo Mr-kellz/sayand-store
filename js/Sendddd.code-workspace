@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		},
+		{
+			"path": "../../../Documents/GCI-CONNECT"
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "Sendddd"
+	}
+}

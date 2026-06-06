@@ -26,7 +26,12 @@
                         <a href="#" onclick="openCollection('men','MEN');return false;" class="hover:text-gray-500 transition-colors duration-300">MEN</a>
                         <a href="#" onclick="openCollection('accessories','ACCESSORIES');return false;" class="hover:text-gray-500 transition-colors duration-300">ACCESSORIES</a>
                         <a href="#" onclick="openSalesPage();return false;" class="text-red-600 hover:text-red-400 transition-colors duration-300">SALE</a>
-                        <a href="login.html" class="nav-account-link hover:text-gray-500 transition-colors duration-300">LOG IN</a>
+                          <a href="login.html" id="desktop-account-link" class="hidden md:flex items-center justify-center hover:opacity-70 transition-opacity">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+    </a>
                     </div>
                 </div>
                 <div class="absolute left-1/2 transform -translate-x-1/2 z-50 pointer-events-none">
@@ -59,7 +64,7 @@
         <a href="#" onclick="openCollection('men','MEN');toggleMenu();return false;" class="text-3xl font-bold tracking-tighter hover:text-gray-500 transition-colors">MEN</a>
         <a href="#" onclick="openCollection('accessories','ACCESSORIES');toggleMenu();return false;" class="text-3xl font-bold tracking-tighter hover:text-gray-500 transition-colors">ACCESSORIES</a>
         <a href="#" onclick="openSalesPage();toggleMenu();return false;" class="text-3xl font-bold tracking-tighter text-red-600 hover:text-red-400 transition-colors">SALE</a>
-        <a href="login.html" class="nav-account-link text-3xl font-bold tracking-tighter hover:text-gray-500 transition-colors">LOG IN</a>
+        <a href="login.html" id="mobile-account-link" class="text-3xl font-bold tracking-tighter hover:text-gray-500 transition-colors">LOG IN</a>
     </div>
 
     <div id="product-detail" class="fixed inset-0 bg-black z-[80] transform translate-y-full transition-transform duration-500 overflow-hidden">
@@ -469,23 +474,27 @@
     <script src="js/main.js"></script>
 
     <script>
-        // Once the page loads, check if the user is already logged in
-        firebase.auth().onAuthStateChanged((user) => {
-            const accountLinks = document.querySelectorAll('.nav-account-link');
-            
-            accountLinks.forEach(link => {
-                if (user) {
-                    // They are logged in
-                    link.textContent = "DASHBOARD";
-                    link.href = "dashboard.html";
-                } else {
-                    // They are NOT logged in
-                    link.textContent = "LOG IN";
-                    link.href = "login.html";
-                }
-            });
-        });
-    </script>
+    firebase.auth().onAuthStateChanged((user) => {
+        const desktopLink = document.getElementById('desktop-account-link');
+        const mobileLink = document.getElementById('mobile-account-link');
+        
+        if (user) {
+            // User is logged in: Point icons to Dashboard
+            if(desktopLink) desktopLink.href = "dashboard.html";
+            if(mobileLink) { 
+                mobileLink.href = "dashboard.html"; 
+                mobileLink.textContent = "ACCOUNT"; 
+            }
+        } else {
+            // User is logged out: Point icons to Login
+            if(desktopLink) desktopLink.href = "login.html";
+            if(mobileLink) { 
+                mobileLink.href = "login.html"; 
+                mobileLink.textContent = "LOG IN"; 
+            }
+        }
+    });
+</script>
 
 </body>
 </html>

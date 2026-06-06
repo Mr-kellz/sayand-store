@@ -53,16 +53,32 @@ form.addEventListener('submit', (e) => {
     const email = emailInput.value;
     const password = passwordInput.value;
 
+    // Helper function to translate ugly Firebase errors into clean English
+    const handleError = (error) => {
+        let cleanMessage = "An error occurred. Please try again.";
+        if (error.code === 'auth/email-already-in-use') {
+            cleanMessage = "This email is already registered. Please sign in instead.";
+        } else if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
+            cleanMessage = "Incorrect email or password.";
+        } else if (error.code === 'auth/weak-password') {
+            cleanMessage = "Password must be at least 6 characters long.";
+        } else if (error.code === 'auth/invalid-email') {
+            cleanMessage = "Please enter a valid email address.";
+        }
+        errorMessage.textContent = cleanMessage;
+    };
+
     if (isLoginMode) {
         signInWithEmailAndPassword(auth, email, password)
             .then(() => window.location.href = "dashboard.html")
-            .catch((error) => errorMessage.textContent = error.message.replace("Firebase:", ""));
+            .catch(handleError);
     } else {
         createUserWithEmailAndPassword(auth, email, password)
             .then(() => window.location.href = "dashboard.html")
-            .catch((error) => errorMessage.textContent = error.message.replace("Firebase:", ""));
+            .catch(handleError);
     }
 });
+
 
 // Handle Google Login
 document.getElementById('google-login').addEventListener('click', () => {
@@ -71,9 +87,22 @@ document.getElementById('google-login').addEventListener('click', () => {
         .catch((error) => errorMessage.textContent = error.message.replace("Firebase:", ""));
 });
 
-// Handle Apple Login
-document.getElementById('apple-login').addEventListener('click', () => {
-    signInWithPopup(auth, appleProvider)
-        .then(() => window.location.href = "dashboard.html")
-        .catch((error) => errorMessage.textContent = error.message.replace("Firebase:", ""));
+// Handle Apple Login (Coming Soon Feature)
+document.getElementById('apple-login').addEventListener('click', (e) => {
+    e.preventDefault(); // Stops the broken Firebase popup from opening
+    
+    const appleBtn = document.getElementById('apple-login');
+    const errorMessage = document.getElementById('error-message');
+    
+    // Change the button aesthetic to look disabled
+    appleBtn.innerHTML = `
+        <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" alt="Apple" style="opacity: 0.4;">
+        <span style="color: #999;">COMING SOON</span>
+    `;
+    appleBtn.style.borderColor = "#eee";
+    appleBtn.style.cursor = "not-allowed";
+    appleBtn.style.backgroundColor = "#fafafa";
+    
+    // Clear any red errors that might be on the screen
+    errorMessage.textContent = ""; 
 });

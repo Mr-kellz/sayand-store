@@ -11,7 +11,7 @@
         /* Sidebar Navigation */
         .sidebar { width: 250px; background: #fff; padding: 40px 30px; box-shadow: 2px 0 5px rgba(0,0,0,0.02); display: flex; flex-direction: column; }
         .sidebar h1 { font-weight: 800; letter-spacing: -1px; margin: 0 0 50px 0; font-size: 24px; }
-        .nav-link { color: #666; text-decoration: none; font-size: 14px; font-weight: 600; margin-bottom: 20px; letter-spacing: 0.05em; transition: color 0.2s; }
+        .nav-link { color: #666; text-decoration: none; font-size: 14px; font-weight: 600; margin-bottom: 20px; letter-spacing: 0.05em; transition: color 0.2s; cursor: pointer; }
         .nav-link:hover, .nav-link.active { color: #000; }
         .spacer { flex-grow: 1; }
         #sign-out-btn { background: none; border: none; color: #dc2626; text-align: left; padding: 0; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; cursor: pointer; letter-spacing: 0.05em; }
@@ -22,21 +22,26 @@
         .header h2 { margin: 0; font-size: 28px; font-weight: 600; letter-spacing: -0.5px; }
         .user-email { color: #666; font-size: 14px; margin-top: 10px; }
         
-        /* Dashboard Cards */
+        /* Dashboard Sections */
+        .dashboard-section { display: none; animation: fadeIn 0.3s ease-in; }
+        .dashboard-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Cards */
         .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; }
         .card { background: #fff; padding: 30px; border: 1px solid #eee; }
         .card h3 { margin: 0 0 15px 0; font-size: 16px; }
         .card p { color: #666; font-size: 14px; line-height: 1.6; margin: 0; }
-        .action-btn { display: inline-block; margin-top: 20px; padding: 10px 20px; background: #000; color: #fff; text-decoration: none; font-size: 11px; font-weight: 600; letter-spacing: 0.1em; }
+        .action-btn { display: inline-block; margin-top: 20px; padding: 10px 20px; background: #000; color: #fff; text-decoration: none; font-size: 11px; font-weight: 600; letter-spacing: 0.1em; border: none; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
         <h1>SAYAND</h1>
-        <a href="#" class="nav-link active">Overview</a>
-        <a href="#" class="nav-link">Order History</a>
-        <a href="#" class="nav-link">Settings</a>
+        <a class="nav-link active" data-tab="overview">Overview</a>
+        <a class="nav-link" data-tab="orders">Order History</a>
+        <a class="nav-link" data-tab="settings">Settings</a>
         <a href="index.html" class="nav-link">Back to Store</a>
         
         <div class="spacer"></div>
@@ -45,23 +50,42 @@
 
     <div class="main-content">
         <div class="header">
-            <h2>My Account</h2>
+            <h2 id="page-title">My Account</h2>
             <div class="user-email" id="display-email">Loading...</div>
         </div>
 
-        <div class="card-grid">
+        <div id="section-overview" class="dashboard-section active">
+            <div class="card-grid">
+                <div class="card">
+                    <h3>Recent Activity</h3>
+                    <p>Welcome to your SAYAND account. Access your orders, manage your preferences, and speed up checkout.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="section-orders" class="dashboard-section">
             <div class="card">
-                <h3>Recent Orders</h3>
+                <h3>Your Orders</h3>
                 <p>You haven't placed any orders yet. Discover our latest premium drops.</p>
                 <a href="index.html" class="action-btn">SHOP NOW</a>
             </div>
-            
-            <div class="card">
-                <h3>Profile Details</h3>
-                <p>Manage your shipping addresses and payment methods for a faster checkout.</p>
-                <a href="#" class="action-btn">EDIT PROFILE</a>
+        </div>
+
+        <div id="section-settings" class="dashboard-section">
+            <div class="card-grid">
+                <div class="card">
+                    <h3>Profile Details</h3>
+                    <p>Manage your account email and password credentials securely.</p>
+                    <button class="action-btn">UPDATE PROFILE</button>
+                </div>
+                <div class="card">
+                    <h3>Shipping Addresses</h3>
+                    <p>Save your delivery locations for a frictionless checkout experience.</p>
+                    <button class="action-btn">ADD ADDRESS</button>
+                </div>
             </div>
         </div>
+
     </div>
 
     <script type="module" src="dashboard.js"></script>
