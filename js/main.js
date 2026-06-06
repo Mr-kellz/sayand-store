@@ -1293,21 +1293,29 @@ window.removeFromBag = function(itemKey) {
     }
 };
 
+// Handle clicking an item in the bag to view the REAL product page
 window.goToProduct = function(productName) {
-    toggleCart(false); 
+    toggleCart(false); // Close the bag
     
     let foundProduct = null;
-    let allProducts = [];
     
     if (typeof SAYAND_PRODUCTS !== 'undefined') {
-        if (SAYAND_PRODUCTS.newArrivals) allProducts = allProducts.concat(SAYAND_PRODUCTS.newArrivals);
-        if (SAYAND_PRODUCTS.trending) allProducts = allProducts.concat(SAYAND_PRODUCTS.trending);
-        if (SAYAND_PRODUCTS.sales) allProducts = allProducts.concat(SAYAND_PRODUCTS.sales);
+        // Dynamically search EVERY category array in your database
+        // (New Arrivals, Trending, Sales, Men, Women, Accessories, etc.)
+        for (const key in SAYAND_PRODUCTS) {
+            if (Array.isArray(SAYAND_PRODUCTS[key])) {
+                // Ignore uppercase/lowercase differences just to be safe
+                const match = SAYAND_PRODUCTS[key].find(p => p.name && p.name.toLowerCase() === productName.toLowerCase());
+                if (match) {
+                    foundProduct = match;
+                    break; // Stop searching once we find it!
+                }
+            }
+        }
     }
     
-    foundProduct = allProducts.find(p => p.name === productName);
-    
     if (foundProduct) {
+        // We found it! Send it to the main Detail rendering function
         const encoded = encodeURIComponent(JSON.stringify(foundProduct));
         openProductDetail(encoded);
     } else {
