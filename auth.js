@@ -4,11 +4,13 @@ import {
     createUserWithEmailAndPassword, 
     signInWithEmailAndPassword,
     updateProfile,
+    sendEmailVerification,
+    sendPasswordResetEmail,
     GoogleAuthProvider,
     OAuthProvider,
     signInWithPopup 
 } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+import { getDatabase, ref, set, update } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyD00XzBiIM2OQQQVmygspFIWxjExDwkldk",
@@ -45,10 +47,12 @@ toggleMode.addEventListener('click', () => {
         authButton.textContent = "SIGN IN";
         toggleMode.textContent = "Need an account? Sign up here.";
         nameFields.classList.add('hidden');
+        document.getElementById('forgot-password').style.display = 'block';
     } else {
         authButton.textContent = "CREATE ACCOUNT";
         toggleMode.textContent = "Already have an account? Sign in here.";
         nameFields.classList.remove('hidden');
+        document.getElementById('forgot-password').style.display = 'none';
     }
     errorMessage.textContent = ""; 
 });
@@ -68,13 +72,29 @@ form.addEventListener('submit', (e) => {
             cleanMessage = "Password must be at least 6 characters long.";
         } else if (error.code === 'auth/invalid-email') {
             cleanMessage = "Please enter a valid email address.";
+        } else if (error.code === 'auth/too-many-requests') {
+            cleanMessage = "Too many attempts. Please try again later.";
         }
         errorMessage.textContent = cleanMessage;
     };
 
     if (isLoginMode) {
         signInWithEmailAndPassword(auth, email, password)
-            .then(() => window.location.href = "dashboard.html")
+            .then((userCredential) => {
+                const user = userCredential.user;
+                if (!user.emailVerified) {
+                    errorMessage.innerHTML = 'Please verify your email before signing in. <a href="#" id="resend-link" style="text-decoration:underline;color:#666;">Resend email</a>';
+                    document.getElementById('resend-link').addEventListener('click', (ev) => {
+                        ev.preventDefault();
+                        sendEmailVerification(user).then(() => {
+                            errorMessage.textContent = "Verification email resent. Check your inbox.";
+                        });
+                    });
+                    firebase.auth().signOut();
+                    return;
+                }
+                window.location.href = "dashboard.html";
+            })
             .catch(handleError);
     } else {
         const firstName = firstNameInput.value.trim();
@@ -88,18 +108,46 @@ form.addEventListener('submit', (e) => {
                 const user = userCredential.user;
                 const fullName = `${firstName} ${lastName}`;
                 return updateProfile(user, { displayName: fullName }).then(() => {
-                    return set(ref(db, 'users/' + user.uid), {
-                        firstName: firstName,
-                        lastName: lastName,
-                        fullName: fullName,
-                        email: email,
-                        createdAt: new Date().toISOString()
+                    return sendEmailVerification(user).then(() => {
+                        return set(ref(db, 'users/' + user.uid), {
+                            firstName: firstName,
+                            lastName: lastName,
+                            fullName: fullName,
+                            email: email,
+                            emailVerified: false,
+                            createdAt: new Date().toISOString()
+                        });
                     });
+                }).then(() => {
+                    errorMessage.style.color = "#16a34a";
+                    errorMessage.textContent = "Account created! Please check your email to verify before signing in.";
+                    isLoginMode = true;
+                    authButton.textContent = "SIGN IN";
+                    toggleMode.textContent = "Need an account? Sign up here.";
+                    nameFields.classList.add('hidden');
+                    document.getElementById('forgot-password').style.display = 'block';
                 });
             })
-            .then(() => window.location.href = "dashboard.html")
             .catch(handleError);
     }
+});
+
+// Forgot Password
+document.getElementById('forgot-password').addEventListener('click', (e) => {
+    e.preventDefault();
+    const email = emailInput.value.trim();
+    if (!email) {
+        errorMessage.textContent = "Please enter your email address first, then click Forgot Password.";
+        return;
+    }
+    sendPasswordResetEmail(auth, email)
+        .then(() => {
+            errorMessage.style.color = "#16a34a";
+            errorMessage.textContent = "Password reset email sent. Check your inbox.";
+        })
+        .catch((err) => {
+            errorMessage.textContent = err.message.replace("Firebase:", "");
+        });
 });
 
 document.getElementById('google-login').addEventListener('click', () => {
@@ -116,6 +164,7 @@ document.getElementById('google-login').addEventListener('click', () => {
                     lastName: lastName,
                     fullName: name,
                     email: user.email,
+                    emailVerified: true,
                     lastLogin: new Date().toISOString()
                 }).catch(() => {});
             }

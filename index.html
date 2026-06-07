@@ -508,5 +508,58 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 </script>
+<script>
+// ===== NEWSLETTER SUBSCRIBE =====
+function handleSubscribe(e) {
+    e.preventDefault();
+    const emailInput = document.getElementById('subscribe-email');
+    const email = emailInput.value.trim().toLowerCase();
+    
+    if (!email || !email.includes('@')) {
+        showToast('Please enter a valid email address');
+        return;
+    }
+
+    // Save to Firebase
+    const subRef = firebase.database().ref('subscribers').push();
+    subRef.set({
+        email: email,
+        date: new Date().toISOString(),
+        source: 'homepage'
+    }).then(() => {
+        // Send welcome email via EmailJS (fill in your credentials below)
+        if (typeof emailjs !== 'undefined') {
+            emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
+                to_email: email,
+                brand_name: "SAYAND"
+            }).catch(() => {}); // Fail silently if EmailJS isn't configured yet
+        }
+        
+        showToast('THANK YOU FOR SUBSCRIBING');
+        emailInput.value = '';
+    }).catch((err) => {
+        console.error('Subscribe error:', err);
+        showToast('Error saving subscription. Please try again.');
+    });
+}
+
+// Simple toast helper if not already defined
+function showToast(msg) {
+    let toast = document.getElementById('toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'toast';
+        toast.className = 'fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-black text-white px-6 py-3 text-xs tracking-[0.2em] font-bold z-[100] transition-all duration-300 opacity-0 pointer-events-none';
+        document.body.appendChild(toast);
+    }
+    toast.textContent = msg;
+    toast.style.opacity = '1';
+    toast.style.transform = 'translate(-50%, 0)';
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translate(-50%, 20px)';
+    }, 3000);
+}
+</script>
 </body>
 </html>
