@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAYAND | Account Action</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+        body { font-family: 'Inter', sans-serif; background: #f5f5f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
+        .box { background: #fff; padding: 40px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        h1 { font-weight: 800; letter-spacing: -1px; margin: 0 0 10px 0; font-size: 24px; }
+        p { color: #666; font-size: 14px; line-height: 1.6; margin: 20px 0; }
+        input { width: 100%; padding: 15px; margin-bottom: 15px; border: 1px solid #ddd; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        button { width: 100%; padding: 15px; background: #000; color: #fff; border: none; font-weight: 600; letter-spacing: 0.1em; cursor: pointer; }
+        button:hover { background: #333; }
+        .error { color: #dc2626; font-size: 12px; margin-top: 10px; }
+        .success { color: #16a34a; font-size: 12px; margin-top: 10px; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="box">
+        <h1>SAYAND</h1>
+        <div id="loading"><p>Loading...</p></div>
+        
+        <div id="reset-section" class="hidden">
+            <p>Enter your new password below.</p>
+            <input type="password" id="new-password" placeholder="New password (min 6 characters)">
+            <button onclick="handleReset()">RESET PASSWORD</button>
+            <div id="reset-msg"></div>
+        </div>
+        
+        <div id="verify-section" class="hidden">
+            <p>Verifying your email address...</p>
+        </div>
+        
+        <div id="success-section" class="hidden">
+            <p id="success-text">Your password has been reset. You can now sign in.</p>
+            <button onclick="window.location.href='login.html'">GO TO SIGN IN</button>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="js/firebase-config.js"></script>
+
+    <script>
+    const url = new URL(window.location.href);
+    const mode = url.searchParams.get('mode');
+    const oobCode = url.searchParams.get('oobCode');
+    const apiKey = url.searchParams.get('apiKey');
+
+    const loading = document.getElementById('loading');
+    const resetSection = document.getElementById('reset-section');
+    const verifySection = document.getElementById('verify-section');
+    const successSection = document.getElementById('success-section');
+
+    if (!oobCode) {
+        loading.innerHTML = '<p class="error">Invalid or expired link.</p>';
+    } else if (mode === 'resetPassword') {
+        loading.classList.add('hidden');
+        resetSection.classList.remove('hidden');
+    } else if (mode === 'verifyEmail') {
+        loading.classList.add('hidden');
+        verifySection.classList.remove('hidden');
+        firebase.auth().applyActionCode(oobCode).then(() => {
+            verifySection.innerHTML = '<p class="success">Your email has been verified!</p><button onclick="window.location.href=\'login.html\'" style="margin-top:20px;">GO TO SIGN IN</button>';
+        }).catch(() => {
+            verifySection.innerHTML = '<p class="error">Invalid or expired verification link.</p>';
+        });
+    } else {
+        loading.innerHTML = '<p class="error">Unknown action.</p>';
+    }
+
+    function handleReset() {
+        const pw = document.getElementById('new-password').value;
+        const msg = document.getElementById('reset-msg');
+        if (pw.length < 6) {
+            msg.className = 'error';
+            msg.textContent = 'Password must be at least 6 characters.';
+            return;
+        }
+        firebase.auth().confirmPasswordReset(oobCode, pw).then(() => {
+            resetSection.classList.add('hidden');
+            successSection.classList.remove('hidden');
+        }).catch((err) => {
+            msg.className = 'error';
+            msg.textContent = err.message;
+        });
+    }
+    </script>
+</body>
+</html>
