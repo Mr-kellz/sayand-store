@@ -293,7 +293,9 @@
     <main class="pt-20 min-h-screen">
         <div class="px-4 sm:px-6 lg:px-8 xl:px-12 py-8 md:py-12">
             <h1 id="collection-page-title" class="text-4xl md:text-6xl font-black tracking-tighter mb-8">COLLECTION</h1>
-            <div id="collection-page-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8"></div>
+            <div id="collection-page-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
+                <div class="col-span-full text-center py-12 text-gray-400 text-sm tracking-wide">Loading products...</div>
+            </div>
         </div>
     </main>
 
@@ -372,17 +374,17 @@
         </div>
     </div>
 
-    <!-- INFO PAGE -->
-    <div id="info-page" class="fixed inset-0 bg-white z-[85] transform translate-y-full transition-transform duration-500 overflow-hidden flex flex-col">
-        <div class="flex justify-between items-center p-6 md:p-8 border-b border-gray-100 sticky top-0 bg-white z-10">
-            <h3 id="info-title" class="text-2xl md:text-4xl font-black tracking-tighter">TITLE</h3>
-            <button onclick="closeInfoPage()" class="text-4xl leading-none text-gray-400 hover:text-black transition-colors">&times;</button>
-        </div>
-        <div class="p-6 md:p-12 overflow-y-auto flex-1 hide-scrollbar max-w-4xl mx-auto w-full">
-            <div id="info-content" class="text-sm md:text-base text-gray-600 leading-relaxed space-y-6">
-            </div>
+   <!-- INFO PAGE -->
+<div id="info-page" class="fixed inset-0 bg-white z-[110] transform translate-y-full transition-transform duration-500 overflow-hidden flex flex-col">
+    <div class="flex justify-between items-center p-6 md:p-8 border-b border-gray-100 sticky top-0 bg-white z-10" style="padding-top: 5rem;">
+        <h3 id="info-title" class="text-2xl md:text-4xl font-black tracking-tighter">TITLE</h3>
+        <button onclick="closeInfoPage()" class="text-4xl leading-none text-gray-400 hover:text-black transition-colors">&times;</button>
+    </div>
+    <div class="p-6 md:p-12 overflow-y-auto flex-1 hide-scrollbar max-w-4xl mx-auto w-full" style="padding-top: 1.5rem;">
+        <div id="info-content" class="text-sm md:text-base text-gray-600 leading-relaxed space-y-6">
         </div>
     </div>
+</div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -392,7 +394,7 @@
     <script src="js/main.js"></script>
 
     <script>
-    // Collection page loader: reads ?category= from URL and renders products into the main page grid
+    // ===== COLLECTION PAGE SELF-LOADER =====
     (function() {
         const params = new URLSearchParams(window.location.search);
         const category = params.get('category');
@@ -402,70 +404,106 @@
         const titleEl = document.getElementById('collection-page-title');
         if (titleEl) titleEl.textContent = titles[category] || category.toUpperCase();
 
-        function renderToPage(items) {
-            const grid = document.getElementById('collection-page-grid');
-            if (!grid) return;
-            if (!items || items.length === 0) {
-                grid.innerHTML = '<p class="col-span-full text-center text-gray-400 py-12 text-sm tracking-wide">No products found in this collection.</p>';
+        const grid = document.getElementById('collection-page-grid');
+        if (!grid) return;
+
+        function getAllProducts(data) {
+            if (!data) return [];
+            const all = [];
+            // Products are in newArrivals and trending arrays
+            if (Array.isArray(data.newArrivals)) all.push(...data.newArrivals);
+            if (Array.isArray(data.trending)) all.push(...data.trending);
+            if (Array.isArray(data.sales)) all.push(...data.sales);
+            // Remove duplicates by name
+            const seen = new Set();
+            return all.filter(p => {
+                if (!p || !p.name || seen.has(p.name)) return false;
+                seen.add(p.name);
+                return true;
+            });
+        }
+
+        function render(items) {
+            const filtered = items.filter(p => {
+                const cat = (p.category || '').toLowerCase().trim();
+                return cat === category.toLowerCase().trim();
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '<div class="col-span-full text-center py-12 text-gray-400 text-sm tracking-wide">No products found in this collection.</div>';
                 return;
             }
 
-            grid.innerHTML = items.map(item => {
-                const isSale = item.salePrice && parseFloat(item.salePrice) < parseFloat(item.price);
+            grid.innerHTML = filtered.map(p => {
+                const isSale = p.salePrice && parseFloat(p.salePrice) < parseFloat(p.price);
                 const priceDisplay = isSale 
-                    ? `<span class="text-xs text-gray-400 line-through mr-2">$${item.price}</span><span class="text-xs font-medium text-red-600">$${item.salePrice}</span>`
-                    : `<span class="text-xs font-medium">$${item.price}</span>`;
+                    ? `<span class="text-xs text-gray-400 line-through mr-2">$${p.price}</span><span class="text-xs font-medium text-red-600">$${p.salePrice}</span>`
+                    : `<span class="text-xs font-medium">$${p.price}</span>`;
                 const saleBadge = isSale ? '<span class="absolute top-2 left-2 bg-red-600 text-white text-[10px] tracking-wider px-2 py-1 font-bold">SALE</span>' : '';
-                const img = item.image || (item.images && item.images[0]) || '';
+                const img = p.images ? p.images[0] : (p.img || '');
+                const safeName = encodeURIComponent(p.name);
 
                 return `
-                <div class="group cursor-pointer" onclick="openProductDetail('${item.id}')">
-                    <div class="aspect-[3/4] overflow-hidden bg-gray-100 mb-3 relative">
-                        <img src="${img}" alt="${item.name}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                <div class="group cursor-pointer">
+                    <div class="aspect-[3/4] overflow-hidden bg-gray-100 mb-3 relative" onclick="window.location.href='product.html?item=${safeName}'">
+                        <img src="${img}" alt="${p.name}" loading="lazy" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
                         ${saleBadge}
                     </div>
-                    <h3 class="text-xs font-medium tracking-wide uppercase mb-1 truncate">${item.name}</h3>
+                    <h3 class="text-xs font-medium tracking-wide uppercase mb-1 truncate cursor-pointer hover:text-gray-500" onclick="window.location.href='product.html?item=${safeName}'">${p.name}</h3>
                     <div class="flex items-center">${priceDisplay}</div>
                 </div>
                 `;
             }).join('');
         }
 
-        // Try to use main.js data if already loaded
-        function tryMainJs() {
-            if (typeof window.products !== 'undefined' && window.products.length > 0) {
-                const filtered = window.products.filter(p => p.category && p.category.toLowerCase() === category.toLowerCase());
-                renderToPage(filtered);
-                return true;
+        function tryRender() {
+            if (typeof SAYAND_PRODUCTS !== 'undefined' && SAYAND_PRODUCTS) {
+                const all = getAllProducts(SAYAND_PRODUCTS);
+                if (all.length > 0) {
+                    render(all);
+                    return true;
+                }
             }
             return false;
         }
 
-        // If main.js hasn't loaded yet, wait for it
-        if (!tryMainJs()) {
-            let attempts = 0;
-            const interval = setInterval(() => {
-                attempts++;
-                if (tryMainJs() || attempts > 50) { // 5 seconds max
-                    clearInterval(interval);
-                    if (attempts > 50 && (!window.products || window.products.length === 0)) {
-                        // Fallback: fetch directly from Firebase
-                        if (typeof firebase !== 'undefined' && firebase.database) {
-                            firebase.database().ref('products').once('value').then(snap => {
-                                const data = snap.val();
-                                if (data) {
-                                    window.products = Object.values(data);
-                                    const filtered = window.products.filter(p => p.category && p.category.toLowerCase() === category.toLowerCase());
-                                    renderToPage(filtered);
-                                }
-                            }).catch(() => {
-                                document.getElementById('collection-page-grid').innerHTML = 
-                                    '<p class="col-span-full text-center text-gray-400 py-12 text-sm tracking-wide">Unable to load products.</p>';
-                            });
-                        }
+        // 1. Try immediately
+        if (tryRender()) return;
+
+        // 2. Wait for main.js to load data
+        let attempts = 0;
+        const wait = setInterval(() => {
+            attempts++;
+            if (tryRender() || attempts > 30) {
+                clearInterval(wait);
+                if (attempts > 30) tryFirebase();
+            }
+        }, 100);
+
+        // 3. Direct Firebase fallback
+        function tryFirebase() {
+            if (typeof firebase === 'undefined' || !firebase.database) {
+                grid.innerHTML = '<div class="col-span-full text-center py-12 text-gray-400 text-sm tracking-wide">Unable to connect to database.</div>';
+                return;
+            }
+
+            firebase.database().ref('mainStore').once('value').then(snap => {
+                const data = snap.val();
+                if (data) {
+                    window.SAYAND_PRODUCTS = data; // Store for other functions
+                    const all = getAllProducts(data);
+                    if (all.length > 0) {
+                        render(all);
+                    } else {
+                        grid.innerHTML = '<div class="col-span-full text-center py-12 text-gray-400 text-sm tracking-wide">No products in database.</div>';
                     }
+                } else {
+                    grid.innerHTML = '<div class="col-span-full text-center py-12 text-gray-400 text-sm tracking-wide">Database is empty.</div>';
                 }
-            }, 100);
+            }).catch(err => {
+                console.error('Collection load error:', err);
+                grid.innerHTML = '<div class="col-span-full text-center py-12 text-gray-400 text-sm tracking-wide">Error loading products.</div>';
+            });
         }
     })();
 

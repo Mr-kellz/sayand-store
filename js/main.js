@@ -1267,62 +1267,59 @@ firebase.auth().onAuthStateChanged((user) => {
 });
 
 // ==================== FIREBASE: CART HELPERS ====================
-window.updateCartQty = function(itemKey, change) {
-    const user = firebase.auth().currentUser;
-    if (user) {
-        const itemRef = firebase.database().ref(`users/${user.uid}/cart/${itemKey}`);
-        itemRef.once('value').then(snapshot => {
-            if(snapshot.exists()) {
-                const itemData = snapshot.val();
-                let newQty = itemData.quantity + change;
-                
-                if (newQty < 1) { return; }
-
-                if (newQty > itemData.maxStock) {
-                    alert(`Sorry, only ${itemData.maxStock} in stock!`);
-                    return;
-                }
-
-                itemRef.update({ quantity: newQty }); 
-            }
-        });
-    }
-};
-
-window.removeFromBag = function(itemKey) {
-    const user = firebase.auth().currentUser;
-    if (user) {
-        firebase.database().ref(`users/${user.uid}/cart/${itemKey}`).remove();
-    }
-};
-
 // Handle clicking an item in the bag to view the REAL product page
 window.goToProduct = function(productName) {
-    toggleCart(false); // Close the bag
+    toggleCart(false);
+    
+    console.log('goToProduct called with:', productName);
     
     let foundProduct = null;
+    const searchName = productName.toString().trim();
+    const searchNameLower = searchName.toLowerCase();
     
-    if (typeof SAYAND_PRODUCTS !== 'undefined') {
-        // Dynamically search EVERY category array in your database
-        // (New Arrivals, Trending, Sales, Men, Women, Accessories, etc.)
+    if (typeof SAYAND_PRODUCTS !== 'undefined' && SAYAND_PRODUCTS) {
+        console.log('SAYAND_PRODUCTS keys:', Object.keys(SAYAND_PRODUCTS));
+        
+        // Search EVERY array in SAYAND_PRODUCTS
         for (const key in SAYAND_PRODUCTS) {
-            if (Array.isArray(SAYAND_PRODUCTS[key])) {
-                // Ignore uppercase/lowercase differences just to be safe
-                const match = SAYAND_PRODUCTS[key].find(p => p.name && p.name.toLowerCase() === productName.toLowerCase());
-                if (match) {
-                    foundProduct = match;
-                    break; // Stop searching once we find it!
+            const arr = SAYAND_PRODUCTS[key];
+            if (Array.isArray(arr)) {
+                console.log(`Checking ${key}, length:`, arr.length);
+                
+                for (const p of arr) {
+                    if (!p || !p.name) continue;
+                    
+                    const dbName = p.name.trim();
+                    const dbNameLower = dbName.toLowerCase();
+                    
+                    // Try multiple matching strategies
+                    if (dbNameLower === searchNameLower) {
+                        console.log('EXACT MATCH found:', dbName);
+                        foundProduct = p;
+                        break;
+                    }
+                    if (dbNameLower.includes(searchNameLower) || searchNameLower.includes(dbNameLower)) {
+                        console.log('PARTIAL MATCH found:', dbName);
+                        foundProduct = p;
+                        break;
+                    }
                 }
+                if (foundProduct) break;
             }
         }
+    } else {
+        console.log('SAYAND_PRODUCTS not loaded yet');
     }
     
     if (foundProduct) {
-        // We found it! Send it to the main Detail rendering function
-        const encoded = encodeURIComponent(JSON.stringify(foundProduct));
-        openProductDetail(encoded);
+        const safeName = encodeURIComponent(foundProduct.name);
+        console.log('Navigating to product:', safeName);
+        window.location.href = 'product.html?item=' + safeName;
     } else {
-        alert("Sorry, we couldn't load the details for this product.");
+        console.log('No product found, trying fallback navigation');
+        // Fallback: navigate with the cart name anyway
+        const safeName = encodeURIComponent(searchName);
+        window.location.href = 'product.html?item=' + safeName;
     }
 };
 
