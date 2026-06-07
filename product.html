@@ -7,29 +7,25 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
-    <style>
-        /* Forces the page to scroll normally, overriding the old overlay lock */
-        body { overflow-y: auto !important; }
-        #product-detail { transform: none !important; position: relative !important; }
-    </style>
 </head>
-<body class="bg-black text-white antialiased overflow-x-hidden flex flex-col min-h-screen">
+<body class="bg-white text-black antialiased overflow-x-hidden">
 
     <div id="toast" class="toast z-[100]">ADDED TO BAG</div>
 
-    <nav class="fixed top-0 left-0 w-full z-[99] bg-black/95 backdrop-blur-sm border-b border-gray-800 text-white">
+    <!-- NAV -->
+    <nav class="fixed top-0 left-0 w-full z-[99] bg-white/95 backdrop-blur-sm border-b border-gray-100">
         <div class="w-full px-4 sm:px-6 lg:px-8 xl:px-12">
             <div class="flex justify-between items-center h-16 md:h-20 relative">
                 <div class="flex items-center flex-1">
                     <button id="menuBtn" class="md:hidden flex flex-col space-y-1.5 p-2 mr-4 z-50">
-                        <span class="w-6 h-0.5 bg-white transition-all duration-300"></span>
-                        <span class="w-6 h-0.5 bg-white transition-all duration-300"></span>
+                        <span class="w-6 h-0.5 bg-black transition-all duration-300"></span>
+                        <span class="w-6 h-0.5 bg-black transition-all duration-300"></span>
                     </button>
                     <div class="hidden md:flex space-x-8 text-xs tracking-[0.2em] font-medium">
-                        <a href="collection.html?category=women" class="hover:text-gray-400 transition-colors duration-300">WOMEN</a>
-                        <a href="collection.html?category=men" class="hover:text-gray-400 transition-colors duration-300">MEN</a>
-                        <a href="collection.html?category=accessories" class="hover:text-gray-400 transition-colors duration-300">ACCESSORIES</a>
-                        <a href="#" onclick="openSalesPage();return false;" class="text-red-500 hover:text-red-400 transition-colors duration-300">SALE</a>
+                        <a href="collection.html?category=women" class="hover:text-gray-500 transition-colors duration-300">WOMEN</a>
+                        <a href="collection.html?category=men" class="hover:text-gray-500 transition-colors duration-300">MEN</a>
+                        <a href="collection.html?category=accessories" class="hover:text-gray-500 transition-colors duration-300">ACCESSORIES</a>
+                        <a href="#" onclick="openSalesPage();return false;" class="text-red-600 hover:text-red-400 transition-colors duration-300">SALE</a>
                         <a href="login.html" id="desktop-account-link" class="hidden md:flex items-center justify-center hover:opacity-70 transition-opacity">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
@@ -48,41 +44,128 @@
                             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                         </svg>
                     </button>
-                    <button id="cart-toggle" class="relative text-xs tracking-[0.2em] font-medium hover:text-gray-400 transition-colors">
-                        BAG <span id="cart-count" class="absolute -top-2 -right-3 w-4 h-4 bg-white text-black text-[10px] flex items-center justify-center rounded-full hidden">0</span>
+                    <button id="wishlist-toggle" class="relative hover:opacity-70 transition-opacity flex items-center">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                        <span id="wishlist-count" class="absolute -top-2 -right-3 w-4 h-4 bg-black text-white text-[10px] flex items-center justify-center rounded-full hidden">0</span>
+                    </button>
+                    <button id="cart-toggle" class="relative text-xs tracking-[0.2em] font-medium hover:text-gray-500 transition-colors">
+                        BAG <span id="cart-count" class="absolute -top-2 -right-3 w-4 h-4 bg-black text-white text-[10px] flex items-center justify-center rounded-full hidden">0</span>
                     </button>
                 </div>
             </div>
         </div>
     </nav>
 
-    <div id="mobileMenu" class="menu-overlay fixed inset-0 bg-white text-black z-40 flex flex-col justify-center items-center space-y-8">
+    <!-- MOBILE MENU -->
+    <div id="mobileMenu" class="menu-overlay fixed inset-0 bg-white z-40 flex flex-col justify-center items-center space-y-8">
         <a href="collection.html?category=women" class="text-3xl font-bold tracking-tighter hover:text-gray-500 transition-colors">WOMEN</a>
         <a href="collection.html?category=men" class="text-3xl font-bold tracking-tighter hover:text-gray-500 transition-colors">MEN</a>
         <a href="collection.html?category=accessories" class="text-3xl font-bold tracking-tighter hover:text-gray-500 transition-colors">ACCESSORIES</a>
+        <a href="#" onclick="openSalesPage();toggleMenu();return false;" class="text-3xl font-bold tracking-tighter text-red-600 hover:text-red-400 transition-colors">SALE</a>
         <a href="login.html" id="mobile-account-link" class="text-3xl font-bold tracking-tighter hover:text-gray-500 transition-colors">LOG IN</a>
     </div>
 
-    <main id="product-detail" class="flex-1 pt-16 md:pt-20 bg-black text-white w-full">
-        
-        <div class="w-full flex justify-end items-center p-4 md:px-8">
-            <div class="flex items-center space-x-6">
+    <!-- WISHLIST -->
+    <div id="wishlist-page" class="fixed inset-0 bg-white z-[75] transform translate-x-full transition-transform duration-500 overflow-hidden flex flex-col">
+        <div class="flex justify-between items-center p-6 border-b border-gray-100">
+            <h3 class="text-2xl md:text-3xl font-black tracking-tighter">SAVED ITEMS</h3>
+            <button onclick="closeWishlist()" class="text-3xl leading-none text-gray-400 hover:text-black transition-colors">&times;</button>
+        </div>
+        <div id="wishlist-content" class="flex-1 overflow-y-auto p-6 hide-scrollbar">
+            <div id="wishlist-empty" class="wishlist-empty">
+                <p class="text-gray-400 text-sm tracking-wide mb-4">You haven't saved any items yet.</p>
+                <button onclick="closeWishlist()" class="bg-black text-white px-8 py-3 text-xs tracking-[0.2em] font-semibold hover:bg-gray-800 transition-colors">START SHOPPING</button>
+            </div>
+            <div id="wishlist-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4 hidden"></div>
+        </div>
+    </div>
+
+    <!-- SALES -->
+    <div id="sales-page" class="fixed inset-0 bg-white z-[75] transform translate-y-full transition-transform duration-500 overflow-hidden flex flex-col">
+        <div class="flex justify-between items-center p-6 border-b border-gray-100 sticky top-0 bg-white z-10">
+            <h3 class="text-3xl md:text-5xl font-black tracking-tighter text-red-600">SALE</h3>
+            <button onclick="closeSalesPage()" class="text-4xl leading-none text-gray-400 hover:text-black transition-colors">&times;</button>
+        </div>
+        <div id="sales-scroll" class="flex-1 overflow-y-auto hide-scrollbar">
+            <div id="sales-active-section" class="p-6 md:p-12">
+                <p class="text-xs tracking-[0.3em] text-gray-500 mb-2">LIMITED TIME</p>
+                <h2 class="text-2xl md:text-4xl font-bold tracking-tighter mb-8">ON SALE NOW</h2>
+                <div id="sales-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8"></div>
+            </div>
+            <div id="sales-upcoming-section" class="p-6 md:p-12 border-t border-gray-100">
+                <p class="text-xs tracking-[0.3em] text-gray-500 mb-2">COMING SOON</p>
+                <h2 class="text-2xl md:text-4xl font-bold tracking-tighter mb-8">UPCOMING DROPS</h2>
+                <div id="upcoming-sales-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CART -->
+    <div id="cart-overlay" class="fixed inset-0 bg-black/30 z-[55] hidden opacity-0 transition-opacity duration-300 backdrop-blur-sm"></div>
+    <div id="shopping-bag" class="fixed top-0 right-0 h-full w-full sm:w-[400px] bg-white z-[105] transform translate-x-full transition-transform duration-500 flex flex-col shadow-2xl">
+        <div class="flex justify-between items-center p-6 border-b border-gray-100">
+            <h3 class="text-xs tracking-[0.2em] font-bold">YOUR SHOPPING BAG</h3>
+            <button id="close-cart" class="text-2xl leading-none text-gray-400 hover:text-black transition-colors">&times;</button>
+        </div>
+        <div id="cart-items" class="flex-1 overflow-y-auto p-6 space-y-6 hide-scrollbar">
+            <p class="text-xs text-gray-500 text-center mt-10">Your bag is currently empty.</p>
+        </div>
+        <div class="p-6 border-t border-gray-100 bg-gray-50">
+            <div class="flex justify-between text-sm font-bold mb-6">
+                <span>TOTAL:</span>
+                <span id="cart-total">$0.00 USD</span>
+            </div>
+            <button id="whatsapp-checkout-btn" class="w-full bg-black text-white py-4 text-xs tracking-[0.2em] font-bold hover:bg-gray-800 transition-colors">PROCEED TO CHECKOUT</button>
+        </div>
+    </div>
+
+    <!-- EDITORIAL -->
+    <div id="editorial-page" class="fixed inset-0 bg-white z-[75] transform translate-y-full transition-transform duration-500 flex flex-col overflow-hidden">
+        <div class="absolute top-0 left-0 w-full flex justify-between items-center p-6 z-20 pointer-events-none">
+            <h3 class="text-xl md:text-2xl font-black tracking-[0.2em] pointer-events-auto blend-diff">THE EDIT</h3>
+            <button onclick="closeEditorial()" class="text-4xl leading-none pointer-events-auto hover:opacity-70 transition-opacity blend-diff">&times;</button>
+        </div>
+        <div class="flex-1 overflow-y-auto hide-scrollbar bg-white pb-24">
+            <div class="relative w-full h-[70vh] md:h-[90vh] bg-black">
+                <img id="editorial-hero-img" src="" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-6 md:p-16 text-white text-center md:text-left">
+                    <p class="text-xs tracking-[0.4em] font-semibold mb-3 fade-in">SPRING / SUMMER</p>
+                    <h1 class="text-4xl md:text-6xl lg:text-7xl font-black tracking-tighter leading-[0.9] mb-4 fade-in stagger-1">ESSENTIAL<br>MODERNITY</h1>
+                    <p class="text-sm md:text-base text-white/90 max-w-md mx-auto md:mx-0 fade-in stagger-2">Precision cuts, premium textures, designed to transcend seasons.</p>
+                </div>
+            </div>
+            <div class="px-4 sm:px-6 lg:px-8 xl:px-12 py-16 md:py-24 max-w-7xl mx-auto">
+                <div class="text-center mb-16 max-w-2xl mx-auto">
+                    <h2 class="text-2xl md:text-3xl font-bold tracking-tighter mb-4">SHOP THE LOOKBOOK</h2>
+                    <p class="text-gray-500 text-sm leading-relaxed">Discover the pieces that define the new standard of minimalism. Carefully curated to build a wardrobe of effortless sophistication.</p>
+                </div>
+                <div id="editorial-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PRODUCT DETAIL (hidden overlay so main.js never crashes) -->
+    <div id="product-detail" class="fixed inset-0 bg-black z-[80] transform translate-y-full transition-transform duration-500 overflow-hidden">
+        <div class="fixed top-0 left-0 right-0 z-50 flex justify-between items-center p-4 md:p-6 bg-gradient-to-b from-black/50 to-transparent pointer-events-none">
+            <button onclick="closeProductDetail()" class="text-white text-3xl leading-none hover:opacity-70 transition-opacity pointer-events-auto">&times;</button>
+            <div class="flex items-center space-x-4 pointer-events-auto">
                 <button id="detail-heart" class="heart-btn text-white hover:opacity-70 transition-opacity" onclick="toggleWishlistCurrent()">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
                 </button>
                 <div class="relative">
                     <button id="detail-share-btn" class="text-white hover:opacity-70 transition-opacity" onclick="toggleShareMenu()">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
                     </button>
-                    <div id="detail-share-menu" class="share-menu bg-white text-black p-4 absolute right-0 mt-2 z-50">
-                        <button onclick="shareProduct('copy')" class="block w-full text-left py-2 hover:text-gray-500 text-xs tracking-wider">COPY LINK</button>
-                        <button onclick="shareProduct('whatsapp')" class="block w-full text-left py-2 hover:text-gray-500 text-xs tracking-wider">WHATSAPP</button>
+                    <div id="detail-share-menu" class="share-menu">
+                        <button onclick="shareProduct('copy')">Copy Link</button>
+                        <button onclick="shareProduct('whatsapp')">Share on WhatsApp</button>
+                        <button onclick="shareProduct('email')">Share via Email</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div id="detail-scroll" class="w-full bg-black">
+        <div id="detail-scroll" class="h-full overflow-y-auto hide-scrollbar bg-black">
             <div class="relative w-full bg-[#f5f5f5]">
                 <div class="w-full aspect-[3/4] md:aspect-[4/5] relative overflow-hidden" id="detail-image-container" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEnd(event)">
                     <img id="detail-hero-img" src="" class="w-full h-full object-cover transition-transform duration-300">
@@ -92,13 +175,13 @@
                 <div id="detail-thumbs" class="flex gap-2 p-4 overflow-x-auto thumb-scroll"></div>
             </div>
 
-            <div class="px-4 md:px-8 py-6 max-w-4xl mx-auto">
+            <div class="bg-black text-white px-4 md:px-8 py-6">
                 <p id="detail-stock" class="text-[11px] tracking-[0.15em] mb-2 font-bold"></p>
-                <h2 id="detail-name" class="text-lg md:text-2xl font-medium tracking-wide mb-2 uppercase">LOADING...</h2>
+                <h2 id="detail-name" class="text-lg md:text-xl font-medium tracking-wide mb-2 uppercase"></h2>
                 
                 <div class="mb-2 flex items-center gap-2">
                     <span id="detail-original-price" class="price-original text-sm hidden"></span>
-                    <span id="detail-price" class="text-xl"></span>
+                    <span id="detail-price" class="text-base"></span>
                 </div>
                 
                 <div id="sale-countdown-container" class="hidden mb-4 mt-2">
@@ -109,7 +192,9 @@
 
                 <p class="text-xs text-gray-500 mb-6">VAT included / excl Shipping cost</p>
 
-                <div class="mb-6"><div id="detail-sizes" class="flex flex-wrap gap-6"></div></div>
+                <div class="mb-6">
+                    <div id="detail-sizes" class="flex flex-wrap gap-6"></div>
+                </div>
 
                 <div class="mb-6 flex items-center justify-between border border-gray-800 p-2">
                     <span class="text-xs tracking-[0.2em] font-medium text-gray-400 ml-2">QTY</span>
@@ -157,7 +242,26 @@
                             <span class="accordion-icon">+</span>
                         </div>
                         <div class="accordion-body">
-                            <p class="text-sm text-gray-400 leading-relaxed">Standard delivery within 3-5 business days. Express delivery available for select locations. Free returns within 30 days of purchase.</p>
+                            <p class="text-sm text-gray-400 leading-relaxed">Standard delivery within 3-5 business days. Express delivery available for select locations. Free returns within 30 days of purchase. Items must be in original condition with tags attached.</p>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <div class="accordion-header" onclick="toggleAccordion(this)">
+                            <span class="text-xs tracking-[0.2em]">IN-STORE AVAILABILITY</span>
+                            <span class="accordion-icon">+</span>
+                        </div>
+                        <div class="accordion-body">
+                            <p class="text-sm text-gray-400 leading-relaxed">Check availability at your nearest SAYAND store. Reserve online and pick up in store within 24 hours.</p>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <div class="accordion-header" onclick="toggleAccordion(this)">
+                            <span class="text-xs tracking-[0.2em]">CAN WE HELP YOU?</span>
+                            <span class="accordion-icon">+</span>
+                        </div>
+                        <div class="accordion-body">
+                            <p class="text-sm text-gray-400 leading-relaxed mb-3">Our customer service team is available Monday to Friday, 9am - 6pm.</p>
+                            <a id="contact-link" href="#" class="text-sm text-white underline hover:no-underline">Contact Us</a>
                         </div>
                     </div>
                 </div>
@@ -172,8 +276,69 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- COLLECTION FOLDER (hidden overlay so main.js never crashes) -->
+    <div id="collection-folder" class="fixed inset-0 bg-white z-[70] transform translate-y-full transition-transform duration-500 flex flex-col">
+        <div class="flex justify-between items-center p-6 border-b border-gray-100 bg-white sticky top-0 z-10">
+            <h3 id="collection-title" class="text-3xl md:text-5xl font-black tracking-tighter">COLLECTION</h3>
+            <button onclick="closeCollection()" class="text-4xl leading-none text-gray-400 hover:text-black transition-colors">&times;</button>
+        </div>
+        <div class="p-6 md:p-12 overflow-y-auto flex-1 bg-white hide-scrollbar">
+            <div id="collection-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8"></div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT: Product Page -->
+    <main class="pt-20 min-h-screen bg-white">
+        <div class="px-4 sm:px-6 lg:px-8 xl:px-12 py-8 md:py-12">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 max-w-7xl mx-auto">
+                <div class="aspect-[3/4] bg-gray-100 overflow-hidden relative">
+                    <img id="product-page-img" src="" class="w-full h-full object-cover" alt="Product">
+                </div>
+                <div class="py-4 md:py-12 flex flex-col">
+                    <p id="product-page-stock" class="text-[11px] tracking-[0.15em] mb-2 font-bold text-gray-500"></p>
+                    <h1 id="product-page-name" class="text-2xl md:text-3xl font-medium tracking-wide mb-2 uppercase"></h1>
+                    
+                    <div class="mb-6 flex items-center gap-2">
+                        <span id="product-page-original-price" class="price-original text-sm hidden text-gray-400 line-through"></span>
+                        <span id="product-page-price" class="text-lg font-medium"></span>
+                    </div>
+
+                    <div class="mb-8">
+                        <div id="product-page-sizes" class="flex flex-wrap gap-4"></div>
+                    </div>
+
+                    <div class="mb-6 flex items-center justify-between border border-gray-200 p-2 max-w-[140px]">
+                        <span class="text-xs tracking-[0.2em] font-medium text-gray-400 ml-2">QTY</span>
+                        <div class="flex items-center text-black">
+                            <button type="button" onclick="document.getElementById('product-page-qty').stepDown()" class="px-3 py-1 hover:text-gray-400 transition-colors">-</button>
+                            <input type="number" id="product-page-qty" min="1" value="1" class="w-10 text-center text-sm focus:outline-none hide-scrollbar bg-transparent text-black">
+                            <button type="button" onclick="document.getElementById('product-page-qty').stepUp()" class="px-3 py-1 hover:text-gray-400 transition-colors">+</button>
+                        </div>
+                    </div>
+
+                    <button id="product-page-add-btn" class="w-full bg-black text-white py-4 text-sm tracking-[0.2em] font-medium hover:bg-gray-800 transition-all duration-300 mb-8">
+                        ADD TO BAG
+                    </button>
+
+                    <div class="border-t border-gray-100 pt-6">
+                        <div class="flex gap-6 mb-6 text-xs tracking-[0.2em]">
+                            <button class="detail-tab active" onclick="switchProductTab('desc')" data-tab="desc">DESCRIPTION</button>
+                            <button class="detail-tab" onclick="switchProductTab('det')" data-tab="det">DETAILS</button>
+                            <button class="detail-tab" onclick="switchProductTab('meas')" data-tab="meas">MEASUREMENTS</button>
+                        </div>
+                        <div id="product-tab-desc" class="text-sm text-gray-600 leading-relaxed"></div>
+                        <div id="product-tab-det" class="hidden text-sm text-gray-600 leading-relaxed"></div>
+                        <div id="product-tab-meas" class="hidden text-sm text-gray-600 leading-relaxed"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
-    <footer class="w-full bg-white text-black border-t border-gray-100 pt-16 pb-8 px-4 sm:px-6 lg:px-8 xl:px-12 mt-auto">
+
+    <!-- FOOTER -->
+    <footer class="w-full bg-white border-t border-gray-100 pt-16 pb-8 px-4 sm:px-6 lg:px-8 xl:px-12">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
             <div>
                 <h4 class="text-xs tracking-[0.2em] font-bold mb-6">HELP</h4>
@@ -221,24 +386,9 @@
         </div>
     </footer>
 
-    <div id="cart-overlay" class="fixed inset-0 bg-black/30 z-[55] hidden opacity-0 transition-opacity duration-300 backdrop-blur-sm"></div>
-    <div id="shopping-bag" class="fixed top-0 right-0 h-full w-full sm:w-[400px] bg-white text-black z-[105] transform translate-x-full transition-transform duration-500 flex flex-col shadow-2xl">
-        <div class="flex justify-between items-center p-6 border-b border-gray-100">
-            <h3 class="text-xs tracking-[0.2em] font-bold">YOUR SHOPPING BAG</h3>
-            <button id="close-cart" class="text-2xl leading-none text-gray-400 hover:text-black transition-colors">&times;</button>
-        </div>
-        <div id="cart-items" class="flex-1 overflow-y-auto p-6 space-y-6 hide-scrollbar"></div>
-        <div class="p-6 border-t border-gray-100 bg-gray-50">
-            <div class="flex justify-between text-sm font-bold mb-6">
-                <span>TOTAL:</span>
-                <span id="cart-total">$0.00 USD</span>
-            </div>
-            <button id="whatsapp-checkout-btn" class="w-full bg-black text-white py-4 text-xs tracking-[0.2em] font-bold hover:bg-gray-800 transition-colors">PROCEED TO CHECKOUT</button>
-        </div>
-    </div>
-
+    <!-- CONTACT MODAL -->
     <div id="contact-modal" class="fixed inset-0 bg-black/40 z-[90] hidden items-center justify-center" onclick="if(event.target===this)closeContact()">
-        <div class="bg-white text-black p-8 max-w-md w-full mx-4 relative">
+        <div class="bg-white p-8 max-w-md w-full mx-4 relative">
             <button onclick="closeContact()" class="absolute top-4 right-4 text-2xl text-gray-400 hover:text-black">&times;</button>
             <h3 class="text-xl font-black tracking-tighter mb-6">CONTACT US</h3>
             <div class="space-y-4 text-sm">
@@ -249,7 +399,8 @@
         </div>
     </div>
 
-    <div id="search-overlay" class="fixed inset-0 bg-white text-black z-[100] transform -translate-y-full transition-transform duration-500 flex flex-col">
+    <!-- SEARCH -->
+    <div id="search-overlay" class="fixed inset-0 bg-white z-[100] transform -translate-y-full transition-transform duration-500 flex flex-col">
         <div class="flex justify-between items-center p-6 md:p-8 border-b border-gray-100">
             <input type="text" id="search-input" placeholder="SEARCH PRODUCTS..." class="w-full text-2xl md:text-5xl font-black tracking-tighter uppercase focus:outline-none placeholder-gray-300" oninput="handleSearch()">
             <button onclick="closeSearch()" class="text-4xl leading-none text-gray-400 hover:text-black transition-colors ml-4">&times;</button>
@@ -261,71 +412,44 @@
         </div>
     </div>
 
-    <div id="info-page" class="fixed inset-0 bg-white text-black z-[85] transform translate-y-full transition-transform duration-500 overflow-hidden flex flex-col">
+    <!-- INFO PAGE -->
+    <div id="info-page" class="fixed inset-0 bg-white z-[85] transform translate-y-full transition-transform duration-500 overflow-hidden flex flex-col">
         <div class="flex justify-between items-center p-6 md:p-8 border-b border-gray-100 sticky top-0 bg-white z-10">
             <h3 id="info-title" class="text-2xl md:text-4xl font-black tracking-tighter">TITLE</h3>
             <button onclick="closeInfoPage()" class="text-4xl leading-none text-gray-400 hover:text-black transition-colors">&times;</button>
         </div>
         <div class="p-6 md:p-12 overflow-y-auto flex-1 hide-scrollbar max-w-4xl mx-auto w-full">
-            <div id="info-content" class="text-sm md:text-base text-gray-600 leading-relaxed space-y-6"></div>
+            <div id="info-content" class="text-sm md:text-base text-gray-600 leading-relaxed space-y-6">
+            </div>
         </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+
     <script src="js/firebase-config.js"></script>
     <script src="js/main.js"></script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Read the URL to find out which item they clicked
-            const urlParams = new URLSearchParams(window.location.search);
-            const itemName = urlParams.get('item');
-
-            if (!itemName) {
-                document.getElementById('detail-name').innerText = "PRODUCT NOT FOUND";
-                return;
+    firebase.auth().onAuthStateChanged((user) => {
+        const desktopLink = document.getElementById('desktop-account-link');
+        const mobileLink = document.getElementById('mobile-account-link');
+        
+        if (user) {
+            if(desktopLink) desktopLink.href = "dashboard.html";
+            if(mobileLink) { 
+                mobileLink.href = "dashboard.html"; 
+                mobileLink.textContent = "ACCOUNT"; 
             }
-
-            // Wait for Firebase to load, then display it
-            const renderTimer = setInterval(() => {
-                if (typeof window.SAYAND_PRODUCTS !== 'undefined') {
-                    clearInterval(renderTimer);
-                    
-                    let allProducts = [];
-                    if (SAYAND_PRODUCTS.newArrivals) allProducts = allProducts.concat(SAYAND_PRODUCTS.newArrivals);
-                    if (SAYAND_PRODUCTS.trending) allProducts = allProducts.concat(SAYAND_PRODUCTS.trending);
-                    if (SAYAND_PRODUCTS.sales) allProducts = allProducts.concat(SAYAND_PRODUCTS.sales);
-
-                    // Find the product in the database that matches the URL
-                    const foundProduct = allProducts.find(p => p.name && p.name.toLowerCase() === itemName.toLowerCase());
-
-                    if (foundProduct) {
-                        // Pass it to your existing main.js detail logic
-                        const encoded = encodeURIComponent(JSON.stringify(foundProduct));
-                        window.openProductDetail(encoded);
-                        
-                        // Force the body to allow scrolling (overrides main.js lock)
-                        document.body.style.overflow = '';
-                        document.title = "SAYAND | " + foundProduct.name;
-                    } else {
-                        document.getElementById('detail-name').innerText = "PRODUCT NOT FOUND";
-                        document.getElementById('detail-price').innerText = "";
-                        document.getElementById('detail-add-btn').style.display = "none";
-                    }
-                }
-            }, 100);
-        });
-
-        firebase.auth().onAuthStateChanged((user) => {
-            const desktopLink = document.getElementById('desktop-account-link');
-            if (user) {
-                if(desktopLink) desktopLink.href = "dashboard.html";
-            } else {
-                if(desktopLink) desktopLink.href = "login.html";
+        } else {
+            if(desktopLink) desktopLink.href = "login.html";
+            if(mobileLink) { 
+                mobileLink.href = "login.html"; 
+                mobileLink.textContent = "LOG IN"; 
             }
-        });
+        }
+    });
     </script>
 </body>
 </html>
