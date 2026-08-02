@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAYAND | Complete Payment</title>
+    <link rel="icon" type="image/png" href="https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/SAYAND%20Intertwined%20S%26A%20Monogram.png?alt=media&token=2afe3106-31a8-4a27-960a-e0d09ee96d4f">
+    <link rel="apple-touch-icon" href="https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/SAYAND%20Intertwined%20S%26A%20Monogram.png?alt=media&token=2afe3106-31a8-4a27-960a-e0d09ee96d4f">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f9f6f0; color: #1a2e15; }
+        .panel-box { background: white; border: 1px solid #c2c9c0; box-shadow: 0 4px 20px rgba(0,0,0,0.03); border-top: 3px solid #2c4c23; }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col">
+
+    <nav class="bg-[#1a2e15] border-b border-[#d4af37]/30 px-6 py-4 flex justify-between items-center sticky top-0 z-50 shadow-md">
+<a href="index.html" onclick="if(window.location.pathname.includes('index.html')||window.location.pathname==='/'||window.location.pathname===''){location.reload();return false;}" class="text-xl md:text-2xl font-black tracking-tighter hover:opacity-70 transition-opacity text-[#d4af37]">SAYAND</a>        <span class="text-[10px] tracking-[0.2em] font-bold text-white">SECURE CHECKOUT</span>
+    </nav>
+
+    <div class="flex-1 flex items-center justify-center p-6">
+        <div class="w-full max-w-md">
+            
+            <div class="text-center mb-10">
+                <div class="w-16 h-16 rounded-full border-2 border-[#1a2e15] flex items-center justify-center mb-6 mx-auto text-[#1a2e15]">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+                <h1 class="text-2xl font-black tracking-[0.1em] uppercase text-[#1a2e15] mb-2">Order Saved</h1>
+                <p class="text-xs text-[#6a7c64] font-bold max-w-xs mx-auto leading-relaxed">Your order has been secured in our system. Complete your payment below to finalize processing.</p>
+            </div>
+
+            <div id="loading-state" class="panel-box p-8 text-center mb-6">
+                <div class="w-8 h-8 border-4 border-[#eef2ec] rounded-full border-t-[#2c4c23] animate-spin mx-auto mb-3"></div>
+                <p class="text-[10px] font-black tracking-widest text-[#2c4c23]">LOADING ORDER DETAILS...</p>
+            </div>
+
+            <div id="payment-state" class="hidden">
+                <div class="panel-box p-6 mb-6">
+                    <div class="flex justify-between items-center mb-4 pb-4 border-b border-[#c2c9c0]/50">
+                        <span class="text-[10px] font-black tracking-widest text-[#d4af37]">ORDER TOTAL</span>
+                        <span id="payment-total" class="text-lg font-black text-[#1a2e15]">€0.00</span>
+                    </div>
+                    <div class="flex justify-between items-center mb-4 pb-4 border-b border-[#c2c9c0]/50">
+                        <span class="text-[10px] font-black tracking-widest text-[#d4af37]">PAYMENT METHOD</span>
+                        <span id="payment-method" class="text-xs font-black text-[#1a2e15] uppercase">...</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-[10px] font-black tracking-widest text-[#d4af37]">ORDER REF</span>
+                        <span id="payment-ref" class="text-xs font-mono text-[#1a2e15] uppercase">...</span>
+                    </div>
+                </div>
+
+                <a id="payment-btn" href="#" target="_blank" class="block w-full bg-[#1a2e15] text-[#d4af37] py-4 text-xs font-black tracking-[0.2em] hover:bg-[#2c4c23] transition-colors text-center shadow-lg border border-[#d4af37] mb-4">
+                    COMPLETE PAYMENT
+                </a>
+
+                <p class="text-[9px] text-[#6a7c64] text-center font-bold mb-8">You will be redirected to your selected payment provider to complete the transaction securely.</p>
+
+                <div class="flex gap-4">
+                    <a href="dashboard.html" class="flex-1 border border-[#1a2e15] text-[#1a2e15] px-4 py-3 text-[10px] font-black tracking-[0.2em] hover:bg-[#1a2e15] hover:text-[#d4af37] transition-colors text-center">VIEW ORDER</a>
+                    <a href="index.html" class="flex-1 bg-[#1a2e15] text-[#d4af37] border border-[#d4af37] px-4 py-3 text-[10px] font-black tracking-[0.2em] hover:bg-[#2c4c23] transition-colors text-center shadow-lg">RETURN TO STORE</a>
+                </div>
+            </div>
+
+            <div id="error-state" class="hidden panel-box p-8 text-center">
+                <p class="text-sm font-black text-red-600 mb-2">UNABLE TO LOAD ORDER</p>
+                <p class="text-[10px] text-[#6a7c64] font-bold mb-4">The order reference was not found or has expired.</p>
+                <a href="dashboard.html" class="text-[10px] font-black tracking-widest text-[#2c4c23] hover:text-[#d4af37] border-b border-[#2c4c23] pb-1">GO TO DASHBOARD</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- FIREBASE -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
+    <script src="js/firebase-config.js"></script>
+    
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = urlParams.get('orderId');
+
+        if (!orderId) {
+            document.getElementById('loading-state').classList.add('hidden');
+            document.getElementById('error-state').classList.remove('hidden');
+        }
+
+        firebase.auth().onAuthStateChanged(async (user) => {
+            if (orderId) {
+                try {
+                    const snap = await firebase.database().ref(`orders/${orderId}`).once('value');
+                    const order = snap.val();
+                    
+                    if (!order) throw new Error('Order not found');
+
+                    document.getElementById('loading-state').classList.add('hidden');
+                    document.getElementById('payment-state').classList.remove('hidden');
+                    
+                    document.getElementById('payment-total').textContent = `€${(order.totalAmount || 0).toFixed(2)} EUR`;
+                    document.getElementById('payment-method').textContent = order.paymentMethod || 'N/A';
+                    document.getElementById('payment-ref').textContent = orderId.slice(-6).toUpperCase();
+                    
+                    const btn = document.getElementById('payment-btn');
+                    if (order.paymentUrl && order.paymentUrl !== '#') {
+                        btn.href = order.paymentUrl;
+                        // Update button text based on method
+                        if (order.paymentMethod === 'WhatsApp') {
+                            btn.textContent = 'OPEN WHATSAPP TO PAY';
+                        } else if (order.paymentMethod === 'PayPal') {
+                            btn.textContent = 'PAY WITH PAYPAL';
+                        } else if (order.paymentMethod === 'Revolut') {
+                            btn.textContent = 'PAY WITH REVOLUT';
+                        }
+                    } else {
+                        btn.textContent = 'PAYMENT LINK UNAVAILABLE';
+                        btn.classList.add('opacity-50', 'cursor-not-allowed');
+                        btn.classList.remove('hover:bg-[#2c4c23]');
+                        btn.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            alert('Payment link is not available. Please contact support.');
+                        });
+                    }
+                } catch (err) {
+                    console.error(err);
+                    document.getElementById('loading-state').classList.add('hidden');
+                    document.getElementById('error-state').classList.remove('hidden');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

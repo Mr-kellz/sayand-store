@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAYAND | Editorial Campaign</title>
+    <link rel="icon" type="image/png" href="https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/SAYAND%20Intertwined%20S%26A%20Monogram.png?alt=media&token=4a0c7abb-0150-4d22-94fc-d58f901a45f6">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f5f0e8; color: #0f1f0f; }
+    </style>
+</head>
+<body class="antialiased overflow-x-hidden flex flex-col min-h-screen">
+
+    <!-- NAVIGATION -->
+    <nav class="fixed top-0 left-0 w-full z-[99] bg-[#f5f0e8]/95 backdrop-blur-md border-b border-[#d4c9a8]">
+        <div class="w-full px-4 sm:px-6 lg:px-8 xl:px-12">
+            <div class="flex justify-between items-center h-16 md:h-20 relative">
+                <a href="lookbook.html" class="text-[9px] md:text-[10px] tracking-[0.2em] font-black text-[#7a8a6e] hover:text-[#0f1f0f] transition-colors uppercase">&larr; BACK TO EDITORIALS</a>
+                <div class="absolute left-1/2 transform -translate-x-1/2 z-50 pointer-events-none">
+                    <a href="index.html" class="text-2xl md:text-3xl font-black tracking-tighter leading-none pointer-events-auto text-[#0f1f0f]">SAYAND</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ARTICLE LAYOUT -->
+    <main class="w-full pb-24">
+        
+        <!-- HERO MEDIA (Index 0) -->
+        <div id="art-hero" class="w-full h-[85vh] md:h-screen relative bg-[#0f1f0f] pt-16 md:pt-20">
+            <!-- Hero injected here -->
+        </div>
+
+        <!-- EDITORIAL TEXT SECTION -->
+        <article class="max-w-4xl mx-auto px-6 lg:px-8 py-16 md:py-24 flex flex-col items-center text-center">
+            <p class="text-sm md:text-base text-gray-700 font-medium leading-relaxed mb-12 text-left w-full max-w-3xl">
+                <span class="font-black text-black mr-2">&mdash;</span> <span id="art-desc">Loading editorial...</span>
+            </p>
+            <h1 id="art-title" class="text-6xl md:text-8xl lg:text-[9rem] font-black tracking-tighter text-[#0f1f0f] leading-none uppercase mb-4">Loading</h1>
+            <p id="art-subtitle" class="text-xs tracking-[0.4em] font-bold text-gray-500 uppercase"></p>
+        </article>
+
+        <!-- MASONRY GALLERY (2-Small, 1-Big Pattern) -->
+        <section class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div id="art-gallery" class="w-full flex flex-col gap-6 md:gap-10">
+                <!-- Grid injected here -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="w-full bg-white border-t border-[#d4c9a8] pt-12 pb-8 px-4 sm:px-6 lg:px-8 mt-auto text-center">
+        <p class="text-[9px] font-black tracking-[0.2em] text-[#7a8a6e] uppercase">&copy; 2026 SAYAND. ALL RIGHTS RESERVED.</p>
+    </footer>
+
+    <!-- FIREBASE -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="js/firebase-config.js"></script>
+
+    <script>
+        if (typeof firebase !== 'undefined' && firebase.database) {
+            firebase.database().ref("mainStore").once("value").then(snap => {
+                const data = snap.val();
+                if (!data) return;
+
+                const urlParams = new URLSearchParams(window.location.search);
+                const articleId = urlParams.get('id');
+                const article = (data.lookbook || []).find(a => a.id === articleId);
+                
+                if (!article) {
+                    document.getElementById('art-title').innerText = "Article Not Found";
+                    return;
+                }
+
+                // Populate Text
+                document.getElementById('art-subtitle').innerText = article.subtitle || 'CAMPAIGN';
+                document.getElementById('art-title').innerText = article.title;
+                document.getElementById('art-desc').innerText = article.description || '';
+
+                const urls = article.urls || [];
+
+                // Hotspot Builder Helper
+                function buildHotspotsHtml(spotArray) {
+                    if (!spotArray || spotArray.length === 0) return '';
+                    return spotArray.map(spot => {
+                        let price = '';
+                        let found = null;
+                        ['newArrivals','trending'].forEach(sec => {
+                            if(!found && data[sec]) found = data[sec].find(x => x.name === spot.product);
+                        });
+                        if (found) price = found.salePrice ? `€${found.salePrice}` : `€${found.price}`;
+
+                        return `
+                        <div class="absolute w-6 h-6 -ml-3 -mt-3 group/pin pointer-events-auto cursor-pointer flex items-center justify-center" style="left: ${spot.x}%; top: ${spot.y}%;" onclick="window.location.href='product.html?item=${encodeURIComponent(spot.product)}'">
+                            <div class="absolute w-full h-full bg-white/60 rounded-full animate-ping"></div>
+                            <div class="relative w-2 h-2 bg-white rounded-full shadow-md border border-gray-200"></div>
+                            <div class="absolute left-1/2 -translate-x-1/2 bottom-full mb-3 bg-[#f5f0e8]/95 backdrop-blur-sm text-black text-[9px] tracking-widest font-black px-4 py-2.5 opacity-0 group-hover/pin:opacity-100 transition-all duration-300 transform translate-y-2 group-hover/pin:translate-y-0 whitespace-nowrap shadow-xl border border-[#d4c9a8] pointer-events-none flex items-center gap-3 z-50">
+                                <span>${spot.product}</span>
+                                <span class="text-[#7a8a6e] font-bold">${price}</span>
+                            </div>
+                        </div>`;
+                    }).join('');
+                }
+
+                // Media Card Builder Helper
+                function createMediaCard(url, index, isBig, isHero = false) {
+                    if (!url) return '';
+                    const isVideo = url.toLowerCase().match(/\.(mp4|mov|webm)(\?.*)?$/) || url.includes('video');
+                    const mediaTag = isVideo 
+                        ? `<video src="${url}" class="w-full h-full object-cover cursor-pointer" autoplay loop muted playsinline onclick="event.stopPropagation(); this.muted = !this.muted;"></video>`
+                        : `<img src="${url}" class="w-full h-full object-cover">`;
+
+                    const spotsHtml = buildHotspotsHtml(article.hotspots ? article.hotspots[index.toString()] : null);
+
+                    if (isHero) {
+                        return `
+                        <div class="relative w-full h-full bg-[#0f1f0f] overflow-hidden">
+                            ${mediaTag}
+                            <div class="absolute inset-0 z-40 pointer-events-none">${spotsHtml}</div>
+                        </div>`;
+                    }
+
+                    const displayNum = (index + 1).toString().padStart(2, '0');
+                    let badgeHtml = '';
+                    if (isBig) {
+                        badgeHtml = `
+                        <div class="absolute bottom-6 left-1/2 -translate-x-1/2 bg-white px-8 py-3 shadow-md text-center border border-gray-100 hidden md:block z-30">
+                            <p class="text-sm font-black tracking-widest text-[#0f1f0f] uppercase mb-1">${article.title}</p>
+                            <p class="text-[9px] tracking-[0.3em] font-bold text-gray-500 uppercase">${article.subtitle}</p>
+                        </div>`;
+                    }
+
+                    return `
+                    <div class="w-full flex flex-col">
+                        <div class="relative w-full ${isBig ? 'aspect-[4/5] md:aspect-auto md:h-[90vh]' : 'aspect-[3/4] md:aspect-[4/5]'} bg-gray-100 overflow-hidden group border border-[#d4c9a8]/30">
+                            ${mediaTag}
+                            <div class="absolute inset-0 pointer-events-none z-40">${spotsHtml}</div>
+                            ${badgeHtml}
+                        </div>
+                        <div class="w-full flex justify-end mt-2 md:mt-3">
+                            <span class="text-[9px] md:text-[10px] font-black text-gray-400 tracking-widest">&mdash; ${displayNum}</span>
+                        </div>
+                    </div>`;
+                }
+
+                // 1. Render Hero (Index 0)
+                const heroContainer = document.getElementById('art-hero');
+                if (urls.length > 0) {
+                    heroContainer.innerHTML = createMediaCard(urls[0], 0, false, true);
+                } else {
+                    heroContainer.style.display = 'none';
+                }
+
+                // 2. Render Masonry Gallery (Starts at Index 1)
+                const galleryContainer = document.getElementById('art-gallery');
+                let galleryHtml = '';
+
+                // Step by 3 to create the [2 small, 1 big] repeating rows
+                for (let i = 1; i < urls.length; i += 3) {
+                    
+                    // ROW A: Two Small Images (Index i and i+1)
+                    if (i < urls.length) {
+                        let img1 = urls[i];
+                        let img2 = (i + 1 < urls.length) ? urls[i + 1] : null;
+
+                        galleryHtml += `<div class="grid grid-cols-2 gap-3 md:gap-8 w-full">`;
+                        galleryHtml += createMediaCard(img1, i, false);
+                        if (img2) {
+                            galleryHtml += createMediaCard(img2, i + 1, false);
+                        } else {
+                            galleryHtml += `<div></div>`; // Empty div keeps grid structure
+                        }
+                        galleryHtml += `</div>`;
+                    }
+
+                    // ROW B: One Big Image (Index i+2)
+                    if (i + 2 < urls.length) {
+                        let img3 = urls[i + 2];
+                        galleryHtml += `<div class="w-full mt-2 md:mt-4">`;
+                        galleryHtml += createMediaCard(img3, i + 2, true);
+                        galleryHtml += `</div>`;
+                    }
+                }
+
+                galleryContainer.innerHTML = galleryHtml;
+                
+            });
+        }
+    </script>
+</body>
+</html>

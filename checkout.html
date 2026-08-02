@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAYAND | Checkout</title>
+    <link rel="icon" type="image/png" href="https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/SAYAND%20Intertwined%20S%26A%20Monogram.png?alt=media&token=2afe3106-31a8-4a27-960a-e0d09ee96d4f">
+    <link rel="apple-touch-icon" href="https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/SAYAND%20Intertwined%20S%26A%20Monogram.png?alt=media&token=2afe3106-31a8-4a27-960a-e0d09ee96d4f">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"/>
+    <link rel="stylesheet" href="css/style.css">
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f9f6f0; color: #1a2e15; }
+        .input-field { width: 100%; border: 1px solid #c2c9c0; padding: 0.75rem 1rem; font-size: 0.75rem; outline: none; transition: border-color 0.2s; background: white; box-sizing: border-box; margin: 0; color: #1a2e15; }
+        .input-field:focus { border-color: #d4af37; box-shadow: 0 0 0 1px #d4af37; }
+        .input-field::placeholder { color: #9ca3af; }
+        
+        .radio-custom:checked + div { border-color: #d4af37; background-color: #eef2ec; }
+        .radio-custom:checked + div .radio-ring { border-color: #d4af37; }
+        .radio-custom:checked + div .radio-dot { opacity: 1; transform: scale(1); background-color: #2c4c23; }
+
+        .iti { width: 100%; display: block; }
+        .iti__flag-container { z-index: 10; padding-left: 0.25rem; }
+        .iti__selected-dial-code { font-size: 0.75rem !important; font-family: 'Inter', sans-serif; color: #2c4c23; font-weight: bold; }
+        .iti__country-list { font-size: 0.75rem !important; font-family: 'Inter', sans-serif; }
+        .iti input { padding-left: 95px !important; }
+        
+        .maps-fallback-msg { font-size: 10px; color: #d4af37; font-weight: 800; letter-spacing: 0.05em; margin-top: 4px; display: none; }
+    </style>
+<base target="_blank">
+<base target="_blank">
+<base target="_blank">
+<base target="_blank">
+</head>
+<body class="antialiased" id="checkout-body">
+
+    <nav class="bg-[#1a2e15] border-b border-[#d4af37]/30 px-6 py-4 flex justify-between items-center sticky top-0 z-50 shadow-md">
+<a href="index.html" onclick="event.preventDefault(); var p=window.location.pathname; if(p==='/'||p.endsWith('index.html')||p===''){location.reload();}else{window.location.href='index.html';}" class="text-xl md:text-2xl font-black tracking-tighter hover:opacity-70 transition-opacity text-[#d4af37]">SAYAND</a>        <span class="text-[10px] tracking-[0.2em] font-bold text-white">SECURE CHECKOUT</span>
+    </nav>
+
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div class="flex flex-col lg:flex-row gap-12">
+            
+            <div class="flex-1">
+                <form id="checkout-form" class="space-y-8">
+                    
+                    <div>
+                        <h2 class="text-sm font-black tracking-[0.1em] mb-4 uppercase text-[#2c4c23]">Contact Information</h2>
+                        <div class="space-y-4">
+                            <input type="email" id="ship-email" required placeholder="Email Address" class="input-field">
+                            
+                            <div>
+                                <input type="tel" id="ship-phone" required class="input-field">
+                                <p id="phone-error" style="color: #dc2626; font-size: 11px; display: none; margin-top: 6px; margin-bottom: 0;">Incorrect number. Please check the length for your selected country.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h2 class="text-sm font-black tracking-[0.1em] mb-4 uppercase text-[#2c4c23]">Shipping Address</h2>
+
+                        <!-- ADDRESS BOOK SELECTOR -->
+                        <div id="address-book-container" class="mb-4 hidden">
+                            <label class="block text-[10px] font-black tracking-wider text-[#d4af37] mb-2">SAVED ADDRESSES</label>
+                            <select id="address-book-select" onchange="selectSavedAddress()" class="input-field w-full p-3 text-xs font-bold">
+                                <option value="">-- Select a saved address --</option>
+                            </select>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-2 gap-4">
+                                <input type="text" id="ship-first-name" required placeholder="First Name" class="input-field">
+                                <input type="text" id="ship-last-name" required placeholder="Last Name" class="input-field">
+                            </div>
+                            
+                            <div>
+                                <input type="text" id="ship-address" required placeholder="Street Address" class="input-field" autocomplete="off">
+                                <p id="maps-fallback" class="maps-fallback-msg">⚠️ Address autocomplete unavailable. Please type your address manually.</p>
+                            </div>
+                            
+                            <input type="text" id="ship-apt" placeholder="Apartment, suite, etc. (optional)" class="input-field">
+                            <div class="grid grid-cols-2 gap-4">
+                                <input type="text" id="ship-city" required placeholder="City" class="input-field">
+                                <input type="text" id="ship-zip" required placeholder="Postal / Zip Code" class="input-field">
+                            </div>
+                            <input type="text" id="ship-country" required placeholder="Country" class="input-field">
+                        </div>
+                    </div>
+
+                    <div>
+                        <h2 class="text-sm font-black tracking-[0.1em] mb-4 uppercase text-[#2c4c23]">Payment Method</h2>
+                        <div class="space-y-3">
+                            
+                            <label class="relative block cursor-pointer group">
+                                <input type="radio" name="payment" value="Revolut" checked class="peer sr-only radio-custom">
+                                <div class="border border-[#c2c9c0] p-4 transition-all flex items-center justify-between bg-white">
+                                    <div class="flex items-center gap-3">
+                                        <div class="radio-ring w-4 h-4 rounded-full border border-[#c2c9c0] flex items-center justify-center transition-all bg-white">
+                                            <div class="radio-dot w-2 h-2 rounded-full opacity-0 scale-50 transition-all"></div>
+                                        </div>
+                                        <span class="text-xs font-black tracking-wider text-[#1a2e15]">REVOLUT PAY</span>
+                                    </div>
+                                </div>
+                                <div class="overflow-hidden max-h-0 peer-checked:max-h-32 transition-all duration-300 ease-in-out px-4 bg-[#f9f6f0] border-x border-b border-[#d4af37] text-[10px] text-[#6a7c64] py-4">
+                                    <p class="text-[#2c4c23] mb-1"><strong>How this works:</strong></p>
+                                    <ul class="list-decimal list-inside space-y-1 font-medium">
+                                        <li>Click <strong>Complete Order</strong> below to securely save your order.</li>
+                                        <li>On the next page, click <strong>Complete Payment</strong> to open Revolut.</li>
+                                    </ul>
+                                </div>
+                            </label>
+
+                            <label class="relative block cursor-pointer group">
+                                <input type="radio" name="payment" value="PayPal" class="peer sr-only radio-custom">
+                                <div class="border border-[#c2c9c0] p-4 transition-all flex items-center justify-between bg-white">
+                                    <div class="flex items-center gap-3">
+                                        <div class="radio-ring w-4 h-4 rounded-full border border-[#c2c9c0] flex items-center justify-center transition-all bg-white">
+                                            <div class="radio-dot w-2 h-2 rounded-full opacity-0 scale-50 transition-all"></div>
+                                        </div>
+                                        <span class="text-xs font-black tracking-wider text-[#1a2e15]">PAYPAL</span>
+                                    </div>
+                                </div>
+                                <div class="overflow-hidden max-h-0 peer-checked:max-h-32 transition-all duration-300 ease-in-out px-4 bg-[#f9f6f0] border-x border-b border-[#d4af37] text-[10px] text-[#6a7c64] py-4">
+                                    <p class="text-[#2c4c23] mb-1"><strong>How this works:</strong></p>
+                                    <ul class="list-decimal list-inside space-y-1 font-medium">
+                                        <li>Click <strong>Complete Order</strong> below to securely save your order.</li>
+                                        <li>On the next page, click <strong>Complete Payment</strong> to open PayPal.</li>
+                                    </ul>
+                                </div>
+                            </label>
+
+                            <label class="relative block cursor-pointer group">
+                                <input type="radio" name="payment" value="WhatsApp" class="peer sr-only radio-custom">
+                                <div class="border border-[#c2c9c0] p-4 transition-all flex items-center justify-between bg-white">
+                                    <div class="flex items-center gap-3">
+                                        <div class="radio-ring w-4 h-4 rounded-full border border-[#c2c9c0] flex items-center justify-center transition-all bg-white">
+                                            <div class="radio-dot w-2 h-2 rounded-full opacity-0 scale-50 transition-all"></div>
+                                        </div>
+                                        <span class="text-xs font-black tracking-wider text-[#1a2e15]">WHATSAPP ORDER</span>
+                                    </div>
+                                </div>
+                                <div class="overflow-hidden max-h-0 peer-checked:max-h-32 transition-all duration-300 ease-in-out px-4 bg-[#f9f6f0] border-x border-b border-[#d4af37] text-[10px] text-[#6a7c64] py-4">
+                                    <p class="text-[#2c4c23] mb-1"><strong>How this works:</strong></p>
+                                    <ul class="list-decimal list-inside space-y-1 font-medium">
+                                        <li>Click <strong>Complete Order</strong> below to securely save your order.</li>
+                                        <li>On the next page, click <strong>Complete Payment</strong> to open WhatsApp.</li>
+                                    </ul>
+                                </div>
+                            </label>
+
+                        </div>
+                    </div>
+
+                    <div class="border border-[#d4af37]/30 p-5 mb-6 bg-white shadow-sm">
+                        <label class="flex items-center gap-3 cursor-pointer">
+                            <input type="checkbox" id="is-gift-checkbox" class="w-4 h-4 text-[#2c4c23] focus:ring-[#2c4c23]" onchange="recalculateTotals()">
+                            <span class="text-[11px] font-black tracking-[0.1em] uppercase text-[#d4af37]">🎁 Add SAYAND Signature Gift Box (+€2.00)</span>
+                        </label>
+                        <div id="gift-options" class="hidden mt-4 pt-4 border-t border-[#c2c9c0]/50">
+                            <p class="text-[10px] text-[#6a7c64] mb-2 font-medium">We will package your items in our signature rigid box with ribbon. Include a personalized handwritten note below.</p>
+                            <textarea id="gift-note" placeholder="Write your custom message here..." class="w-full border border-[#c2c9c0] p-3 text-xs focus:border-[#d4af37] outline-none h-20 font-serif italic"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-3 mb-4">
+                        <input type="checkbox" id="save-address-checkbox" class="w-4 h-4 text-[#2c4c23] focus:ring-[#2c4c23]" checked>
+                        <label for="save-address-checkbox" class="text-[11px] font-black tracking-[0.1em] uppercase text-[#2c4c23]">Save this address to my address book</label>
+                    </div>
+
+                    <p id="checkout-error" class="text-[#dc2626] text-xs font-bold text-center mt-4"></p>
+
+                    <button type="submit" id="submit-order-btn" class="w-full bg-[#1a2e15] text-[#d4af37] py-4 text-xs font-black tracking-[0.2em] hover:bg-[#2c4c23] transition-colors mt-6 shadow-lg border border-[#d4af37]">
+                        COMPLETE ORDER
+                    </button>
+                </form>
+            </div>
+            
+            <div class="w-full lg:w-[400px] bg-white border border-[#c2c9c0] p-6 h-fit sticky top-24 shadow-sm border-t-4 border-t-[#2c4c23]">
+                <h2 class="text-sm font-black tracking-[0.1em] mb-6 uppercase border-b border-[#c2c9c0]/50 pb-4 text-[#1a2e15]">Order Summary</h2>
+                
+                <div id="checkout-items" class="space-y-4 max-h-[40vh] overflow-y-auto hide-scrollbar mb-6">
+                    <p class="text-xs text-[#6a7c64] text-center py-4 font-bold">Loading your bag...</p>
+                </div>
+
+                <div class="mb-6 pt-4 border-t border-[#c2c9c0]/50">
+                    <label class="block text-[10px] font-black tracking-wider text-[#d4af37] mb-2">PROMO CODE</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="promo-code-input" class="input-field uppercase flex-1" placeholder="ENTER CODE">
+                        <button type="button" id="apply-promo-btn" class="bg-[#1a2e15] text-[#d4af37] px-4 text-[10px] tracking-widest font-black hover:bg-[#2c4c23] transition-colors border border-[#d4af37]">APPLY</button>
+                    </div>
+                    <p id="promo-message" class="text-[9px] font-bold mt-2 hidden"></p>
+                </div>
+
+                <div class="border-t border-[#c2c9c0]/50 pt-4 space-y-3 text-xs tracking-wider">
+                    <div class="flex justify-between text-[#6a7c64] font-bold">
+                        <span>SUBTOTAL</span>
+                        <span id="checkout-subtotal">€0.00</span>
+                    </div>
+                    
+                    <div id="vip-discount-row" class="flex justify-between text-[#d4af37] font-black hidden">
+                        <span id="checkout-vip-label">VIP DISCOUNT</span>
+                        <span id="checkout-vip">-€0.00</span>
+                    </div>
+
+                    <div id="promo-discount-row" class="flex justify-between text-green-600 font-black hidden">
+                        <span id="checkout-promo-label">PROMO DISCOUNT</span>
+                        <span id="checkout-promo">-€0.00</span>
+                    </div>
+
+                    <div id="announcement-promo-row" class="flex justify-between text-[#d4af37] font-black hidden">
+                        <span id="checkout-announcement-label">ANNOUNCEMENT PROMO</span>
+                        <span id="checkout-announcement">-€0.00</span>
+                    </div>
+
+                    <div id="checkout-gift-row" class="flex justify-between text-[#1a2e15] font-black hidden">
+                        <span>GIFT PACKAGING</span>
+                        <span id="checkout-gift-amount">+€2.00</span>
+                    </div>
+
+                    <div class="flex justify-between text-[#6a7c64] font-bold">
+                        <span id="checkout-shipping-label">SHIPPING</span>
+                        <span id="checkout-shipping">€5.00</span>
+                    </div>
+                    
+                    <div class="flex justify-between font-black text-sm pt-4 border-t border-[#c2c9c0]/50 mt-3 text-[#1a2e15]">
+                        <span>TOTAL</span>
+                        <span id="checkout-total">€0.00 EUR</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+
+    <!-- FIREBASE SCRIPTS -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-functions-compat.js"></script>
+    
+    <script src="js/firebase-config.js"></script>
+    <script>if(typeof firebase!=="undefined"&&firebase.database){window.db=firebase.database();}</script>
+    
+<script>
+    let orderCartData = null;
+    let orderSubtotal = 0;
+    let finalOrderTotal = 0;
+    let shippingCost = 0;
+    let giftCost = 0;
+    
+    let vipDiscountAmount = 0;
+    let vipDiscountPercentApplied = 0;
+    let vipLabel = "";
+    let prevCount200 = 0;
+    let prevCount500 = 0;
+    let prevCount700 = 0;
+
+    let appliedPromo = null;
+    let promoDiscountAmount = 0;
+    let usedPromoCodes = [];
+
+    let announcementPromo = null;
+    let announcementDiscountAmount = 0; 
+    
+       function normalizeCodeEntry(entry) {
+        if (entry && typeof entry === 'object' && 'value' in entry) {
+            return entry.value;
+        }
+        return entry;
+    }
+
+    // ─── LIVE STOCK VALIDATOR ───
+    // Checks cart items against current Firebase inventory before checkout
+    async function validateCartStock(cartItems, storeData) {
+        const errors = [];
+        
+        for (const key in cartItems) {
+            const cartItem = cartItems[key];
+            let foundProduct = null;
+            let foundSection = null;
+            let foundIndex = null;
+
+            // Search for the product in all store sections
+            const sections = ['newArrivals', 'trending', 'sales', 'upcomingSales'];
+            for (const section of sections) {
+                if (storeData[section] && Array.isArray(storeData[section])) {
+                    const idx = storeData[section].findIndex(p => p.name === cartItem.name);
+                    if (idx !== -1) {
+                        foundProduct = storeData[section][idx];
+                        foundSection = section;
+                        foundIndex = idx;
+                        break;
+                    }
+                }
+            }
+
+            if (!foundProduct) {
+                errors.push(`"${cartItem.name}" is no longer available.`);
+                continue;
+            }
+
+            // Skip stock check for preorders
+            if (foundProduct.isPreorder) continue;
+
+            // Check forced out of stock
+            if (foundProduct.isOutOfStock) {
+                errors.push(`"${cartItem.name}" is now SOLD OUT.`);
+                continue;
+            }
+
+            // Check size-specific stock
+            const cartSize = cartItem.size || 'OS';
+            const cartQty = parseInt(cartItem.quantity || cartItem.qty || 1);
+            
+            if (foundProduct.sizeQuantities && foundProduct.sizeQuantities[cartSize] !== undefined) {
+                const available = parseInt(foundProduct.sizeQuantities[cartSize]);
+                if (available <= 0) {
+                    errors.push(`"${cartItem.name}" (Size ${cartSize}) is now SOLD OUT.`);
+                } else if (cartQty > available) {
+                    errors.push(`"${cartItem.name}" (Size ${cartSize}): Only ${available} left in stock. You have ${cartQty} in your bag.`);
+                }
+            } else {
+                // Fallback to total quantity
+                const available = parseInt(foundProduct.quantity || 0);
+                if (available <= 0) {
+                    errors.push(`"${cartItem.name}" is now SOLD OUT.`);
+                } else if (cartQty > available) {
+                    errors.push(`"${cartItem.name}": Only ${available} left in stock. You have ${cartQty} in your bag.`);
+                }
+            }
+        }
+
+        return errors;
+    }
+
+    let baseRevolut = "";
+
+    function calculateShippingCost(country) {
+        if (!country) return 5.00;
+        const c = country.trim().toLowerCase();
+        if (c === 'italy' || c === 'italia') return 5.00;
+        return 15.00;
+    }
+
+    function updateShippingDisplay() {
+        const country = document.getElementById('ship-country').value;
+        const isItaly = country && (country.trim().toLowerCase() === 'italy' || country.trim().toLowerCase() === 'italia');
+        shippingCost = vipDiscountPercentApplied > 0 ? 0 : calculateShippingCost(country);
+
+        const shippingLabel = document.getElementById('checkout-shipping-label');
+        if (shippingLabel) {
+            shippingLabel.textContent = isItaly ? 'SHIPPING' : 'INTERNATIONAL SHIPPING';
+        }
+
+        if (vipDiscountPercentApplied > 0) {
+            document.getElementById('checkout-shipping').textContent = 'COMPLIMENTARY';
+        } else {
+            document.getElementById('checkout-shipping').textContent = formatPrice(shippingCost);
+        }
+        recalculateTotals();
+    }
+    let basePaypal = "";
+    let baseWhatsapp = "";
+    let activeDiscountCodes = {};
+    let activeFixedCodes = {}; 
+    let activeDiscountCodeExpiry = {};
+
+// ==================== CURRENCY SUPPORT ====================
+const CURRENCY_RATES = { EUR: 1, USD: 1.09, GBP: 0.84 };
+const CURRENCY_SYMBOLS = { EUR: '€', USD: '$', GBP: '£' };
+let currentCurrency = localStorage.getItem('sayand_currency') || 'EUR';
+
+async function fetchLiveRates() {
+    try {
+        const res = await fetch('https://api.exchangerate-api.com/v4/latest/EUR');
+        const data = await res.json();
+        if (data && data.rates) {
+            if (data.rates.USD) CURRENCY_RATES.USD = data.rates.USD;
+            if (data.rates.GBP) CURRENCY_RATES.GBP = data.rates.GBP;
+        }
+    } catch (e) { console.log('[CHECKOUT] Using default currency rates'); }
+}
+fetchLiveRates();
+
+function formatPrice(priceEUR) {
+    if (!priceEUR && priceEUR !== 0) return CURRENCY_SYMBOLS[currentCurrency] + '0.00';
+    const rate = CURRENCY_RATES[currentCurrency] || 1;
+    const converted = (parseFloat(priceEUR) * rate).toFixed(2);
+    return (CURRENCY_SYMBOLS[currentCurrency] || '€') + converted;
+}
+
+    // Store loaded address book for dropdown selection
+    window.checkoutAddrBook = {};
+
+    const phoneInputField = document.querySelector("#ship-phone");
+    const phoneInput = window.intlTelInput(phoneInputField, {
+        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+        initialCountry: "auto",
+        geoIpLookup: function(success, failure) {
+            fetch("https://ipapi.co/json").then(res => res.json()).then(data => success(data.country_code)).catch(() => success("it"));
+        },
+        separateDialCode: true,
+    });
+
+    // ─── GOOGLE MAPS AUTOCOMPLETE ───
+    window.initAddressAutocomplete = function() {
+        const addressInput = document.getElementById('ship-address');
+        const fallbackMsg = document.getElementById('maps-fallback');
+        
+        if (!addressInput) {
+            console.error('[CHECKOUT] Address input not found for autocomplete');
+            return;
+        }
+
+        if (typeof google === 'undefined' || !google.maps || !google.maps.places) {
+            console.error('[CHECKOUT] Google Maps API not loaded. Check API key and Places API enablement.');
+            if (fallbackMsg) fallbackMsg.style.display = 'block';
+            return;
+        }
+
+        try {
+            const autocomplete = new google.maps.places.Autocomplete(addressInput, {
+                types: ['address'],
+                fields: ['address_components', 'name', 'formatted_address']
+            });
+
+            // Prevent form submit on Enter key in autocomplete
+            addressInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') { 
+                    e.preventDefault(); 
+                }
+            });
+
+            autocomplete.addListener('place_changed', function() {
+                const place = autocomplete.getPlace();
+                if (!place || !place.address_components) {
+                    console.warn('[CHECKOUT] No address_components in selected place');
+                    return;
+                }
+
+                // Clear previous values
+                document.getElementById('ship-city').value = '';
+                document.getElementById('ship-zip').value = '';
+                document.getElementById('ship-country').value = '';
+
+                for (const component of place.address_components) {
+                    const types = component.types;
+                    if (types.includes('locality') || types.includes('postal_town') || types.includes('sublocality')) {
+                        document.getElementById('ship-city').value = component.long_name;
+                    }
+                    if (types.includes('postal_code')) {
+                        document.getElementById('ship-zip').value = component.long_name;
+                    }
+                    if (types.includes('country')) {
+                        document.getElementById('ship-country').value = component.long_name;
+                    }
+                }
+                
+                // If street address is empty after selection, use formatted_address
+                if (!addressInput.value.trim() && place.formatted_address) {
+                    addressInput.value = place.formatted_address;
+                }
+                
+                console.log('[CHECKOUT] Address filled from Google Maps:', place.name || place.formatted_address);
+                setTimeout(updateShippingDisplay, 50);
+            });
+            
+            console.log('[CHECKOUT] Google Maps autocomplete initialized successfully');
+        } catch (err) {
+            console.error('[CHECKOUT] Failed to init autocomplete:', err);
+            if (fallbackMsg) fallbackMsg.style.display = 'block';
+        }
+    };
+
+    // Retry with max attempts
+    let mapsRetryCount = 0;
+    const MAX_MAPS_RETRIES = 20;
+    
+    window.initMapsWithRetry = function() {
+        const fallbackMsg = document.getElementById('maps-fallback');
+        
+        if (typeof google !== 'undefined' && google.maps && google.maps.places) {
+            if (window.mapsLoadTimeout) clearTimeout(window.mapsLoadTimeout);
+            initAddressAutocomplete();
+            if (fallbackMsg) fallbackMsg.style.display = 'none';
+            return;
+        }
+        
+        mapsRetryCount++;
+        if (mapsRetryCount > MAX_MAPS_RETRIES) {
+            console.error('[CHECKOUT] Google Maps failed to load after max retries.');
+            if (fallbackMsg) fallbackMsg.style.display = 'block';
+            return;
+        }
+        
+        console.warn('[CHECKOUT] Google Maps not ready, retrying... (' + mapsRetryCount + '/' + MAX_MAPS_RETRIES + ')');
+        setTimeout(initMapsWithRetry, 500);
+    };
+
+    // Timeout fallback for Google Maps API loading
+    window.mapsLoadTimeout = setTimeout(() => {
+        const fallbackMsg = document.getElementById('maps-fallback');
+        if (typeof google === 'undefined' || !google.maps || !google.maps.places) {
+            console.error('[CHECKOUT] Google Maps API failed to load within 5 seconds.');
+            if (fallbackMsg) fallbackMsg.style.display = 'block';
+        }
+    }, 5000);
+
+    window.gm_authFailure = function() {
+        console.error('Google Maps API authentication failed. Check your API key restrictions and billing.');
+        const fallbackMsg = document.getElementById('maps-fallback');
+        if (fallbackMsg) fallbackMsg.style.display = 'block';
+    };
+
+    // ─── ADDRESS BOOK DROPDOWN ───
+    window.selectSavedAddress = function() {
+        const key = document.getElementById('address-book-select').value;
+        if (!key) {
+            document.getElementById('ship-first-name').value = '';
+            document.getElementById('ship-last-name').value = '';
+            document.getElementById('ship-address').value = '';
+            document.getElementById('ship-apt').value = '';
+            document.getElementById('ship-city').value = '';
+            document.getElementById('ship-zip').value = '';
+            document.getElementById('ship-country').value = '';
+            phoneInput.setNumber('');
+            return;
+        }
+        if (!window.checkoutAddrBook || !window.checkoutAddrBook[key]) return;
+        const addr = window.checkoutAddrBook[key];
+        document.getElementById('ship-first-name').value = addr.firstName || '';
+        document.getElementById('ship-last-name').value = addr.lastName || '';
+        document.getElementById('ship-address').value = addr.street || '';
+        document.getElementById('ship-apt').value = addr.apt || '';
+        document.getElementById('ship-city').value = addr.city || '';
+        document.getElementById('ship-zip').value = addr.zip || '';
+        document.getElementById('ship-country').value = addr.country || '';
+        if (addr.phone) {
+            phoneInput.setNumber(addr.phone);
+        }
+        setTimeout(updateShippingDisplay, 50);
+    };
+
+    // ─── CART NORMALIZATION ───
+    function normalizeCart(cart) {
+        if (!cart) return null;
+        if (Array.isArray(cart)) {
+            const obj = {};
+            cart.forEach((item, index) => { obj[index] = item; });
+            return obj;
+        }
+        if (typeof cart === 'object') return cart;
+        return null;
+    }
+
+    function formatPayPalLink(baseLink, amount) {
+        if (!baseLink) return '#';
+        let link = baseLink.trim();
+        if (!link.startsWith('http')) { link = 'https://' + link; }
+        link = link.replace(/\/+$/, ""); 
+        let formattedAmount = Number.isInteger(amount) ? amount.toString() : amount.toFixed(2);
+        return `${link}/${formattedAmount}`;
+    }
+
+    function formatRevolutLink(baseLink) {
+        if (!baseLink) return '#';
+        let link = baseLink.trim();
+        if (!link.startsWith('http')) { link = 'https://' + link; }
+        return link;
+    }
+
+    function recalculateTotals() {
+        // Calculate announcement promo discount
+        announcementDiscountAmount = 0;
+        if (announcementPromo && orderSubtotal >= announcementPromo.minAmount) {
+            announcementDiscountAmount = Math.round((orderSubtotal * announcementPromo.percent / 100) * 100) / 100;
+        }
+
+        let totalDiscount = vipDiscountAmount + promoDiscountAmount + announcementDiscountAmount;
+
+        const giftCheckbox = document.getElementById('is-gift-checkbox');
+        const giftOptions = document.getElementById('gift-options');
+        const isGift = giftCheckbox ? giftCheckbox.checked : false;
+
+        giftCost = isGift ? 2.00 : 0;
+
+        if(isGift) {
+            giftOptions.classList.remove('hidden');
+            document.getElementById('checkout-gift-row').classList.remove('hidden');
+        } else {
+            giftOptions.classList.add('hidden');
+            document.getElementById('checkout-gift-row').classList.add('hidden');
+        }
+
+        finalOrderTotal = Math.max(0, orderSubtotal - totalDiscount) + shippingCost + giftCost;
+
+        document.getElementById('checkout-total').textContent = formatPrice(finalOrderTotal) + ' ' + currentCurrency;
+        const giftAmtEl = document.getElementById('checkout-gift-amount');
+        if(giftAmtEl) giftAmtEl.textContent = '+' + formatPrice(2.00);
+
+        const promoRow = document.getElementById('promo-discount-row');
+        if (appliedPromo) {
+            promoRow.classList.remove('hidden');
+            let labelExtra = appliedPromo.type === 'fixed' ? 'GIFT CARD' : 'PROMO';
+            document.getElementById('checkout-promo-label').textContent = `${labelExtra} (${appliedPromo.code})`;
+            document.getElementById('checkout-promo').textContent = '-' + formatPrice(promoDiscountAmount);
+        } else {
+            promoRow.classList.add('hidden');
+        }
+
+        // Show/hide announcement promo row
+        const annRow = document.getElementById('announcement-promo-row');
+        if (announcementPromo && announcementDiscountAmount > 0) {
+            annRow.classList.remove('hidden');
+            document.getElementById('checkout-announcement-label').textContent = `ANNOUNCEMENT PROMO (${announcementPromo.percent}% OFF)`;
+            document.getElementById('checkout-announcement').textContent = '-' + formatPrice(announcementDiscountAmount);
+        } else {
+            annRow.classList.add('hidden');
+        }
+    }
+
+    document.getElementById('apply-promo-btn').addEventListener('click', async () => {
+        const codeInput = document.getElementById('promo-code-input').value.trim().toUpperCase();
+        const msgEl = document.getElementById('promo-message');
+        
+        if (!codeInput) return;
+
+        // If promo codes haven't loaded yet, fetch them now
+        if (Object.keys(activeDiscountCodes).length === 0 && Object.keys(activeFixedCodes).length === 0) {
+            msgEl.textContent = "LOADING CODES...";
+            msgEl.className = "text-[9px] font-bold mt-2 text-[#d4af37] block";
+            try {
+                const storeSnap = await firebase.database().ref('mainStore').once('value');
+                const storeData = storeSnap.val();
+                if (storeData) {
+                    if (storeData.discountCodes) activeDiscountCodes = storeData.discountCodes;
+                    if (storeData.fixedCodes) activeFixedCodes = storeData.fixedCodes;
+                    if (storeData.discountCodeExpiry) activeDiscountCodeExpiry = storeData.discountCodeExpiry;
+                }
+            } catch (e) {
+                console.error('Failed to fetch promo codes:', e);
+            }
+        }
+
+        if (usedPromoCodes.includes(codeInput)) {
+            msgEl.textContent = "YOU HAVE ALREADY USED THIS CODE.";
+            msgEl.className = "text-[9px] font-bold mt-2 text-red-600 block";
+            appliedPromo = null;
+            recalculateTotals();
+            return;
+        }
+
+        if (activeDiscountCodes[codeInput]) {
+            const now = Date.now();
+            const codeExpiry = activeDiscountCodeExpiry ? activeDiscountCodeExpiry[codeInput] : null;
+
+            if (codeExpiry && now > codeExpiry) {
+                msgEl.textContent = "THIS PROMO CODE HAS EXPIRED.";
+                msgEl.className = "text-[9px] font-bold mt-2 text-red-600 block";
+                appliedPromo = null;
+                recalculateTotals();
+                return;
+            }
+
+            const codeValue = normalizeCodeEntry(activeDiscountCodes[codeInput]);
+            appliedPromo = { code: codeInput, type: 'percent', value: codeValue };
+            promoDiscountAmount = orderSubtotal * (codeValue / 100);
+            msgEl.textContent = `CODE APPLIED: -${codeValue}% OFF`;
+            msgEl.className = "text-[9px] font-bold mt-2 text-green-600 block";
+            recalculateTotals();
+        } else if (activeFixedCodes[codeInput]) {
+                       const codeValue = normalizeCodeEntry(activeFixedCodes[codeInput]);
+            appliedPromo = { code: codeInput, type: 'fixed', value: codeValue };
+            promoDiscountAmount = Math.min(codeValue, orderSubtotal);
+            msgEl.textContent = `GIFT CARD APPLIED: -${formatPrice(codeValue)}`;
+            msgEl.className = "text-[9px] font-bold mt-2 text-green-600 block";
+            recalculateTotals();
+        } else {
+            msgEl.textContent = "INVALID OR EXPIRED CODE.";
+            msgEl.className = "text-[9px] font-bold mt-2 text-red-600 block";
+            appliedPromo = null;
+            recalculateTotals();
+        }
+    });
+
+       firebase.auth().onAuthStateChanged(async (user) => {
+        if (!user) {
+            window.location.href = "login.html";
+            return;
+        }
+
+        console.log('[CHECKOUT] User authenticated:', user.uid);
+        const itemsContainer = document.getElementById('checkout-items');
+
+        // ─── LOAD USER PROFILE ───
+        try {
+            if(user.email) document.getElementById('ship-email').value = user.email;
+            const userSnap = await firebase.database().ref(`users/${user.uid}`).once('value');
+            const userData = userSnap.val();
+            if (userData && userData.address) {
+                document.getElementById('ship-first-name').value = userData.address.firstName || '';
+                document.getElementById('ship-last-name').value = userData.address.lastName || '';
+                document.getElementById('ship-address').value = userData.address.street || '';
+                document.getElementById('ship-apt').value = userData.address.apt || '';
+                document.getElementById('ship-city').value = userData.address.city || '';
+                document.getElementById('ship-zip').value = userData.address.zip || '';
+                document.getElementById('ship-country').value = userData.address.country || '';
+                if (userData.address.phone) phoneInput.setNumber(userData.address.phone);
+            }
+        } catch(e) { console.error('[CHECKOUT] Profile load error:', e); }
+
+        // ─── LOAD ADDRESS BOOK ───
+        try {
+            const addrBookSnap = await firebase.database().ref(`users/${user.uid}/addressBook`).once('value');
+            window.checkoutAddrBook = addrBookSnap.val() || {};
+            const addrSelect = document.getElementById('address-book-select');
+            addrSelect.innerHTML = '<option value="">-- Select a saved address --</option>';
+            let hasPreferred = false;
+            Object.entries(window.checkoutAddrBook).forEach(([key, addr]) => {
+                const opt = document.createElement('option');
+                opt.value = key;
+                opt.textContent = `${addr.street}, ${addr.city}${addr.preferred ? ' (Preferred)' : ''}`;
+                if (addr.preferred) { opt.selected = true; hasPreferred = true; }
+                addrSelect.appendChild(opt);
+            });
+            if (Object.keys(window.checkoutAddrBook).length > 0) {
+                document.getElementById('address-book-container').classList.remove('hidden');
+                if (hasPreferred) selectSavedAddress();
+            }
+        } catch(e) { console.error('[CHECKOUT] Address book error:', e); }
+
+        // ─── LOAD VIP STATUS ───
+        try {
+            const ordersSnap = await firebase.database().ref('orders').orderByChild('userId').equalTo(user.uid).once('value');
+            prevCount200 = 0; prevCount500 = 0; prevCount700 = 0;
+            let used3 = 0, used6 = 0, used10 = 0;
+            if (ordersSnap.exists()) {
+                Object.values(ordersSnap.val()).forEach(o => {
+                    if (o.status !== 'Canceled' && o.status !== 'Refunded') {
+                        let amt = o.totalAmount || 0;
+                        if (amt >= 700) prevCount700++;
+                        if (amt >= 500) prevCount500++;
+                        if (amt >= 200) prevCount200++;
+                        if (o.vipDiscountPercent === 10) used10++;
+                        else if (o.vipDiscountPercent === 6) used6++;
+                        else if (o.vipDiscountPercent === 3) used3++;
+                        if (o.promoCodeUsed) usedPromoCodes.push(o.promoCodeUsed.toUpperCase());
+                    }
+                });
+            }
+            if (prevCount700 >= 10 && used10 < 2) { vipDiscountPercentApplied = 10; vipLabel = "ATELIER ELITE (-10%)"; }
+            else if (prevCount500 >= 6 && used6 < 1) { vipDiscountPercentApplied = 6; vipLabel = "ATELIER PRESTIGE (-6%)"; }
+            else if (prevCount200 >= 3 && used3 < 1) { vipDiscountPercentApplied = 3; vipLabel = "ATELIER VIP (-3%)"; }
+        } catch(e) { console.error('[CHECKOUT] VIP status error:', e); }
+
+        // ─── LOAD CART ───
+        try {
+            const cartSnap = await firebase.database().ref(`users/${user.uid}/cart`).once('value');
+            orderCartData = normalizeCart(cartSnap.val());
+            console.log('[CHECKOUT] Firebase cart:', orderCartData);
+
+            if (!orderCartData || Object.keys(orderCartData).length === 0) {
+                const localCartRaw = localStorage.getItem('sayand_cart');
+                if (localCartRaw) {
+                    try {
+                        const localCart = JSON.parse(localCartRaw);
+                        if (Array.isArray(localCart) && localCart.length > 0) {
+                            orderCartData = {};
+                            localCart.forEach((item, index) => {
+                                orderCartData[index] = {
+                                    name: item.name || '',
+                                    price: parseFloat(item.price || item.salePrice || 0),
+                                    quantity: parseInt(item.qty || item.quantity || 1),
+                                    size: item.size || 'N/A',
+                                    color: item.color || 'N/A',
+                                    image: item.image || item.img || ''
+                                };
+                            });
+                        }
+                    } catch (e) { console.error('[CHECKOUT] localStorage parse error:', e); }
+                }
+            }
+
+            if (!orderCartData || Object.keys(orderCartData).length === 0) {
+                itemsContainer.innerHTML = '<p class="text-xs text-[#6a7c64] font-bold text-center py-4">Your bag is empty.</p>';
+                orderSubtotal = 0;
+            } else {
+                let html = '';
+                orderSubtotal = 0;
+                Object.values(orderCartData).forEach(item => {
+                    const itemPrice = parseFloat(item.price || 0);
+                    const itemQty = parseInt(item.quantity || item.qty || 1);
+                    const itemTotal = itemPrice * itemQty;
+                    orderSubtotal += itemTotal;
+                    html += `<div class="flex items-center gap-4 border-b border-[#c2c9c0]/50 pb-3 mb-3">
+                        <div class="relative">
+                            <img src="${item.image || item.img || ''}" class="w-16 h-20 object-cover border border-[#c2c9c0]/30" onerror="this.style.display='none'">
+                            <span class="absolute -top-2 -right-2 bg-[#1a2e15] text-[#d4af37] w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black">${itemQty}</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-[10px] font-black tracking-wider truncate uppercase text-[#1a2e15]">${item.name || 'Unknown Item'}</h4>
+                            <p class="text-[9px] text-[#6a7c64] font-bold mt-1 uppercase">SIZE: ${item.size || 'N/A'} | COLOR: ${item.color || 'N/A'}</p>
+                        </div>
+                        <div class="text-[10px] font-black text-[#1a2e15]">${formatPrice(itemTotal)}</div>
+                    </div>`;
+                });
+                itemsContainer.innerHTML = html;
+                document.getElementById('checkout-subtotal').textContent = formatPrice(orderSubtotal);
+            }
+        } catch(e) {
+            console.error('[CHECKOUT] Cart load error:', e);
+            itemsContainer.innerHTML = '<p class="text-xs text-red-600 font-bold text-center py-4">Error loading bag. Check console.</p>';
+        }
+
+        // ─── LOAD STORE DATA (payment links, promo codes, announcement promo) ───
+        try {
+            const storeSnap = await firebase.database().ref('mainStore').once('value');
+            const storeData = storeSnap.val();
+            if (storeData) {
+                if (storeData.contact) {
+                    baseRevolut = storeData.contact.revolut || '';
+                    basePaypal = storeData.contact.paypal || '';
+                    baseWhatsapp = storeData.contact.whatsapp || '';
+                }
+                if (storeData.discountCodes) activeDiscountCodes = storeData.discountCodes;
+                if (storeData.fixedCodes) activeFixedCodes = storeData.fixedCodes;
+                if (storeData.discountCodeExpiry) activeDiscountCodeExpiry = storeData.discountCodeExpiry;
+
+                // ─── LOAD ANNOUNCEMENT PROMO ───
+                if (storeData.announcement && storeData.announcement.isPromo && storeData.announcement.active) {
+                    const now = new Date().getTime();
+                    const endDate = storeData.announcement.promoEndDate ? new Date(storeData.announcement.promoEndDate).getTime() : 0;
+                    if (endDate > now) {
+                        announcementPromo = {
+                            minAmount: parseFloat(storeData.announcement.promoMinAmount) || 0,
+                            percent: parseFloat(storeData.announcement.promoPercent) || 0
+                        };
+                        console.log('[CHECKOUT] Active announcement promo:', announcementPromo);
+                    } else {
+                        announcementPromo = null;
+                        console.log('[CHECKOUT] Announcement promo expired');
+                    }
+                } else {
+                    announcementPromo = null;
+                }
+            }
+        } catch(e) { console.error('[CHECKOUT] Store data error:', e); }
+
+        // ─── CALCULATE AND DISPLAY ALL TOTALS ONLY AFTER ALL DATA IS LOADED ───
+        try {
+            vipDiscountAmount = vipDiscountPercentApplied > 0 ? (orderSubtotal * (vipDiscountPercentApplied / 100)) : 0;
+            if(vipDiscountPercentApplied > 0) {
+                document.getElementById('vip-discount-row').classList.remove('hidden');
+                document.getElementById('checkout-vip-label').textContent = vipLabel;
+                document.getElementById('checkout-vip').textContent = '-' + formatPrice(vipDiscountAmount);
+            } else {
+                document.getElementById('vip-discount-row').classList.add('hidden');
+            }
+            updateShippingDisplay();
+        } catch(e) { console.error('[CHECKOUT] Totals error:', e); }
+    });
+
+    document.getElementById('checkout-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        if (!orderCartData) {
+            alert("Your bag is empty!");
+            return;
+        }
+
+        const phoneErrorEl = document.getElementById('phone-error');
+        const generalErrorEl = document.getElementById('checkout-error');
+        
+        phoneErrorEl.style.display = 'none';
+        if(generalErrorEl) generalErrorEl.innerText = '';
+
+        if (!phoneInput.isValidNumber()) {
+            phoneErrorEl.style.display = 'block';
+            document.getElementById('ship-phone').focus();
+            return; 
+        }
+        
+        const securePhoneNumber = phoneInput.getNumber(); 
+
+        const addressInput = document.getElementById('ship-address').value.trim();
+        const cityInput = document.getElementById('ship-city').value.trim();
+        const zipInput = document.getElementById('ship-zip').value.trim();
+
+        if (addressInput.length < 5) {
+            if(generalErrorEl) generalErrorEl.innerText = "Please provide a complete street address.";
+            document.getElementById('ship-address').focus();
+            return; 
+        }
+
+        if (cityInput.length < 2) {
+            if(generalErrorEl) generalErrorEl.innerText = "Please provide a valid city.";
+            document.getElementById('ship-city').focus();
+            return; 
+        }
+
+        if (zipInput.length < 2) {
+            if(generalErrorEl) generalErrorEl.innerText = "Please provide a valid ZIP/Postal code.";
+            document.getElementById('ship-zip').focus();
+            return; 
+        }
+
+        const submitBtn = document.getElementById('submit-order-btn');
+        submitBtn.innerText = "PROCESSING...";
+        submitBtn.disabled = true;
+
+        const shipping = {
+            firstName: document.getElementById('ship-first-name').value.trim(),
+            lastName: document.getElementById('ship-last-name').value.trim(),
+            email: document.getElementById('ship-email').value.trim(),
+            phone: securePhoneNumber, 
+            address: addressInput,
+            apt: document.getElementById('ship-apt').value.trim(),
+            city: cityInput,
+            zip: zipInput,
+            country: document.getElementById('ship-country').value.trim()
+        };
+
+        const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+
+        // ─── LIVE STOCK VALIDATION ───
+        try {
+            const storeSnap = await firebase.database().ref('mainStore').once('value');
+            const storeData = storeSnap.val() || {};
+            const stockErrors = await validateCartStock(orderCartData, storeData);
+            
+            if (stockErrors.length > 0) {
+                if (generalErrorEl) {
+                    generalErrorEl.innerHTML = stockErrors.map(e => `• ${e}`).join('<br>');
+                }
+                submitBtn.innerText = "COMPLETE ORDER";
+                submitBtn.disabled = false;
+                return;
+            }
+        } catch (e) {
+            console.error('[CHECKOUT] Stock validation error:', e);
+            if (generalErrorEl) generalErrorEl.innerText = "Unable to verify stock. Please try again.";
+            submitBtn.innerText = "COMPLETE ORDER";
+            submitBtn.disabled = false;
+            return;
+        }
+
+        const currentUser = firebase.auth().currentUser;
+        if(!currentUser){
+            if(generalErrorEl)generalErrorEl.innerText='Session expired. Please sign in again.';
+            submitBtn.innerText='COMPLETE ORDER';submitBtn.disabled=false;
+            setTimeout(()=>window.location.href='login.html',2000);return;
+        }
+        const isGiftChecked = document.getElementById('is-gift-checkbox').checked;
+        
+        const newOrderRef = firebase.database().ref('orders').push();
+        const orderId = newOrderRef.key;
+        
+        // Generate payment URL before saving
+        let paymentUrl = null;
+        if (paymentMethod === 'Revolut' && baseRevolut) {
+            paymentUrl = formatRevolutLink(baseRevolut);
+        } else if (paymentMethod === 'PayPal' && basePaypal) {
+            paymentUrl = formatPayPalLink(basePaypal, finalOrderTotal);
+        } else if (paymentMethod === 'WhatsApp' && baseWhatsapp) {
+            const formattedPhone = baseWhatsapp.replace(/[^0-9+]/g, '');
+            const giftAddon = isGiftChecked ? ' This order includes a SAYAND Signature Gift Box.' : '';
+            const orderText = `Hello SAYAND! I just placed an order (Total: €${finalOrderTotal.toFixed(2)} EUR). My order email is: ${shipping.email}.${giftAddon} I would like to arrange payment.`;
+            paymentUrl = `https://wa.me/${formattedPhone}?text=${encodeURIComponent(orderText)}`;
+        }
+
+        const newOrder = {
+            userId: currentUser.uid,
+            status: "Pending",
+            date: new Date().toISOString(),
+            timestamp: firebase.database.ServerValue.TIMESTAMP,
+            totalAmount: finalOrderTotal,
+            discountAmount: vipDiscountAmount + promoDiscountAmount + announcementDiscountAmount,
+            vipDiscountPercent: vipDiscountPercentApplied,
+            promoCodeUsed: appliedPromo ? appliedPromo.code : null,
+            announcementDiscount: announcementDiscountAmount,
+            announcementPromoPercent: announcementPromo ? announcementPromo.percent : 0,
+            shippingCost: shippingCost,    
+            paymentMethod: paymentMethod,
+            paymentUrl: paymentUrl,
+            isGift: isGiftChecked,
+            giftNote: isGiftChecked ? document.getElementById('gift-note').value.trim() : "",
+            shippingInfo: shipping,
+            items: orderCartData
+        };
+
+       const updates = {};
+updates['/orders/' + orderId] = newOrder; 
+updates['/users/' + currentUser.uid + '/orders/' + orderId] = newOrder;
+updates['/adminOrderIndex/' + orderId] = {
+    timestamp: firebase.database.ServerValue.TIMESTAMP,
+    userId: currentUser.uid
+};
+updates['/publicOrderIndex/' + orderId.slice(-6).toUpperCase()] = {
+    orderId: orderId,
+    timestamp: firebase.database.ServerValue.TIMESTAMP
+};
+
+         // Save address to address book if checked
+        const saveAddressChecked = document.getElementById('save-address-checkbox').checked;
+        if (saveAddressChecked) {
+            const addressLabel = `${shipping.address}, ${shipping.city}`;
+            const addressEntry = {
+                label: addressLabel,
+                firstName: shipping.firstName,
+                lastName: shipping.lastName,
+                street: shipping.address,
+                apt: shipping.apt,
+                city: shipping.city,
+                zip: shipping.zip,
+                country: shipping.country,
+                phone: shipping.phone,
+                preferred: true
+            };
+            
+            // Check for duplicates before saving
+            const userAddrSnap = await firebase.database().ref(`users/${currentUser.uid}/addressBook`).once('value');
+            const existingAddrs = userAddrSnap.val() || {};
+            
+            let isDuplicate = false;
+            Object.values(existingAddrs).forEach(addr => {
+                if (
+                    (addr.street || '').trim().toLowerCase() === shipping.address.toLowerCase() &&
+                    (addr.city || '').trim().toLowerCase() === shipping.city.toLowerCase() &&
+                    (addr.zip || '').trim().toLowerCase() === shipping.zip.toLowerCase() &&
+                    (addr.country || '').trim().toLowerCase() === shipping.country.toLowerCase()
+                ) {
+                    isDuplicate = true;
+                }
+            });
+            
+            if (!isDuplicate) {
+                const newAddrKey = firebase.database().ref().push().key;
+                
+                Object.keys(existingAddrs).forEach(k => {
+                    if (existingAddrs[k].preferred) {
+                        updates[`/users/${currentUser.uid}/addressBook/${k}/preferred`] = false;
+                    }
+                });
+                
+                updates[`/users/${currentUser.uid}/addressBook/${newAddrKey}`] = addressEntry;
+            }
+            
+            updates[`/users/${currentUser.uid}/address`] = addressEntry;
+        }
+
+        try {
+            const storeSnap = await firebase.database().ref('mainStore').once('value');
+            const storeData = storeSnap.val();
+
+            if (storeData) {
+                Object.values(orderCartData).forEach(cartItem => {
+                    for (const section in storeData) {
+                        if (Array.isArray(storeData[section])) {
+                            storeData[section].forEach((prod, index) => {
+                                if (prod.name === cartItem.name) {
+                                    let path = `/mainStore/${section}/${index}`;
+                                    const cartQty = parseInt(cartItem.quantity || cartItem.qty || 1);
+                                    
+                                    if (prod.sizeQuantities && prod.sizeQuantities[cartItem.size] !== undefined) {
+                                        const currentQty = parseInt(prod.sizeQuantities[cartItem.size]);
+                                        const newQty = Math.max(0, currentQty - cartQty);
+                                        updates[`${path}/sizeQuantities/${cartItem.size}`] = newQty;
+                                    } 
+                                    
+                                    if (prod.quantity !== undefined) {
+                                        const newTotal = Math.max(0, parseInt(prod.quantity) - cartQty);
+                                        updates[`${path}/quantity`] = newTotal;
+                                        if (newTotal === 0) updates[`${path}/isOutOfStock`] = true;
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+
+            await firebase.database().ref().update(updates);
+            await firebase.database().ref(`users/${currentUser.uid}/cart`).remove();
+
+            // Clear all possible localStorage cart keys
+            ['sayand_cart', 'cart', 'sayandCart', 'shoppingCart', 'bag', 'sayand_bag'].forEach(k => localStorage.removeItem(k));
+
+            try {
+                const cartItemsList = Object.values(orderCartData);
+                const firstItem = cartItemsList.length > 0 ? cartItemsList[0] : {};
+
+                const sendEmailFn = firebase.functions().httpsCallable('sendStoreEmail');
+                
+                sendEmailFn({
+                    type: 'order_confirmed',
+                    payload: {
+                        email: shipping.email,
+                        firstName: shipping.firstName,
+                        orderId: orderId.slice(-6).toUpperCase(),
+                        totalAmount: finalOrderTotal.toFixed(2),
+                        itemPrice: Number(firstItem.price || 0).toFixed(2),
+                        subtotal: orderSubtotal.toFixed(2),
+                        shippingCost: Number(shippingCost).toFixed(2),
+                        shippingAddress: `${shipping.address}, ${shipping.city}, ${shipping.country}`,
+                        productImage: firstItem.image || '', 
+                        productName: firstItem.name || ''     
+                    }
+                });
+
+                let newlyUnlockedTier = null;
+                let discountPercent = null;
+
+                if (finalOrderTotal >= 700 && prevCount700 === 9) { 
+                    newlyUnlockedTier = "ATELIER ELITE"; 
+                    discountPercent = "10%"; 
+                } else if (finalOrderTotal >= 500 && prevCount500 === 5) { 
+                    newlyUnlockedTier = "ATELIER PRESTIGE"; 
+                    discountPercent = "6%"; 
+                } else if (finalOrderTotal >= 200 && prevCount200 === 2) { 
+                    newlyUnlockedTier = "ATELIER VIP"; 
+                    discountPercent = "3%"; 
+                }
+
+                if (newlyUnlockedTier) {
+                    sendEmailFn({
+                        type: 'vip_unlocked',
+                        payload: {
+                            email: shipping.email,
+                            firstName: shipping.firstName,
+                            vipTier: newlyUnlockedTier,
+                            discountPercent: discountPercent,
+                            shopUrl: "https://thesayand.com/"
+                        }
+                    });
+                }
+
+            } catch (emailErr) {
+                console.error("Email trigger failed:", emailErr);
+            }
+
+            // ─── REDIRECT TO PAYMENT PAGE ───
+            if (paymentMethod === 'WhatsApp' && paymentUrl) {
+                window.open(paymentUrl, '_blank');
+            }
+            window.location.href = `payment.html?orderId=${orderId}`;
+
+        } catch (error) {
+            console.error("Order error:", error);
+            const generalErrorEl = document.getElementById('checkout-error');
+            let msg="There was an error submitting your order. Please try again.";
+            if(error&&error.message){if(error.message.includes('PERMISSION'))msg="Permission denied. Contact support.";else if(error.message.includes('network')||error.message.includes('offline'))msg="Network error. Check connection.";}
+            if(generalErrorEl) generalErrorEl.innerText = msg;
+            submitBtn.innerText = "COMPLETE ORDER";
+            submitBtn.disabled = false;
+        }
+    });
+
+    // Dynamic shipping listeners
+    document.getElementById('ship-country').addEventListener('input', updateShippingDisplay);
+    document.getElementById('ship-country').addEventListener('change', updateShippingDisplay);
+</script>
+
+    <!-- Google Maps API -->
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD8RHTg2bBV_mclB6RKb_nz_Cdk8C48pls&libraries=places&callback=initMapsWithRetry"></script>
+</body>
+</html>

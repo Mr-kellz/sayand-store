@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAYAND | Atelier Lookbook</title>
+    <link rel="icon" type="image/png" href="https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/SAYAND%20Intertwined%20S%26A%20Monogram.png?alt=media&token=4a0c7abb-0150-4d22-94fc-d58f901a45f6">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f5f0e8; color: #0f1f0f; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .lookbook-card:hover .lookbook-img { transform: scale(1.05); }
+        .lookbook-overlay { background: linear-gradient(to top, rgba(15,31,15,0.9) 0%, rgba(15,31,15,0.2) 60%, transparent 100%); }
+    </style>
+</head>
+<body class="antialiased overflow-x-hidden flex flex-col min-h-screen bg-[#f5f0e8]">
+
+    <!-- NAVIGATION -->
+    <nav class="fixed top-0 left-0 w-full z-[99] bg-[#0f1f0f]/95 backdrop-blur-md border-b border-[#c9a227]/20">
+        <div class="w-full px-4 sm:px-6 lg:px-8 xl:px-12">
+            <div class="flex justify-between items-center h-16 md:h-20 relative">
+                <div class="flex items-center flex-1">
+                    <button id="menuBtn" class="md:hidden flex flex-col space-y-1.5 p-2 mr-4 z-50" onclick="toggleMenu()">
+                        <span class="w-6 h-0.5 bg-[#c9a227] transition-all duration-300"></span>
+                        <span class="w-6 h-0.5 bg-[#c9a227] transition-all duration-300"></span>
+                    </button>
+                    <div class="hidden md:flex space-x-8 text-[10px] tracking-[0.2em] font-black">
+                        <a href="collection.html?category=women" class="text-[#e8d5a3] hover:text-[#c9a227] transition-colors duration-300">WOMEN</a>
+                        <a href="collection.html?category=men" class="text-[#e8d5a3] hover:text-[#c9a227] transition-colors duration-300">MEN</a>
+                        <a href="collection.html?category=accessories" class="text-[#e8d5a3] hover:text-[#c9a227] transition-colors duration-300">ACCESSORIES</a>
+                        <a href="lookbook.html" class="text-[#c9a227] transition-colors duration-300">EDITORIAL</a>
+                        <a href="sales.html" class="text-red-400 hover:text-red-300 transition-colors duration-300">SALE</a>
+                    </div>
+                </div>
+                <div class="absolute left-1/2 transform -translate-x-1/2 z-50 pointer-events-none">
+                    <a href="index.html" class="text-2xl md:text-3xl lg:text-4xl font-black tracking-tighter leading-none pointer-events-auto text-[#c9a227] hover:opacity-80 transition-opacity">SAYAND</a>
+                </div>
+                <div class="flex items-center justify-end space-x-4 md:space-x-6 flex-1">
+                    <a href="index.html" class="text-[10px] tracking-[0.2em] font-black text-[#e8d5a3] hover:text-[#c9a227] transition-colors uppercase">Storefront &rarr;</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MOBILE MENU -->
+    <div id="mobileMenu" class="fixed inset-0 bg-[#0f1f0f] text-[#c9a227] z-40 flex flex-col justify-center items-center space-y-6 transform translate-x-full transition-transform duration-300">
+        <button onclick="toggleMenu()" class="absolute top-5 right-5 text-3xl text-[#c9a227]">&times;</button>
+        <a href="collection.html?category=women" class="text-3xl font-black tracking-widest hover:text-[#e8d5a3] transition-colors uppercase">WOMEN</a>
+        <a href="collection.html?category=men" class="text-3xl font-black tracking-widest hover:text-[#e8d5a3] transition-colors uppercase">MEN</a>
+        <a href="collection.html?category=accessories" class="text-3xl font-black tracking-widest hover:text-[#e8d5a3] transition-colors uppercase">ACCESSORIES</a>
+        <a href="lookbook.html" class="text-3xl font-black tracking-widest hover:text-[#e8d5a3] transition-colors uppercase">EDITORIAL</a>
+        <a href="sales.html" class="text-3xl font-black tracking-widest text-red-500 hover:text-red-400 transition-colors uppercase">SALE</a>
+    </div>
+
+    <!-- LOOKBOOK HERO SECTION -->
+    <section class="relative w-full h-[85vh] md:h-screen pt-16 md:pt-20 overflow-hidden bg-[#0f1f0f]">
+        <div id="lb-hero-media" class="absolute inset-0"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-[#0f1f0f]/90 via-[#0f1f0f]/40 to-transparent pointer-events-none"></div>
+        <div class="relative h-full flex flex-col justify-end pb-12 md:pb-20 px-4 sm:px-6 lg:px-8 xl:px-12 pointer-events-none">
+            <div class="max-w-4xl text-white pointer-events-auto">
+               <p id="lb-hero-subtitle" class="text-[10px] tracking-[0.4em] font-black mb-3 text-[#c9a227] uppercase">THE EDIT</p>
+               <h1 id="lb-hero-title" class="text-5xl md:text-7xl lg:text-8xl font-black leading-[0.9] tracking-tighter mb-4 text-[#f5f0e8]">LESS IS<br>ALWAYS<br>MORE</h1>
+               <p id="lb-hero-desc" class="text-xs md:text-sm text-[#e8d5a3] max-w-md font-medium leading-relaxed">Our design philosophy centers on precision cutting and premium materials. Each piece is crafted to transcend seasons, not chase them.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CATEGORY MOOD CARDS -->
+    <section class="w-full py-16 md:py-24 px-4 sm:px-6 lg:px-8 xl:px-12 bg-[#f5f0e8]">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <p class="text-[10px] font-black tracking-[0.3em] text-[#c9a227] mb-2 uppercase">Seasonless</p>
+                <h2 class="text-3xl md:text-5xl font-black tracking-tighter text-[#0f1f0f] uppercase">The Collections</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                <!-- Look 1 (Women) -->
+                <div class="lookbook-card group cursor-pointer relative aspect-[3/4] overflow-hidden border border-[#d4c9a8]/40 shadow-sm" onclick="window.location.href='collection.html?category=women'">
+                    <div id="lb-women-media" class="w-full h-full absolute inset-0"></div>
+                    <div class="lookbook-overlay absolute inset-0 flex flex-col justify-end p-6 md:p-8 pointer-events-none">
+                        <p class="text-[10px] tracking-[0.3em] font-black text-[#c9a227] mb-2 uppercase">Women</p>
+                        <h3 class="text-2xl md:text-3xl font-black tracking-tighter text-white mb-2">THE SILHOUETTE EDIT</h3>
+                        <p class="text-xs text-[#e8d5a3] font-medium leading-relaxed mb-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">Oversized coats and precision-cut tailoring for the modern wardrobe.</p>
+                        <span class="text-[10px] tracking-[0.2em] font-black text-[#c9a227] uppercase border-b border-[#c9a227] pb-1 w-fit">Shop The Edit &rarr;</span>
+                    </div>
+                </div>
+
+                <!-- Look 2 (Men) -->
+                <div class="lookbook-card group cursor-pointer relative aspect-[3/4] overflow-hidden border border-[#d4c9a8]/40 shadow-sm" onclick="window.location.href='collection.html?category=men'">
+                    <div id="lb-men-media" class="w-full h-full absolute inset-0"></div>
+                    <div class="lookbook-overlay absolute inset-0 flex flex-col justify-end p-6 md:p-8 pointer-events-none">
+                        <p class="text-[10px] tracking-[0.3em] font-black text-[#c9a227] mb-2 uppercase">Men</p>
+                        <h3 class="text-2xl md:text-3xl font-black tracking-tighter text-white mb-2">STRUCTURED EASE</h3>
+                        <p class="text-xs text-[#e8d5a3] font-medium leading-relaxed mb-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">Relaxed fits with architectural structure. Built for movement.</p>
+                        <span class="text-[10px] tracking-[0.2em] font-black text-[#c9a227] uppercase border-b border-[#c9a227] pb-1 w-fit">Shop The Edit &rarr;</span>
+                    </div>
+                </div>
+
+                <!-- Look 3 (Accessories) -->
+                <div class="lookbook-card group cursor-pointer relative aspect-[3/4] overflow-hidden border border-[#d4c9a8]/40 shadow-sm" onclick="window.location.href='collection.html?category=accessories'">
+                    <div id="lb-acc-media" class="w-full h-full absolute inset-0"></div>
+                    <div class="lookbook-overlay absolute inset-0 flex flex-col justify-end p-6 md:p-8 pointer-events-none">
+                        <p class="text-[10px] tracking-[0.3em] font-black text-[#c9a227] mb-2 uppercase">Accessories</p>
+                        <h3 class="text-2xl md:text-3xl font-black tracking-tighter text-white mb-2">FINISHING TOUCHES</h3>
+                        <p class="text-xs text-[#e8d5a3] font-medium leading-relaxed mb-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">Leather goods, eyewear, and objects of permanence.</p>
+                        <span class="text-[10px] tracking-[0.2em] font-black text-[#c9a227] uppercase border-b border-[#c9a227] pb-1 w-fit">Shop The Edit &rarr;</span>
+                    </div>
+                </div>
+
+                <!-- Look 4 (Sale) -->
+                <div class="lookbook-card group cursor-pointer relative aspect-[3/4] overflow-hidden border border-[#d4c9a8]/40 shadow-sm" onclick="window.location.href='sales.html'">
+                    <div id="lb-sale-media" class="w-full h-full absolute inset-0"></div>
+                    <div class="lookbook-overlay absolute inset-0 flex flex-col justify-end p-6 md:p-8 pointer-events-none">
+                        <p class="text-[10px] tracking-[0.3em] font-black text-[#c9a227] mb-2 uppercase">Archive</p>
+                        <h3 class="text-2xl md:text-3xl font-black tracking-tighter text-white mb-2">THE SALE EDIT</h3>
+                        <p class="text-xs text-[#e8d5a3] font-medium leading-relaxed mb-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">Exclusive access to previous collections and rare pieces.</p>
+                        <span class="text-[10px] tracking-[0.2em] font-black text-[#c9a227] uppercase border-b border-[#c9a227] pb-1 w-fit">Shop Sale &rarr;</span>
+                    </div>
+                </div>
+
+                <!-- Look 5 (Editorial) -->
+                <div class="lookbook-card group cursor-pointer relative aspect-[3/4] overflow-hidden border border-[#d4c9a8]/40 shadow-sm" onclick="document.getElementById('magazine-feed').scrollIntoView({behavior: 'smooth'})">
+                    <div id="lb-edit-media" class="w-full h-full absolute inset-0"></div>
+                    <div class="lookbook-overlay absolute inset-0 flex flex-col justify-end p-6 md:p-8 pointer-events-none">
+                        <p class="text-[10px] tracking-[0.3em] font-black text-[#c9a227] mb-2 uppercase">Editorial</p>
+                        <h3 class="text-2xl md:text-3xl font-black tracking-tighter text-white mb-2">THE CAMPAIGN</h3>
+                        <p class="text-xs text-[#e8d5a3] font-medium leading-relaxed mb-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">Discover the stories and styling behind our latest drops.</p>
+                        <span class="text-[10px] tracking-[0.2em] font-black text-[#c9a227] uppercase border-b border-[#c9a227] pb-1 w-fit">Read More &rarr;</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- NEW MAGAZINE FEED SECTION -->
+    <section class="w-full py-16 md:py-24 bg-[#0f1f0f] border-t border-[#c9a227]/20">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 border-b border-[#c9a227]/20 pb-10">
+                <p class="text-[10px] font-black tracking-[0.3em] text-[#c9a227] mb-4 uppercase">The Campaign</p>
+                <h1 class="text-4xl md:text-6xl font-black tracking-tighter text-[#f5f0e8] uppercase">EDITORIAL MAGAZINE</h1>
+                <p class="text-[#7a8a6e] text-xs font-medium leading-relaxed mt-4">Immerse yourself in the mood of the season. Click any article to view styling details and shop the featured pieces.</p>
+            </div>
+            
+            <!-- Articles get injected here -->
+            <div id="magazine-feed" class="flex flex-col space-y-20">
+                <p class="text-xs font-bold tracking-widest text-[#7a8a6e] text-center uppercase py-10">Loading editorial...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="w-full bg-white border-t border-[#d4c9a8] pt-16 pb-8 px-4 sm:px-6 lg:px-8 xl:px-12 mt-auto">
+        <div class="border-t border-[#d4c9a8] pt-8 flex flex-col justify-center items-center">
+            <p class="text-[9px] font-black tracking-[0.2em] text-[#7a8a6e] uppercase">&copy; 2026 SAYAND. ALL RIGHTS RESERVED.</p>
+        </div>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="js/firebase-config.js"></script>
+
+    <script>
+        function toggleMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('translate-x-full');
+        }
+
+        if (typeof firebase !== 'undefined' && firebase.database) {
+            firebase.database().ref("mainStore").once("value").then(snap => {
+                const data = snap.val();
+                if (!data) return;
+
+                // 1. Populate Hero & Mood Cards
+                const sc = data.siteContent || {};
+                
+                if (sc.editSubtitle) document.getElementById('lb-hero-subtitle').innerText = sc.editSubtitle;
+                if (sc.editTitle) document.getElementById('lb-hero-title').innerHTML = sc.editTitle;
+                if (sc.editDesc) document.getElementById('lb-hero-desc').innerText = sc.editDesc;
+                
+                // Ultra-Robust Dynamic Engine
+                const renderDynamicMedia = (url, containerId, extraClasses) => {
+                    const container = document.getElementById(containerId);
+                    if (!container || !url || url === '') return;
+                    
+                    const isVideo = url.toLowerCase().match(/\.(mp4|mov|webm)(\?.*)?$/) || url.includes('video');
+                    
+                    if (isVideo) {
+                        // 🟢 Injects video with Tap-to-Unmute
+                        container.innerHTML = `<video src="${url}" class="${extraClasses} cursor-pointer" autoplay loop muted playsinline onclick="event.stopPropagation(); this.muted = !this.muted;"></video>`;
+                        
+                        // 🟢 Forces iOS Safari to kickstart the video if it gets stuck
+                        setTimeout(() => {
+                            const v = container.querySelector('video');
+                            if(v) { v.muted = true; v.play().catch(e => console.log('Autoplay blocked:', e)); }
+                        }, 500);
+                    } else {
+                        container.innerHTML = `<img src="${url}" class="${extraClasses}">`;
+                    }
+                };
+
+                // 🟢 BULLETPROOF LOGIC: Filter out any text, and ONLY grab the first pure HTTPS link from the carousel
+                let heroMediaUrl = '';
+                if (sc.editImg && sc.editImg.includes('http')) {
+                    const validUrls = sc.editImg.split(',').map(s => s.trim()).filter(s => s.startsWith('http'));
+                    if (validUrls.length > 0) heroMediaUrl = validUrls[0];
+                } 
+                
+                // Fallback: If storefront is empty, grab from Lookbook Hero upload box
+                if (!heroMediaUrl && sc.lbHeroImg && sc.lbHeroImg.includes('http')) {
+                    heroMediaUrl = sc.lbHeroImg.trim(); 
+                }
+
+                renderDynamicMedia(heroMediaUrl, 'lb-hero-media', 'w-full h-full object-cover opacity-85');
+                renderDynamicMedia(sc.lbWomenImg, 'lb-women-media', 'lookbook-img w-full h-full object-cover transition-transform duration-700');
+                renderDynamicMedia(sc.lbMenImg, 'lb-men-media', 'lookbook-img w-full h-full object-cover transition-transform duration-700');
+                renderDynamicMedia(sc.lbAccImg, 'lb-acc-media', 'lookbook-img w-full h-full object-cover transition-transform duration-700');
+                renderDynamicMedia(sc.lbSaleImg, 'lb-sale-media', 'lookbook-img w-full h-full object-cover transition-transform duration-700');
+                renderDynamicMedia(sc.lbEditCardImg, 'lb-edit-media', 'lookbook-img w-full h-full object-cover transition-transform duration-700');
+
+                // 2. Render Stacked Magazine Feed
+                const lookbookData = data.lookbook || [];
+                const feedContainer = document.getElementById('magazine-feed');
+                
+                if (lookbookData.length > 0) {
+                    const sortedData = [...lookbookData].reverse(); 
+                    
+                    feedContainer.innerHTML = sortedData.map((article) => {
+                        const coverUrl = article.urls[0] || '';
+                        const isVideo = coverUrl.toLowerCase().match(/\.(mp4|mov|webm)(\?.*)?$/) || coverUrl.includes('video');
+                        
+                        const mediaHtml = isVideo 
+                            ? `<video src="${coverUrl}" class="article-img w-full h-[50vh] md:h-[70vh] object-cover cursor-pointer" autoplay loop muted playsinline onclick="event.stopPropagation(); this.muted = !this.muted;"></video>`
+                            : `<img src="${coverUrl}" class="article-img w-full h-[50vh] md:h-[70vh] object-cover bg-[#1a2e15]">`;
+
+                        return `
+                            <article class="article-card group cursor-pointer w-full" onclick="window.location.href='article.html?id=${article.id}'">
+                                <div class="w-full overflow-hidden mb-6 border border-[#c9a227]/20 relative">
+                                    ${mediaHtml}
+                                </div>
+                                <div class="px-2 max-w-2xl mx-auto text-center md:text-left">
+                                    <p class="text-[10px] tracking-[0.3em] font-black text-[#c9a227] mb-3 uppercase">${article.subtitle || 'EDITORIAL'}</p>
+                                    <h2 class="text-3xl md:text-5xl font-black tracking-tighter leading-tight text-[#f5f0e8] mb-4 group-hover:text-[#c9a227] transition-colors">${article.title}</h2>
+                                    <p class="text-xs md:text-sm text-[#e8d5a3] font-medium leading-relaxed line-clamp-3">${article.description}</p>
+                                </div>
+                            </article>
+                        `;
+                    }).join('');
+                } else {
+                    feedContainer.innerHTML = '<p class="text-xs font-bold tracking-widest text-[#7a8a6e] text-center uppercase py-10">Editorial campaign dropping soon.</p>';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

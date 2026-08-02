@@ -4,49 +4,66 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SAYAND | Admin Dashboard</title>
+    <link rel="icon" type="image/png" href="https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/SAYAND%20Intertwined%20S%26A%20Monogram.png?alt=media&token=4a0c7abb-0150-4d22-94fc-d58f901a45f6">
+    <link rel="apple-touch-icon" href="https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/SAYAND%20Intertwined%20S%26A%20Monogram.png?alt=media&token=4a0c7abb-0150-4d22-94fc-d58f901a45f6">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
-    <!-- Link to your external CSS file -->
     <link rel="stylesheet" href="css/admin.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f9f6f0; color: #1a2e15; }
+        .panel-box { background: white; border: 1px solid #c2c9c0; box-shadow: 0 4px 20px rgba(0,0,0,0.03); border-top: 3px solid #2c4c23; }
+        .input-field { border: 1px solid #c2c9c0; background: #fff; color: #1a2e15; outline: none; }
+        .input-field:focus { border-color: #d4af37; box-shadow: 0 0 0 1px #d4af37; }
+        .tab-btn { color: #6a7c64; border-bottom: 2px solid transparent; transition: all 0.2s; }
+        .tab-btn:hover { color: #1a2e15; }
+        .tab-btn.active { color: #1a2e15; border-bottom-color: #d4af37; }
+    </style>
 </head>
-<body class="bg-gray-50 text-black antialiased min-h-screen flex flex-col overflow-x-hidden">
+<body class="antialiased min-h-screen flex flex-col overflow-x-hidden">
 
-    <nav class="bg-white border-b border-gray-200 px-4 md:px-8 py-4 flex justify-between items-center sticky top-0 z-10">
-        <h1 class="text-lg md:text-xl font-black tracking-tighter">SAYAND <span class="text-gray-400 font-medium hidden sm:inline">| CMS DASHBOARD</span></h1>
-        <a href="index.html" class="text-xs tracking-[0.2em] font-bold text-gray-500 hover:text-black transition-colors">VIEW STOREFRONT &rarr;</a>
+    <nav class="bg-[#1a2e15] border-b border-[#d4af37]/30 px-4 md:px-8 py-4 flex justify-between items-center sticky top-0 z-10 text-white shadow-md">
+   <h1 class="text-lg md:text-xl font-black tracking-tighter flex items-center text-[#d4af37]">
+            SAYAND <span class="text-[#c2c9c0] font-medium hidden sm:inline ml-2 text-xs tracking-[0.2em] pt-1">| CMS DASHBOARD</span>
+            <span id="user-count-display" class="ml-4 text-[10px] bg-[#2c4c23] text-white px-2 py-1 border border-[#c2c9c0]/30 font-bold"></span>
+            <span id="visitor-count-display" class="ml-2 text-[10px] bg-black text-[#d4af37] px-2 py-1 border border-[#d4af37]/30 font-bold hidden"></span>
+        </h1>
+        <a href="index.html" target="_blank" class="text-[10px] tracking-[0.2em] font-black text-[#c2c9c0] hover:text-[#d4af37] transition-colors uppercase">VIEW STOREFRONT &rarr;</a>
     </nav>
 
-    <div class="flex-1 flex flex-col md:flex-row gap-6 p-4 md:p-6 max-w-[1600px] mx-auto w-full">
+    <div class="flex-1 flex flex-col md:flex-row gap-8 p-4 md:p-8 max-w-[1600px] mx-auto w-full">
         
-        <!-- LEFT SIDEBAR: Tabs + Forms -->
-        <div class="w-full md:w-[420px] bg-white border border-gray-200 shadow-sm h-fit flex-shrink-0">
-            <!-- Tab Navigation -->
-            <div class="flex border-b border-gray-100 overflow-x-auto hide-scrollbar">
-                <button class="tab-btn active pb-3 pt-4 px-4 text-[10px] tracking-[0.1em] font-bold whitespace-nowrap" onclick="switchTab('products')" data-tab="products">PRODUCTS</button>
-                <button class="tab-btn pb-3 pt-4 px-4 text-[10px] tracking-[0.1em] font-bold whitespace-nowrap" onclick="switchTab('sales')" data-tab="sales">SALES</button>
-                <button class="tab-btn pb-3 pt-4 px-4 text-[10px] tracking-[0.1em] font-bold whitespace-nowrap" onclick="switchTab('design')" data-tab="design">PAGE DESIGN</button>
-                <button class="tab-btn pb-3 pt-4 px-4 text-[10px] tracking-[0.1em] font-bold whitespace-nowrap" onclick="switchTab('contact')" data-tab="contact">CONTACT</button>
+        <div class="w-full lg:w-[650px] md:w-[550px] panel-box h-fit flex-shrink-0">
+            
+            <div class="flex flex-wrap border-b border-[#c2c9c0]/50 bg-[#f9f6f0]">
+                <button class="tab-btn active pb-3 pt-4 px-3 text-[10px] tracking-[0.1em] font-black whitespace-nowrap" onclick="switchTab('products')" data-tab="products">PRODUCTS</button>
+                <button class="tab-btn pb-3 pt-4 px-3 text-[10px] tracking-[0.1em] font-black whitespace-nowrap" onclick="switchTab('sales')" data-tab="sales">SALES & DROPS</button>
+                <button class="tab-btn pb-3 pt-4 px-3 text-[10px] tracking-[0.1em] font-black whitespace-nowrap" onclick="switchTab('design')" data-tab="design">PAGE DESIGN</button>
+                <button class="tab-btn pb-3 pt-4 px-3 text-[10px] tracking-[0.1em] font-black whitespace-nowrap" onclick="switchTab('lookbook')" data-tab="lookbook">LOOKBOOK</button>
+                <button class="tab-btn pb-3 pt-4 px-3 text-[10px] tracking-[0.1em] font-bold whitespace-nowrap" onclick="switchTab('contact')" data-tab="contact">CONTACT</button>
+                <button class="tab-btn pb-3 pt-4 px-3 text-[10px] tracking-[0.1em] font-bold whitespace-nowrap" onclick="switchTab('footer')" data-tab="footer">FOOTER</button>
+                <button class="tab-btn pb-3 pt-4 px-3 text-[10px] tracking-[0.1em] font-bold whitespace-nowrap" onclick="switchTab('subscribers')" data-tab="subscribers">SUBSCRIBERS</button>
+                <button class="tab-btn pb-3 pt-4 px-3 text-[10px] tracking-[0.1em] font-black whitespace-nowrap text-[#2c4c23]" onclick="switchTab('orders')" data-tab="orders">ORDERS</button>
+                <button class="tab-btn text-[10px] font-bold tracking-widest uppercase px-3 pb-3 pt-4" data-tab="reviews" onclick="switchTab('reviews')">Reviews</button>
             </div>
 
-            <!-- ==================== PRODUCTS TAB ==================== -->
+            <!-- PRODUCTS SECTION -->
             <div id="section-products" class="p-5">
                 <div class="flex justify-between items-center mb-4">
-                    <h2 id="formTitle" class="text-[10px] tracking-[0.2em] font-bold text-gray-400">ADD / EDIT PRODUCT</h2>
-                    <button id="cancelEditBtn" class="text-[10px] text-red-500 font-bold hidden" onclick="cancelEdit()">CANCEL</button>
+                    <h2 id="formTitle" class="text-[10px] tracking-[0.2em] font-black text-[#d4af37] uppercase">ADD / EDIT PRODUCT</h2>
+                    <button id="cancelEditBtn" class="text-[10px] text-red-600 font-black tracking-widest hidden border border-red-200 bg-red-50 px-3 py-1" onclick="cancelEdit()">CANCEL</button>
                 </div>
-                <form id="addProductForm" class="space-y-3 max-h-[75vh] overflow-y-auto hide-scrollbar pr-1">
-                    <div class="grid grid-cols-2 gap-3">
+                <form id="addProductForm" class="space-y-4 max-h-[75vh] overflow-y-auto hide-scrollbar pr-2">
+                    <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-[10px] font-bold tracking-wider text-gray-500 mb-1">SECTION</label>
-                            <select id="prodSection" class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black bg-white">
+                            <label class="block text-[10px] font-bold tracking-wider text-[#6a7c64] mb-1">SECTION</label>
+                            <select id="prodSection" class="input-field p-2.5 text-xs font-bold uppercase">
                                 <option value="newArrivals">New Arrivals</option>
                                 <option value="trending">Trending Now</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold tracking-wider text-gray-500 mb-1">CATEGORY</label>
-                            <select id="prodCategory" class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black bg-white">
+                            <label class="block text-[10px] font-bold tracking-wider text-[#6a7c64] mb-1">CATEGORY</label>
+                            <select id="prodCategory" class="input-field p-2.5 text-xs font-bold uppercase">
                                 <option value="women">Women</option>
                                 <option value="men">Men</option>
                                 <option value="accessories">Accessories</option>
@@ -54,286 +71,546 @@
                         </div>
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold tracking-wider text-gray-500 mb-1">PRODUCT NAME</label>
-                        <input type="text" id="prodName" required placeholder="OVERSIZED WOOL COAT" class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black uppercase">
+                        <label class="block text-[10px] font-bold tracking-wider text-[#6a7c64] mb-1">PRODUCT NAME</label>
+                        <input type="text" id="prodName" required placeholder="OVERSIZED WOOL COAT" class="input-field p-2.5 text-xs uppercase font-bold">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold tracking-wider text-gray-500 mb-1">PRICE ($)</label>
-                        <input type="number" id="prodPrice" required placeholder="289" class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black">
+                        <label class="block text-[10px] font-bold tracking-wider text-[#6a7c64] mb-1">PRICE (€)</label>
+                        <input type="number" id="prodPrice" required placeholder="289" class="input-field p-2.5 text-xs font-bold">
                     </div>
                     
-                    <div class="grid grid-cols-1 gap-3">
+                    <div class="grid grid-cols-1 gap-4">
                         <div>
-                            <label class="block text-[10px] font-bold tracking-wider text-gray-500 mb-1">COLORS (Comma separated)</label>
-                            <input type="text" id="prodColors" placeholder="Black, White" class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black">
+                            <label class="block text-[10px] font-bold tracking-wider text-[#6a7c64] mb-1">COLORS (Comma separated)</label>
+                            <input type="text" id="prodColors" placeholder="Black, White" class="input-field p-2.5 text-xs font-bold">
                         </div>
                     </div>
 
-                    <!-- NEW: SIZES & INVENTORY -->
-                    <div class="border-t border-gray-100 pt-3 mb-2">
+                    <div class="border-t border-[#c2c9c0]/50 pt-4 mb-2">
                         <div class="flex justify-between items-center mb-2">
-                            <label class="block text-[10px] font-bold tracking-wider text-gray-500">SIZES & INVENTORY</label>
-                            <button type="button" onclick="addSizeRow()" class="text-[10px] text-blue-600 font-bold hover:underline">+ ADD SIZE</button>
+                            <label class="block text-[10px] font-black tracking-wider text-[#1a2e15] uppercase">SIZES & INVENTORY</label>
+                            <button type="button" onclick="addSizeRow()" class="text-[10px] text-[#2c4c23] font-black tracking-widest border-b border-[#2c4c23] hover:text-[#d4af37] hover:border-[#d4af37] transition-colors">+ ADD SIZE</button>
                         </div>
-                        <p class="text-[9px] text-gray-400 mb-2">Total quantity is calculated automatically.</p>
+                        <p class="text-[9px] text-[#6a7c64] font-medium mb-3">Total quantity is calculated automatically.</p>
                         <div id="sizes-inputs" class="space-y-2"></div>
                     </div>
 
-                    <!-- OUT OF STOCK TOGGLE -->
-                    <div class="mb-2 flex items-center gap-2 border border-gray-300 p-3 bg-red-50/50">
-                        <input type="checkbox" id="prodOutOfStock" class="w-4 h-4 text-black focus:ring-black cursor-pointer">
-                        <label for="prodOutOfStock" class="text-[10px] font-bold tracking-wider text-red-600 cursor-pointer">FORCE "OUT OF STOCK" (MAKES UNCLICKABLE)</label>
+                    <div class="mb-2 flex items-center gap-2 border border-red-200 p-3 bg-red-50 mt-4">
+                        <input type="checkbox" id="prodOutOfStock" class="w-4 h-4 text-red-600 focus:ring-red-600 cursor-pointer">
+                        <label for="prodOutOfStock" class="text-[10px] font-black tracking-widest text-red-600 cursor-pointer uppercase">FORCE "OUT OF STOCK" (MAKES UNCLICKABLE)</label>
                     </div>
 
-                    <!-- Description with AI Button -->
-                    <div class="border-t border-gray-100 pt-3">
-                        <div class="flex justify-between items-center mb-1">
-                            <label class="block text-[10px] font-bold tracking-wider text-gray-500">DESCRIPTION</label>
-                            <button type="button" id="aiDescBtn" onclick="generateAIDescription()" class="text-[10px] bg-purple-100 text-purple-700 px-2 py-1 font-bold tracking-wider hover:bg-purple-200 transition-colors border border-purple-200">✨ AI GENERATE</button>
+                    <div class="mb-2 flex items-center gap-2 border border-[#d4af37]/50 p-3 bg-[#fdfbf7]">
+                        <input type="checkbox" id="prodVipOnly" class="w-4 h-4 text-[#d4af37] focus:ring-[#d4af37] cursor-pointer">
+                        <label for="prodVipOnly" class="text-[10px] font-black tracking-widest text-[#d4af37] cursor-pointer uppercase">LOCK AS "ATELIER VIP EXCLUSIVE"</label>
+                    </div>
+
+                    <div class="border-t border-[#c2c9c0]/50 pt-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="block text-[10px] font-black tracking-wider text-[#1a2e15] uppercase">DESCRIPTION</label>
+                            <button type="button" id="aiDescBtn" onclick="generateAIDescription()" class="text-[10px] bg-[#1a2e15] text-[#d4af37] px-3 py-2 font-black tracking-widest hover:bg-[#2c4c23] transition-colors shadow-sm">✨ AI GENERATE</button>
                         </div>
-                        <textarea id="prodDesc" placeholder="Full product description for the description tab..." class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black h-16"></textarea>
+                        <textarea id="prodDesc" placeholder="Full product description for the description tab..." class="input-field p-2.5 text-xs h-20 font-medium"></textarea>
                     </div>
 
-                    <!-- Details (collapsible) -->
-                    <div class="border-t border-gray-100 pt-2">
-                        <button type="button" class="flex justify-between items-center w-full py-2 text-[10px] font-bold tracking-wider text-gray-500 hover:text-black" onclick="toggleCollapsible('details-collapsible', this)">
+                    <div class="border-t border-[#c2c9c0]/50 pt-3">
+                        <button type="button" class="flex justify-between items-center w-full py-2 text-[10px] font-black tracking-widest text-[#1a2e15] hover:text-[#d4af37] transition-colors uppercase" onclick="toggleCollapsible('details-collapsible', this)">
                             <span>PRODUCT DETAILS (MATERIAL, FIT, CARE)</span>
-                            <span class="collapsible-icon transition-transform">+</span>
+                            <span class="collapsible-icon transition-transform text-[#d4af37]">+</span>
                         </button>
-                        <div id="details-collapsible" class="collapsible space-y-2">
-                            <input type="text" id="detailMaterial" placeholder="Material (e.g. 100% Wool)" class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black">
-                            <input type="text" id="detailFit" placeholder="Fit (e.g. Regular)" class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black">
-                            <input type="text" id="detailCare" placeholder="Care (e.g. Dry clean only)" class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black">
-                            <input type="text" id="detailOrigin" placeholder="Origin (e.g. Made in Italy)" class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black">
+                        <div id="details-collapsible" class="collapsible space-y-3">
+                            <input type="text" id="detailMaterial" placeholder="Material (e.g. 100% Wool)" class="input-field p-2.5 text-xs font-bold">
+                            <input type="text" id="detailFit" placeholder="Fit (e.g. Regular)" class="input-field p-2.5 text-xs font-bold">
+                            <input type="text" id="detailCare" placeholder="Care (e.g. Dry clean only)" class="input-field p-2.5 text-xs font-bold">
+                            <input type="text" id="detailOrigin" placeholder="Origin (e.g. Made in Italy)" class="input-field p-2.5 text-xs font-bold">
                         </div>
                     </div>
 
-                    <!-- Measurements (collapsible) -->
-                    <div class="border-t border-gray-100 pt-2">
-                        <button type="button" class="flex justify-between items-center w-full py-2 text-[10px] font-bold tracking-wider text-gray-500 hover:text-black" onclick="toggleCollapsible('measurements-collapsible', this)">
+                    <div class="border-t border-[#c2c9c0]/50 pt-3">
+                        <button type="button" class="flex justify-between items-center w-full py-2 text-[10px] font-black tracking-widest text-[#1a2e15] hover:text-[#d4af37] transition-colors uppercase" onclick="toggleCollapsible('measurements-collapsible', this)">
                             <span>MEASUREMENTS PER SIZE</span>
-                            <span class="collapsible-icon transition-transform">+</span>
+                            <span class="collapsible-icon transition-transform text-[#d4af37]">+</span>
                         </button>
                         <div id="measurements-collapsible" class="collapsible">
-                            <p class="text-[10px] text-gray-400 mb-2">Enter as: Chest:96cm, Waist:82cm, Length:148cm</p>
-                            <div id="measurements-inputs" class="space-y-2"></div>
-                            <button type="button" onclick="addMeasurementRow()" class="text-[10px] text-blue-600 font-bold mt-2 hover:underline">+ ADD SIZE</button>
+                            <p class="text-[9px] text-[#6a7c64] font-medium mb-3 uppercase tracking-widest">Enter as: Chest:96cm, Waist:82cm, Length:148cm</p>
+                            <div id="measurements-inputs" class="space-y-3"></div>
+                            <button type="button" onclick="addMeasurementRow()" class="text-[10px] text-[#2c4c23] font-black tracking-widest border-b border-[#2c4c23] hover:text-[#d4af37] hover:border-[#d4af37] transition-colors mt-3">+ ADD SIZE</button>
                         </div>
                     </div>
 
-                    <!-- Related Products (collapsible) -->
-                    <div class="border-t border-gray-100 pt-2">
-                        <button type="button" class="flex justify-between items-center w-full py-2 text-[10px] font-bold tracking-wider text-gray-500 hover:text-black" onclick="toggleCollapsible('related-collapsible', this)">
+                    <div class="border-t border-[#c2c9c0]/50 pt-3">
+                        <button type="button" class="flex justify-between items-center w-full py-2 text-[10px] font-black tracking-widest text-[#1a2e15] hover:text-[#d4af37] transition-colors uppercase" onclick="toggleCollapsible('related-collapsible', this)">
                             <span>COMPLETE YOUR LOOK (RELATED PRODUCTS)</span>
-                            <span class="collapsible-icon transition-transform">+</span>
+                            <span class="collapsible-icon transition-transform text-[#d4af37]">+</span>
                         </button>
                         <div id="related-collapsible" class="collapsible">
-                            <p class="text-[10px] text-gray-400 mb-2">Type product names (comma separated)</p>
-                            <input type="text" id="prodRelated" placeholder="e.g. BLACK HAT, LEATHER BELT" class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black">
+                            <p class="text-[9px] text-[#6a7c64] font-medium mb-2 uppercase tracking-widest">Type product names (comma separated)</p>
+                            <input type="text" id="prodRelated" placeholder="e.g. BLACK HAT, LEATHER BELT" class="input-field p-2.5 text-xs uppercase font-bold">
                         </div>
                     </div>
 
-                    <!-- Images -->
-                    <div class="pt-2 border-t border-gray-100">
-                        <label class="block text-[10px] font-bold tracking-wider text-gray-500 mb-1">IMAGES</label>
-                        <p class="text-[10px] text-gray-400 mb-2">Images are automatically embedded as base64. No external hosting needed.</p>
-                        <div class="mb-2">
-                            <label class="block text-[10px] text-gray-400 font-bold tracking-wider mb-1">UPLOAD FROM DEVICE (Multiple)</label>
-                            <input type="file" id="prodImageFile" accept="image/*" multiple class="w-full text-[10px] text-gray-500 file:mr-3 file:py-2 file:px-3 file:border-0 file:text-[10px] file:font-semibold file:bg-gray-100 file:text-black hover:file:bg-gray-200">
+                    <div class="pt-4 border-t border-[#c2c9c0]/50">
+                        <label class="block text-[10px] font-black tracking-wider text-[#1a2e15] mb-1 uppercase">IMAGES</label>
+                        <p class="text-[9px] text-[#6a7c64] font-medium mb-3 uppercase tracking-widest">Upload directly to cloud storage for high quality.</p>
+                        <div class="mb-3">
+                            <label class="block text-[10px] text-[#2c4c23] font-bold tracking-widest mb-2 uppercase">UPLOAD FROM DEVICE (Multiple)</label>
+                            <input type="file" id="prodImageFile" accept="image/*" multiple class="w-full text-[10px] text-[#6a7c64] file:mr-3 file:py-2 file:px-3 file:border border-[#c2c9c0] file:text-[10px] file:font-black file:tracking-widest file:bg-[#eef2ec] file:text-[#1a2e15] hover:file:bg-[#c2c9c0]/30 transition-all cursor-pointer">
                         </div>
-                        <div class="text-center text-[10px] text-gray-400 font-bold mb-2">- OR -</div>
+                        <div class="text-center text-[10px] text-[#c2c9c0] font-black mb-3 tracking-widest">- OR -</div>
                         <div>
-                            <label class="block text-[10px] text-gray-400 font-bold tracking-wider mb-1">PASTE IMAGE URLs</label>
-                            <textarea id="prodImgUrl" placeholder="https://img1.jpg, https://img2.jpg..." class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black h-12"></textarea>
+                            <label class="block text-[10px] text-[#2c4c23] font-bold tracking-widest mb-2 uppercase">PASTE IMAGE URLs</label>
+                            <textarea id="prodImgUrl" placeholder="https://img1.jpg, https://img2.jpg..." class="input-field p-2.5 text-xs h-16 font-medium"></textarea>
                         </div>
-                        <div id="uploaded-preview" class="flex gap-2 mt-2 flex-wrap"></div>
+                        <div id="uploaded-preview" class="flex gap-2 mt-3 flex-wrap"></div>
                     </div>
 
-                    <button type="submit" id="submitBtn" class="w-full bg-black text-white py-3 mt-4 text-xs tracking-[0.2em] font-bold hover:bg-gray-800 transition-colors">+ ADD PRODUCT</button>
+                    <button type="submit" id="submitBtn" class="w-full bg-[#1a2e15] text-[#d4af37] border border-[#d4af37] py-4 mt-6 text-[10px] tracking-widest font-black hover:bg-[#2c4c23] transition-colors shadow-lg">+ ADD PRODUCT</button>
                 </form>
             </div>
 
-            <!-- ==================== SALES TAB ==================== -->
-            <div id="section-sales" class="p-5 hidden">
-                <div class="space-y-6 max-h-[75vh] overflow-y-auto hide-scrollbar pr-1">
-                    
-                    <!-- Convert to Sale -->
+            <!-- ORDERS SECTION -->
+            <div id="section-orders" class="hidden animate-fade-in pb-20 p-5">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4 border-b border-[#c2c9c0]/50 pb-4">
                     <div>
-                        <h3 class="text-[10px] tracking-[0.2em] font-bold text-gray-400 mb-3">CONVERT PRODUCT TO SALE</h3>
-                        <p class="text-[10px] text-gray-500 mb-3">Select a product and set sale price to auto-calculate the discount.</p>
-                        <div class="mb-2">
-                            <label class="block text-[10px] font-bold tracking-wider text-gray-500 mb-1">SELECT PRODUCT</label>
-                            <select id="saleProductSelect" class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black bg-white"></select>
+                        <h2 class="text-xl md:text-2xl font-black uppercase tracking-widest text-[#1a2e15]">Orders</h2>
+                        <p class="text-[10px] text-[#6a7c64] font-bold tracking-widest uppercase mt-1">Manage customer orders</p>
+                    </div>
+                    
+                    <div class="relative w-full md:w-72">
+                        <input type="text" id="orderSearchInput" onkeyup="filterOrders()" placeholder="Search Order #, Name, or Email..." class="input-field p-2 pl-8 text-[10px] font-bold tracking-widest uppercase">
+                        <svg class="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-[#6a7c64]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+                </div>
+                <div id="orders-list"></div>
+            </div>
+
+            <!-- SALES SECTION -->
+            <div id="section-sales" class="p-5 hidden">
+                <div class="space-y-6 max-h-[75vh] overflow-y-auto hide-scrollbar pr-2">
+                    <div>
+                        <h3 class="text-[10px] tracking-[0.2em] font-black text-[#d4af37] mb-3 uppercase">CONVERT PRODUCT TO SALE</h3>
+                        <p class="text-[10px] text-[#6a7c64] font-medium mb-4">Select a product and set sale price to auto-calculate the discount.</p>
+                        <div class="mb-3">
+                            <label class="block text-[10px] font-bold tracking-wider text-[#6a7c64] mb-1">SELECT PRODUCT</label>
+                            <select id="saleProductSelect" class="input-field p-2.5 text-xs font-bold uppercase"></select>
                         </div>
-                        <div class="grid grid-cols-2 gap-3 mb-2">
+                        <div class="grid grid-cols-2 gap-4 mb-3">
                             <div>
-                                <label class="block text-[10px] font-bold tracking-wider text-gray-500 mb-1">ORIGINAL PRICE</label>
-                                <input type="text" id="saleOriginalPrice" readonly class="w-full border border-gray-200 p-2 text-xs bg-gray-50 text-gray-500 cursor-not-allowed">
+                                <label class="block text-[10px] font-bold tracking-wider text-[#6a7c64] mb-1">ORIGINAL PRICE</label>
+                                <input type="text" id="saleOriginalPrice" readonly class="input-field p-2.5 text-xs bg-[#eef2ec] text-[#6a7c64] cursor-not-allowed font-bold">
                             </div>
                             <div>
-                                <label class="block text-[10px] font-bold tracking-wider text-gray-500 mb-1">SALE PRICE ($)</label>
-                                <input type="number" id="salePriceInput" placeholder="199" class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black" oninput="calculateSalePercent()">
+                                <label class="block text-[10px] font-bold tracking-wider text-[#6a7c64] mb-1">SALE PRICE (€)</label>
+                                <input type="number" id="salePriceInput" placeholder="199" class="input-field p-2.5 text-xs font-bold" oninput="calculateSalePercent()">
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-[10px] font-bold tracking-wider text-[#6a7c64] mb-1">DISCOUNT % (AUTO-CALCULATED)</label>
+                            <input type="number" id="salePercentInput" readonly placeholder="Auto" class="input-field p-2.5 text-xs bg-[#eef2ec] text-[#6a7c64] cursor-not-allowed font-black">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-[10px] font-bold tracking-wider text-[#6a7c64] mb-1">SALE END DATE (Countdown)</label>
+                            <input type="datetime-local" id="saleEndDateInput" class="input-field p-2.5 text-xs font-bold bg-white">
+                        </div>
+                        <button onclick="addToSales()" class="w-full bg-red-600 text-white py-4 text-[10px] tracking-widest font-black hover:bg-red-700 transition-colors shadow-lg">ADD TO SALE</button>
+                    </div>
+                    
+                    <div class="border-t border-[#c2c9c0]/50 pt-6">
+                        <h3 class="text-[10px] tracking-[0.2em] font-black text-[#1a2e15] mb-4 uppercase">REMOVE FROM SALE</h3>
+                        <div id="current-sales-list" class="space-y-3"></div>
+                    </div>
+                    
+                    <div class="border-t border-[#c2c9c0]/50 pt-6 mt-6">
+                        <h3 class="text-[10px] tracking-[0.2em] font-black text-[#d4af37] mb-4 uppercase">PROMO CODES & GIFT CARDS</h3>
+                        <p class="text-[10px] text-[#6a7c64] font-medium mb-4">Create percentage discounts or fixed Euro (€) gift cards.</p>
+                        <div class="flex gap-3 mb-3 flex-wrap">
+                            <input type="text" id="newPromoCode" placeholder="CODE (e.g. SAYAND20)" class="flex-1 min-w-[120px] input-field p-2.5 text-xs uppercase font-bold">
+                            <select id="newPromoType" class="w-24 input-field p-2.5 text-xs font-bold">
+                                <option value="percent">% Off</option>
+                                <option value="fixed">€ Off</option>
+                            </select>
+                            <input type="number" id="newPromoValue" placeholder="Amount" class="w-24 input-field p-2.5 text-xs font-bold">
+                            <input type="number" id="newPromoMaxUses" placeholder="Uses (blank = ∞)" class="w-28 input-field p-2.5 text-xs font-bold" title="Leave blank for unlimited uses">
+                        </div>
+                        <p class="text-[9px] text-[#6a7c64] font-medium mb-4 uppercase tracking-widest">Leave "Uses" blank for unlimited redemption. Set to 1 for one-time, or any number for limited use.</p>
+                        <button onclick="addPromoCode()" class="w-full bg-[#1a2e15] text-[#d4af37] border border-[#d4af37] py-3 text-[10px] tracking-widest font-black hover:bg-[#2c4c23] transition-colors shadow-md">CREATE CODE</button>
+                        <div id="promo-codes-list" class="mt-6 space-y-2"></div>
+                    </div>
+
+                    <div class="border-t border-[#c2c9c0]/50 pt-6 mt-6">
+                        <h3 class="text-[10px] tracking-[0.2em] font-black text-[#1a2e15] mb-4 uppercase">CREATE A PRE-ORDER DROP</h3>
+                        <div class="mb-3">
+                            <label class="block text-[10px] font-bold tracking-wider text-[#6a7c64] mb-1">PRODUCT NAME</label>
+                            <input type="text" id="upcomingName" placeholder="SAYAND CAPSULE HOODIE" class="input-field p-2.5 text-xs uppercase font-bold">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 mb-3">
+                            <div>
+                                <label class="block text-[10px] font-bold tracking-wider text-[#6a7c64] mb-1">EXPECTED PRICE (€)</label>
+                                <input type="number" id="upcomingPrice" placeholder="299" class="input-field p-2.5 text-xs font-bold">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold tracking-wider text-[#6a7c64] mb-1">AVAILABLE SIZES</label>
+                                <input type="text" id="upcomingSizes" placeholder="S, M, L" class="input-field p-2.5 text-xs uppercase font-bold">
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label class="block text-[10px] font-bold tracking-wider text-gray-500 mb-1">DISCOUNT % (AUTO-CALCULATED)</label>
-                            <input type="number" id="salePercentInput" readonly placeholder="Auto" class="w-full border border-gray-200 p-2 text-xs bg-gray-50 text-gray-500 cursor-not-allowed font-bold">
+                            <label class="block text-[10px] font-bold tracking-wider text-[#6a7c64] mb-1">TEASER IMAGES (MULTIPLE SUPPORTED)</label>
+                            <input type="file" id="upcomingImageFile" accept="image/*" multiple class="w-full text-[10px] text-[#6a7c64] file:mr-3 file:py-2 file:px-3 file:border border-[#c2c9c0] file:text-[10px] file:font-black file:tracking-widest file:bg-[#eef2ec] file:text-[#1a2e15] hover:file:bg-[#c2c9c0]/30 transition-all cursor-pointer mb-2">
+                            <input type="text" id="upcomingImageUrl" placeholder="...or paste image URL(s) separated by commas" class="input-field p-2.5 text-xs font-medium">
                         </div>
-                        
-                        <div class="mb-3">
-                            <label class="block text-[10px] font-bold tracking-wider text-gray-500 mb-1">SALE END DATE (Countdown)</label>
-                            <input type="datetime-local" id="saleEndDateInput" class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black bg-white">
-                        </div>
-
-                        <button onclick="addToSales()" class="w-full bg-red-600 text-white py-3 text-xs tracking-[0.2em] font-bold hover:bg-red-700 transition-colors">ADD TO SALE</button>
-                    </div>
-
-                    <!-- Remove from Sale -->
-                    <div class="border-t border-gray-100 pt-4">
-                        <h3 class="text-[10px] tracking-[0.2em] font-bold text-gray-400 mb-3">REMOVE FROM SALE</h3>
-                        <div id="current-sales-list" class="space-y-2"></div>
-                    </div>
-
-                    <!-- Upcoming Sales -->
-                    <div class="border-t border-gray-100 pt-4">
-                        <h3 class="text-[10px] tracking-[0.2em] font-bold text-gray-400 mb-3">UPCOMING SALE TEASERS</h3>
-                        <p class="text-[10px] text-gray-500 mb-3">Post preview images without prices for upcoming sales.</p>
-                        <div class="mb-2">
-                            <label class="block text-[10px] font-bold tracking-wider text-gray-500 mb-1">TEASER NAME</label>
-                            <input type="text" id="upcomingName" placeholder="Summer Collection Preview" class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black">
-                        </div>
-                        <div class="mb-2">
-                            <label class="block text-[10px] font-bold tracking-wider text-gray-500 mb-1">TEASER IMAGE</label>
-                            <input type="file" id="upcomingImageFile" accept="image/*" class="w-full text-[10px] text-gray-500 file:mr-3 file:py-2 file:px-3 file:border-0 file:text-[10px] file:font-semibold file:bg-gray-100 file:text-black hover:file:bg-gray-200 mb-2">
-                            <input type="text" id="upcomingImageUrl" placeholder="...or paste image URL" class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black">
-                        </div>
-                        <div class="mb-2">
-                            <label class="block text-[10px] font-bold tracking-wider text-gray-500 mb-1">CATEGORY</label>
-                            <select id="upcomingCategory" class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black bg-white">
+                        <div class="mb-4">
+                            <label class="block text-[10px] font-bold tracking-wider text-[#6a7c64] mb-1">CATEGORY</label>
+                            <select id="upcomingCategory" class="input-field p-2.5 text-xs font-bold uppercase">
                                 <option value="women">Women</option>
                                 <option value="men">Men</option>
                                 <option value="accessories">Accessories</option>
                                 <option value="general">General</option>
                             </select>
                         </div>
-                        <button onclick="addUpcomingSale()" class="w-full bg-gray-800 text-white py-3 text-xs tracking-[0.2em] font-bold hover:bg-gray-900 transition-colors">POST TEASER</button>
-                        <div id="upcoming-list" class="mt-4 space-y-2"></div>
+                        
+                        <div class="mb-4 flex items-center gap-2 border border-[#d4af37]/30 p-3 bg-[#fdfbf7]">
+                            <input type="checkbox" id="upcomingVipOnly" class="w-4 h-4 text-[#d4af37] focus:ring-[#d4af37] cursor-pointer">
+                            <label for="upcomingVipOnly" class="text-[10px] font-black tracking-widest text-[#d4af37] cursor-pointer uppercase">LOCK DROP FOR VIPs ONLY</label>
+                        </div>
+
+                        <button onclick="addUpcomingSale()" class="w-full bg-[#d4af37] text-[#1a2e15] border border-[#1a2e15] py-4 text-[10px] tracking-widest font-black hover:bg-white hover:border-white transition-colors shadow-lg">POST PRE-ORDER DROP</button>
+                        <div id="upcoming-list" class="mt-4 space-y-3"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- ==================== PAGE DESIGN TAB ==================== -->
+            <!-- PAGE DESIGN SECTION -->
             <div id="section-design" class="hidden p-5">
-                <p class="text-[10px] text-gray-500 mb-4 leading-relaxed font-semibold">Update text and images for the homepage. Changes instantly update the code generator.</p>
-                <form id="designForm" class="space-y-5 max-h-[75vh] overflow-y-auto hide-scrollbar pr-2">
-                    <div class="space-y-2 bg-gray-50 p-4 border border-gray-100">
-                        <h3 class="text-[10px] font-black tracking-[0.2em]">HERO SECTION</h3>
-                        <input type="text" id="heroSubtitle" placeholder="Subtitle" class="w-full border border-gray-300 p-2 text-xs focus:border-black" oninput="updateDesign()">
-                        <textarea id="heroTitle" placeholder="Main Title (Use &lt;br&gt; for new line)" class="w-full border border-gray-300 p-2 text-xs focus:border-black h-14" oninput="updateDesign()"></textarea>
-                        <label class="block text-[10px] text-gray-400 font-bold tracking-wider mt-2">HERO IMAGE</label>
-                        <input type="file" accept="image/*" class="w-full text-[10px] text-gray-500 file:mr-3 file:py-2 file:px-3 file:border-0 file:text-[10px] file:font-semibold file:bg-gray-100 hover:file:bg-gray-200 mb-1" onchange="handleDesignImageUpload(event, 'heroImg')">
-                        <input type="url" id="heroImg" placeholder="...or paste URL" class="w-full border border-gray-300 p-2 text-xs focus:border-black" oninput="updateDesign()">
+                <p class="text-[10px] text-[#6a7c64] font-medium mb-6 leading-relaxed uppercase tracking-widest border-b border-[#c2c9c0]/50 pb-4">Update text and images for the homepage. Changes instantly update the code generator.</p>
+                <form id="designForm" class="space-y-6 max-h-[75vh] overflow-y-auto hide-scrollbar pr-2">
+                    
+                    <div class="space-y-3 bg-white p-5 border border-[#c2c9c0]/50 shadow-sm">
+                        <h3 class="text-[10px] font-black tracking-widest mb-2 text-[#1a2e15] uppercase">ANNOUNCEMENT BAR</h3>
+                        <p class="text-[9px] text-[#6a7c64] font-medium mb-2 uppercase tracking-widest">Live message shown at the top of the storefront.</p>
+                        <input type="text" id="announcementText" placeholder="e.g. FREE SHIPPING ON ORDERS OVER €150" class="input-field p-2.5 text-xs font-bold uppercase" oninput="updateAnnouncement()">
+                        
+                        <div class="flex items-center gap-2 mt-2">
+                            <input type="checkbox" id="announcementActive" class="w-4 h-4 text-[#2c4c23] focus:ring-[#2c4c23] cursor-pointer" onchange="updateAnnouncement()">
+                            <label for="announcementActive" class="text-[10px] font-black tracking-widest text-[#1a2e15] uppercase cursor-pointer">SHOW ANNOUNCEMENT BAR</label>
+                        </div>
+                        
+                        <div class="border-t border-[#c2c9c0]/30 pt-3 mt-3">
+                            <div class="flex items-center gap-2 mb-3">
+                                <input type="checkbox" id="announcementIsPromo" class="w-4 h-4 text-[#d4af37] focus:ring-[#d4af37] cursor-pointer" onchange="togglePromoFields(); updateAnnouncement();">
+                                <label for="announcementIsPromo" class="text-[10px] font-black tracking-widest text-[#d4af37] uppercase cursor-pointer">ENABLE COUNTDOWN PROMO MODE</label>
+                            </div>
+                            <p class="text-[9px] text-[#6a7c64] font-medium mb-3 uppercase tracking-widest">When enabled, a countdown timer appears and an automatic discount applies at checkout.</p>
+                            
+                            <div id="promo-fields" class="space-y-3 hidden">
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-[10px] font-bold tracking-wider text-[#6a7c64] mb-1">MIN ORDER (€)</label>
+                                        <input type="number" id="promoMinAmount" placeholder="100" class="input-field p-2.5 text-xs font-bold" oninput="updateAnnouncement()">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-bold tracking-wider text-[#6a7c64] mb-1">DISCOUNT %</label>
+                                        <input type="number" id="promoPercent" placeholder="6" min="1" max="99" class="input-field p-2.5 text-xs font-bold" oninput="updateAnnouncement()">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold tracking-wider text-[#6a7c64] mb-1">PROMO END DATE (Countdown)</label>
+                                    <input type="datetime-local" id="promoEndDate" class="input-field p-2.5 text-xs font-bold bg-white" oninput="updateAnnouncement()">
+                                </div>
+                                <div class="bg-[#fdfbf7] border border-[#d4af37]/30 p-3">
+                                    <p class="text-[9px] text-[#1a2e15] font-bold tracking-widest uppercase" id="promo-preview">Preview: Get 0% off orders above €0</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="space-y-2 bg-gray-50 p-4 border border-gray-100">
-                        <h3 class="text-[10px] font-black tracking-[0.2em]">CATEGORY IMAGES</h3>
-                        <label class="block text-[10px] text-gray-400 font-bold tracking-wider">WOMEN</label>
-                        <input type="file" accept="image/*" class="w-full text-[10px] text-gray-500 file:mr-3 file:py-2 file:px-3 file:border-0 file:text-[10px] file:font-semibold file:bg-gray-100 hover:file:bg-gray-200 mb-1" onchange="handleDesignImageUpload(event, 'womenImg')">
-                        <input type="url" id="womenImg" placeholder="...or paste URL" class="w-full border border-gray-300 p-2 text-xs focus:border-black mb-3" oninput="updateDesign()">
-                        <label class="block text-[10px] text-gray-400 font-bold tracking-wider">MEN</label>
-                        <input type="file" accept="image/*" class="w-full text-[10px] text-gray-500 file:mr-3 file:py-2 file:px-3 file:border-0 file:text-[10px] file:font-semibold file:bg-gray-100 hover:file:bg-gray-200 mb-1" onchange="handleDesignImageUpload(event, 'menImg')">
-                        <input type="url" id="menImg" placeholder="...or paste URL" class="w-full border border-gray-300 p-2 text-xs focus:border-black mb-3" oninput="updateDesign()">
-                        <label class="block text-[10px] text-gray-400 font-bold tracking-wider">ACCESSORIES</label>
-                        <input type="file" accept="image/*" class="w-full text-[10px] text-gray-500 file:mr-3 file:py-2 file:px-3 file:border-0 file:text-[10px] file:font-semibold file:bg-gray-100 hover:file:bg-gray-200 mb-1" onchange="handleDesignImageUpload(event, 'accImg')">
-                        <input type="url" id="accImg" placeholder="...or paste URL" class="w-full border border-gray-300 p-2 text-xs focus:border-black" oninput="updateDesign()">
+
+                    <div class="space-y-3 bg-white p-5 border border-[#c2c9c0]/50 shadow-sm">
+                        <h3 class="text-[10px] font-black tracking-widest mb-2 text-[#1a2e15] uppercase">HERO SECTION</h3>
+                        <input type="text" id="heroSubtitle" placeholder="Subtitle" class="input-field p-2.5 text-xs font-bold" oninput="updateDesign()">
+                        <textarea id="heroTitle" placeholder="Main Title (Use <br> for new line)" class="input-field p-2.5 text-xs h-16 font-bold uppercase" oninput="updateDesign()"></textarea>
+                        <label class="block text-[10px] text-[#6a7c64] font-bold tracking-wider mt-3">HERO IMAGE</label>
+                        <div id="heroImgPreviewContainer" class="mt-2 mb-3 hidden"></div>
+                        <input type="file" accept="image/*" multiple class="w-full text-[10px] text-[#6a7c64] file:mr-3 file:py-2 file:px-3 file:border border-[#c2c9c0] file:text-[10px] file:font-black file:tracking-widest file:bg-[#eef2ec] file:text-[#1a2e15] hover:file:bg-[#c2c9c0]/30 transition-all cursor-pointer mb-2" onchange="handleDesignImageUpload(event, 'heroImg')">
+                        <input type="url" id="heroImg" placeholder="...or paste URL" class="input-field p-2.5 text-xs font-medium" oninput="updateDesign()">
                     </div>
-                    <div class="space-y-2 bg-gray-50 p-4 border border-gray-100">
-                        <h3 class="text-[10px] font-black tracking-[0.2em]">EDITORIAL SECTION</h3>
-                        <input type="text" id="editSubtitle" placeholder="Subtitle" class="w-full border border-gray-300 p-2 text-xs focus:border-black" oninput="updateDesign()">
-                        <textarea id="editTitle" placeholder="Title" class="w-full border border-gray-300 p-2 text-xs focus:border-black h-14" oninput="updateDesign()"></textarea>
-                        <textarea id="editDesc" placeholder="Description" class="w-full border border-gray-300 p-2 text-xs focus:border-black h-14" oninput="updateDesign()"></textarea>
-                        <label class="block text-[10px] text-gray-400 font-bold tracking-wider mt-2">EDITORIAL IMAGE</label>
-                        <input type="file" accept="image/*" class="w-full text-[10px] text-gray-500 file:mr-3 file:py-2 file:px-3 file:border-0 file:text-[10px] file:font-semibold file:bg-gray-100 hover:file:bg-gray-200 mb-1" onchange="handleDesignImageUpload(event, 'editImg')">
-                        <input type="url" id="editImg" placeholder="...or paste URL" class="w-full border border-gray-300 p-2 text-xs focus:border-black" oninput="updateDesign()">
+                    
+                    <div class="space-y-3 bg-white p-5 border border-[#c2c9c0]/50 shadow-sm">
+                        <h3 class="text-[10px] font-black tracking-widest mb-2 text-[#1a2e15] uppercase">CATEGORY IMAGES</h3>
+                        
+                        <label class="block text-[10px] text-[#6a7c64] font-bold tracking-wider">WOMEN</label>
+                        <div id="womenImgPreviewContainer" class="mt-2 mb-3 hidden"></div>
+                        <input type="file" accept="image/*" multiple class="w-full text-[10px] text-[#6a7c64] file:mr-3 file:py-2 file:px-3 file:border border-[#c2c9c0] file:text-[10px] file:font-black file:tracking-widest file:bg-[#eef2ec] file:text-[#1a2e15] hover:file:bg-[#c2c9c0]/30 transition-all cursor-pointer mb-2" onchange="handleDesignImageUpload(event, 'womenImg')">
+                        <input type="url" id="womenImg" placeholder="...or paste URL" class="input-field p-2.5 text-xs font-medium mb-4" oninput="updateDesign()">
+                        
+                        <label class="block text-[10px] text-[#6a7c64] font-bold tracking-wider">MEN</label>
+                        <div id="menImgPreviewContainer" class="mt-2 mb-3 hidden"></div>
+                        <input type="file" accept="image/*" multiple class="w-full text-[10px] text-[#6a7c64] file:mr-3 file:py-2 file:px-3 file:border border-[#c2c9c0] file:text-[10px] file:font-black file:tracking-widest file:bg-[#eef2ec] file:text-[#1a2e15] hover:file:bg-[#c2c9c0]/30 transition-all cursor-pointer mb-2" onchange="handleDesignImageUpload(event, 'menImg')">
+                        <input type="url" id="menImg" placeholder="...or paste URL" class="input-field p-2.5 text-xs font-medium mb-4" oninput="updateDesign()">
+                        
+                        <label class="block text-[10px] text-[#6a7c64] font-bold tracking-wider">ACCESSORIES</label>
+                        <div id="accImgPreviewContainer" class="mt-2 mb-3 hidden"></div>
+                        <input type="file" accept="image/*" multiple class="w-full text-[10px] text-[#6a7c64] file:mr-3 file:py-2 file:px-3 file:border border-[#c2c9c0] file:text-[10px] file:font-black file:tracking-widest file:bg-[#eef2ec] file:text-[#1a2e15] hover:file:bg-[#c2c9c0]/30 transition-all cursor-pointer mb-2" onchange="handleDesignImageUpload(event, 'accImg')">
+                        <input type="url" id="accImg" placeholder="...or paste URL" class="input-field p-2.5 text-xs font-medium" oninput="updateDesign()">
+                    </div>
+                    
+                    <div class="space-y-3 bg-white p-5 border border-[#c2c9c0]/50 shadow-sm">
+                        <h3 class="text-[10px] font-black tracking-widest mb-2 text-[#1a2e15] uppercase">LOOKBOOK HERO TEXT & CARDS</h3>
+                        <p class="text-[9px] text-[#6a7c64] font-medium mb-2">These control the Lookbook overlay text and navigation mood cards.</p>
+                        
+                        <input type="text" id="editSubtitle" placeholder="Lookbook Subtitle" class="input-field p-2.5 text-xs font-bold uppercase mb-2" oninput="updateDesign()">
+                        <textarea id="editTitle" placeholder="Lookbook Title" class="input-field p-2.5 text-xs h-16 font-black uppercase mb-2" oninput="updateDesign()"></textarea>
+                        <textarea id="editDesc" placeholder="Lookbook Description" class="input-field p-2.5 text-xs h-20 font-medium mb-4" oninput="updateDesign()"></textarea>
+
+                          <!-- HOMEPAGE CAROUSEL MANAGER -->
+                        <div class="border-t border-[#c2c9c0]/30 pt-6 mt-6">
+                            <label class="block text-[10px] text-[#1a2e15] font-black tracking-widest mb-2 uppercase">HOMEPAGE CAROUSEL MANAGER</label>
+                            <p class="text-[9px] text-[#6a7c64] font-medium mb-4">Upload and manage videos/images for the homepage swipeable carousel. Items appear in order.</p>
+                            
+                            <!-- Upload Box -->
+                            <div class="bg-[#fdfbf7] p-4 border border-[#d4af37]/50 mb-4 shadow-sm">
+                                <label class="block text-[9px] text-[#6a7c64] font-bold tracking-wider uppercase mb-2">UPLOAD MULTIPLE FILES</label>
+                                <input type="file" id="hpCarouselFile" accept="image/*,video/mp4,video/quicktime,video/webm" multiple class="w-full text-[10px] text-[#6a7c64] file:mr-3 file:py-2 file:px-3 file:border border-[#c2c9c0] file:font-black file:bg-white file:text-[#1a2e15] cursor-pointer mb-2 transition-colors hover:file:bg-[#eef2ec]">
+                                <p class="text-center text-[9px] font-black tracking-widest text-[#c2c9c0] my-2">- OR PASTE URL -</p>
+                                <input type="text" id="hpCarouselUrl" placeholder="https://..." class="input-field p-2.5 text-xs mb-3 font-medium w-full">
+                                <button type="button" onclick="addHomepageSlide()" class="w-full bg-[#1a2e15] text-[#d4af37] border border-[#d4af37] py-2 text-[10px] font-black tracking-widest hover:bg-[#2c4c23] transition-colors uppercase shadow-sm">+ ADD TO CAROUSEL</button>
+                            </div>
+                            
+                            <!-- Hidden input to safely store the comma string for the database -->
+                            <input type="hidden" id="editImg" oninput="updateDesign()">
+                            <!-- Restore Slide Text (Kiki Set, etc.) -->
+                            <div class="mt-4 border-t border-[#c2c9c0]/30 pt-4">
+                                <label class="block text-[10px] text-[#6a7c64] font-bold tracking-wider uppercase mb-2">SLIDE TITLES (OPTIONAL)</label>
+                                <p class="text-[9px] text-[#6a7c64] font-medium mb-2">Type the text for each slide separated by commas (e.g. , Kiki set, Two set)</p>
+                                <textarea id="mediaDescriptions" placeholder="Slide 1 text, Slide 2 text..." class="input-field p-2.5 text-xs font-medium w-full h-12" oninput="updateDesign()"></textarea>
+                            </div>
+                            
+                            <!-- Visual List of Slides -->
+                            <div id="homepage-carousel-list" class="space-y-2 max-h-60 overflow-y-auto pr-2 hide-scrollbar border border-gray-100 p-2 bg-gray-50"></div>
+                        </div>
+
+                        <label class="block text-[10px] text-[#6a7c64] font-bold tracking-wider mt-4">LOOKBOOK HERO BACKGROUND</label>
+                        <div id="lbHeroImgPreviewContainer" class="mt-2 mb-3 hidden"></div>
+                        <input type="file" accept="image/*" class="w-full text-[10px] text-[#6a7c64] file:mr-3 file:py-2 file:px-3 file:border border-[#c2c9c0] file:text-[10px] file:font-black file:tracking-widest file:bg-[#eef2ec] file:text-[#1a2e15] hover:file:bg-[#c2c9c0]/30 transition-all cursor-pointer mb-2" onchange="handleDesignImageUpload(event, 'lbHeroImg')">
+                        <input type="url" id="lbHeroImg" placeholder="...or paste URL" class="input-field p-2.5 text-xs font-medium mb-4" oninput="updateDesign()">
+                        
+                        <label class="block text-[10px] text-[#6a7c64] font-bold tracking-wider">WOMEN MOOD CARD</label>
+                        <div id="lbWomenImgPreviewContainer" class="mt-2 mb-3 hidden"></div>
+                        <input type="file" accept="image/*" class="w-full text-[10px] text-[#6a7c64] file:mr-3 file:py-2 file:px-3 file:border border-[#c2c9c0] file:text-[10px] file:font-black file:tracking-widest file:bg-[#eef2ec] file:text-[#1a2e15] hover:file:bg-[#c2c9c0]/30 transition-all cursor-pointer mb-2" onchange="handleDesignImageUpload(event, 'lbWomenImg')">
+                        <input type="url" id="lbWomenImg" placeholder="...or paste URL" class="input-field p-2.5 text-xs font-medium mb-4" oninput="updateDesign()">
+                        
+                        <label class="block text-[10px] text-[#6a7c64] font-bold tracking-wider">MEN MOOD CARD</label>
+                        <div id="lbMenImgPreviewContainer" class="mt-2 mb-3 hidden"></div>
+                        <input type="file" accept="image/*" class="w-full text-[10px] text-[#6a7c64] file:mr-3 file:py-2 file:px-3 file:border border-[#c2c9c0] file:text-[10px] file:font-black file:tracking-widest file:bg-[#eef2ec] file:text-[#1a2e15] hover:file:bg-[#c2c9c0]/30 transition-all cursor-pointer mb-2" onchange="handleDesignImageUpload(event, 'lbMenImg')">
+                        <input type="url" id="lbMenImg" placeholder="...or paste URL" class="input-field p-2.5 text-xs font-medium mb-4" oninput="updateDesign()">
+                        
+                        <label class="block text-[10px] text-[#6a7c64] font-bold tracking-wider">ACCESSORIES MOOD CARD</label>
+                        <div id="lbAccImgPreviewContainer" class="mt-2 mb-3 hidden"></div>
+                        <input type="file" accept="image/*" class="w-full text-[10px] text-[#6a7c64] file:mr-3 file:py-2 file:px-3 file:border border-[#c2c9c0] file:text-[10px] file:font-black file:tracking-widest file:bg-[#eef2ec] file:text-[#1a2e15] hover:file:bg-[#c2c9c0]/30 transition-all cursor-pointer mb-2" onchange="handleDesignImageUpload(event, 'lbAccImg')">
+                        <input type="url" id="lbAccImg" placeholder="...or paste URL" class="input-field p-2.5 text-xs font-medium mb-4" oninput="updateDesign()">
+                        
+                        <label class="block text-[10px] text-[#6a7c64] font-bold tracking-wider">SALE MOOD CARD</label>
+                        <div id="lbSaleImgPreviewContainer" class="mt-2 mb-3 hidden"></div>
+                        <input type="file" accept="image/*" class="w-full text-[10px] text-[#6a7c64] file:mr-3 file:py-2 file:px-3 file:border border-[#c2c9c0] file:text-[10px] file:font-black file:tracking-widest file:bg-[#eef2ec] file:text-[#1a2e15] hover:file:bg-[#c2c9c0]/30 transition-all cursor-pointer mb-2" onchange="handleDesignImageUpload(event, 'lbSaleImg')">
+                        <input type="url" id="lbSaleImg" placeholder="...or paste URL" class="input-field p-2.5 text-xs font-medium mb-4" oninput="updateDesign()">
+                        
+                        <label class="block text-[10px] text-[#6a7c64] font-bold tracking-wider">EDITORIAL MOOD CARD</label>
+                        <div id="lbEditCardImgPreviewContainer" class="mt-2 mb-3 hidden"></div>
+                        <input type="file" accept="image/*" class="w-full text-[10px] text-[#6a7c64] file:mr-3 file:py-2 file:px-3 file:border border-[#c2c9c0] file:text-[10px] file:font-black file:tracking-widest file:bg-[#eef2ec] file:text-[#1a2e15] hover:file:bg-[#c2c9c0]/30 transition-all cursor-pointer mb-2" onchange="handleDesignImageUpload(event, 'lbEditCardImg')">
+                        <input type="url" id="lbEditCardImg" placeholder="...or paste URL" class="input-field p-2.5 text-xs font-medium" oninput="updateDesign()">
                     </div>
                 </form>
             </div>
 
-            <!-- ==================== CONTACT TAB ==================== -->
-            <div id="section-contact" class="hidden p-5">
-                <h3 class="text-[10px] tracking-[0.2em] font-bold text-gray-400 mb-4">CONTACT INFORMATION</h3>
-                <div class="space-y-3 max-h-[75vh] overflow-y-auto hide-scrollbar pr-1">
+ <!-- LOOKBOOK SECTION -->
+            <div id="section-lookbook" class="hidden p-5">
+                <div class="flex justify-between items-end mb-6 border-b border-[#c2c9c0]/50 pb-4">
                     <div>
-                        <label class="block text-[10px] font-bold tracking-wider text-gray-500 mb-1">EMAIL</label>
-                        <input type="email" id="contactEmail" class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black" oninput="updateContact()">
+                        <h2 class="text-xl md:text-2xl font-black uppercase tracking-widest text-[#1a2e15]">Editorial Magazine</h2>
+                        <p class="text-[10px] text-[#6a7c64] tracking-widest uppercase mt-1 font-bold">Manage magazine articles, galleries, and shoppable tags</p>
                     </div>
-                    <div>
-                        <label class="block text-[10px] font-bold tracking-wider text-gray-500 mb-1">WHATSAPP NUMBER</label>
-                        <input type="text" id="contactWhatsapp" class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black" oninput="updateContact()">
+                </div>
+                
+                <div class="space-y-6 max-h-[75vh] overflow-y-auto hide-scrollbar pr-2">
+                    <div class="border-t border-[#c2c9c0]/50 pt-5">
+                        <div class="flex justify-between items-center mb-4">
+                            <div>
+                                <label id="lookbookFormTitle" class="block text-[10px] text-[#1a2e15] font-black tracking-widest uppercase">1. CREATE / EDIT ARTICLE</label>
+                                <p class="text-[9px] text-[#6a7c64] font-medium uppercase tracking-widest">Upload multiple images to create a full editorial campaign.</p>
+                            </div>
+                            <button id="cancelLookbookEditBtn" class="text-[10px] text-red-600 font-black tracking-widest hidden border border-red-200 bg-red-50 px-3 py-1" onclick="cancelEditLookbook()">CANCEL EDIT</button>
+                        </div>
+
+                        <div class="bg-[#fdfbf7] p-5 border border-[#d4af37]/50 mb-5 shadow-sm space-y-4">
+                            
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-[9px] text-[#6a7c64] font-bold tracking-wider uppercase mb-1">ARTICLE TITLE</label>
+                                    <input type="text" id="lbTitle" placeholder="e.g. Granny Takes A Trip" class="input-field p-2.5 text-xs font-bold w-full">
+                                </div>
+                                <div>
+                                    <label class="block text-[9px] text-[#6a7c64] font-bold tracking-wider uppercase mb-1">SUBHEADING / CATEGORY</label>
+                                    <input type="text" id="lbSubtitle" placeholder="e.g. NEWS or CAMPAIGN" class="input-field p-2.5 text-xs font-bold w-full uppercase">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-[9px] text-[#6a7c64] font-bold tracking-wider uppercase mb-1">ARTICLE DESCRIPTION</label>
+                                <textarea id="lbDesc" placeholder="Write the editorial text..." class="input-field p-2.5 text-xs h-20 font-medium w-full"></textarea>
+                            </div>
+
+                            <div class="border-t border-[#c2c9c0]/30 pt-4">
+                                <label class="block text-[9px] text-[#6a7c64] font-bold tracking-wider uppercase mb-1">UPLOAD GALLERY IMAGES/VIDEOS</label>
+                                <p class="text-[8px] text-gray-500 mb-2">Select all media files for this article at once. The first file will be the cover image.</p>
+                                <input type="file" id="lbFile" accept="image/*,video/mp4,video/quicktime,video/webm" multiple class="w-full text-[10px] text-[#6a7c64] file:mr-3 file:py-2 file:px-3 file:border border-[#c2c9c0] file:font-black file:bg-white file:text-[#1a2e15] cursor-pointer mb-2 transition-colors hover:file:bg-[#eef2ec]">
+                                <p class="text-center text-[9px] font-black tracking-widest text-[#c2c9c0] mb-2">- OR PASTE URLs (COMMA SEPARATED) -</p>
+                                <textarea id="lbUrl" placeholder="https://img1.jpg, https://img2.jpg..." class="input-field p-2.5 text-xs font-medium w-full h-16"></textarea>
+                            </div>
+                            
+                            <button type="button" id="lbSubmitBtn" onclick="addLookbookArticle()" class="w-full bg-[#1a2e15] text-[#d4af37] border border-[#d4af37] py-3 text-[10px] font-black tracking-widest hover:bg-[#2c4c23] transition-colors uppercase shadow-md">+ PUBLISH ARTICLE</button>
+                        </div>
+                        <div id="lookbook-slides-list" class="space-y-3 max-h-80 overflow-y-auto pr-2 hide-scrollbar"></div>
                     </div>
-                    <div>
-                        <label class="block text-[10px] font-bold tracking-wider text-gray-500 mb-1">INSTAGRAM URL</label>
-                        <input type="url" id="contactInstagram" class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black" oninput="updateContact()">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold tracking-wider text-gray-500 mb-1">TIKTOK URL</label>
-                        <input type="url" id="contactTiktok" class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black" oninput="updateContact()">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold tracking-wider text-gray-500 mb-1">PINTEREST URL</label>
-                        <input type="url" id="contactPinterest" class="w-full border border-gray-300 p-2 text-xs focus:outline-none focus:border-black" oninput="updateContact()">
-                        <button class="tab-btn pb-3 pt-4 px-4 text-[10px] tracking-[0.1em] font-bold whitespace-nowrap" onclick="switchTab('footer')" data-tab="footer">FOOTER</button>
+
+                    <div class="border-t border-[#c2c9c0]/50 pt-5 mt-5">
+                        <h4 class="text-[10px] font-black tracking-widest text-[#d4af37] mb-2 uppercase">2. TAG PRODUCTS IN ARTICLES</h4>
+                        <p class="text-[9px] text-[#6a7c64] font-medium mb-4 uppercase tracking-widest">Select an article, then select which image from the gallery you want to tag.</p>
+                        
+                        <div class="grid grid-cols-3 gap-3 mb-4">
+                            <select id="hotspotArticleSelect" class="input-field p-2 text-xs font-bold" onchange="updateHotspotImageDropdown()"></select>
+                            <select id="hotspotImageSelect" class="input-field p-2 text-xs font-bold" onchange="loadHotspotEditor()"></select>
+                            <select id="hotspotProductSelect" class="input-field p-2 text-xs font-bold uppercase"></select>
+                        </div>
+                        
+                        <div class="relative inline-block w-full border border-[#c2c9c0] bg-[#eef2ec] cursor-crosshair overflow-hidden" id="hotspot-editor-container" onclick="addHotspot(event)">
+                            <div id="hotspot-markers" class="absolute inset-0 pointer-events-none"></div>
+                        </div>
+                        <div id="hotspot-list" class="mt-4 space-y-2 max-h-40 overflow-y-auto"></div>
                     </div>
                 </div>
             </div>
-        </div>
-        <!-- ==================== FOOTER TAB ==================== -->
-<div id="section-footer" class="hidden p-5">
-    <h2 class="text-[10px] tracking-[0.2em] font-bold text-gray-400 mb-2">FOOTER PAGE CONTENT</h2>
-    <p class="text-[10px] text-gray-500 mb-4">Edit content for each footer link. HTML is supported. Changes sync instantly.</p>
-    <div class="space-y-3 max-h-[75vh] overflow-y-auto hide-scrollbar pr-1" id="footer-edit-list"></div>
-    
-    <div class="border-t border-gray-100 pt-4 mt-4">
-        <p class="text-[10px] font-bold text-gray-500 mb-2">ADD NEW PAGE</p>
-        <div class="flex gap-2 mb-2">
-            <input type="text" id="newFooterKey" placeholder="page-key (e.g. faq)" class="w-1/2 border border-gray-300 p-2 text-xs focus:outline-none focus:border-black lowercase">
-            <input type="text" id="newFooterTitle" placeholder="Page Title" class="w-1/2 border border-gray-300 p-2 text-xs focus:outline-none focus:border-black">
-        </div>
-        <button onclick="addFooterPage()" class="w-full bg-gray-800 text-white py-2 text-[10px] tracking-[0.2em] font-bold hover:bg-gray-900 transition-colors">+ ADD FOOTER PAGE</button>
-        <button class="tab-btn pb-3 pt-4 px-4 text-[10px] tracking-[0.1em] font-bold whitespace-nowrap" onclick="switchTab('subscribers')" data-tab="subscribers">SUBSCRIBERS</button>
-    </div>
-</div>
-<!-- ==================== SUBSCRIBERS TAB ==================== -->
-<div id="section-subscribers" class="hidden p-5">
-    <div class="flex justify-between items-center mb-4">
-        <h2 class="text-[10px] tracking-[0.2em] font-bold text-gray-400">NEWSLETTER SUBSCRIBERS</h2>
-        <button onclick="exportSubscribers()" class="text-[10px] bg-black text-white px-3 py-2 font-bold tracking-wider hover:bg-gray-800 transition-colors">EXPORT CSV</button>
-    </div>
-    <div class="max-h-[75vh] overflow-y-auto hide-scrollbar pr-1">
-        <table class="w-full text-[10px]">
-            <thead class="bg-gray-50 text-gray-500 font-bold tracking-wider border-b border-gray-200">
-                <tr>
-                    <th class="text-left p-3">EMAIL</th>
-                    <th class="text-left p-3">DATE</th>
-                    <th class="text-right p-3">ACTION</th>
-                </tr>
-            </thead>
-            <tbody id="subscribers-list"></tbody>
-        </table>
-        <p id="subscribers-empty" class="text-[10px] text-gray-400 italic text-center py-8">No subscribers yet.</p>
-    </div>
-</div>
+            
+            <!-- CONTACT SECTION -->
+            <div id="section-contact" class="hidden p-5">
+                <h3 class="text-[10px] tracking-widest font-black text-[#1a2e15] mb-6 uppercase border-b border-[#c2c9c0]/50 pb-3">CONTACT INFORMATION</h3>
+                <div class="space-y-4 max-h-[75vh] overflow-y-auto hide-scrollbar pr-2">
+                    <div>
+                        <label class="block text-[10px] font-bold tracking-wider text-[#6a7c64] mb-1">EMAIL</label>
+                        <input type="email" id="contactEmail" class="input-field p-2.5 text-xs font-bold" oninput="updateContact()">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold tracking-wider text-[#6a7c64] mb-1">WHATSAPP NUMBER</label>
+                        <input type="text" id="contactWhatsapp" class="input-field p-2.5 text-xs font-bold" oninput="updateContact()">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold tracking-wider text-[#6a7c64] mb-1">INSTAGRAM URL</label>
+                        <input type="url" id="contactInstagram" class="input-field p-2.5 text-xs font-medium" oninput="updateContact()">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold tracking-wider text-[#6a7c64] mb-1">TIKTOK URL</label>
+                        <input type="url" id="contactTiktok" class="input-field p-2.5 text-xs font-medium" oninput="updateContact()">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold tracking-wider text-[#6a7c64] mb-1">PINTEREST URL</label>
+                        <input type="url" id="contactPinterest" class="input-field p-2.5 text-xs font-medium" oninput="updateContact()">
+                    </div>
 
-        <!-- RIGHT: Inventory + Code Output -->
-        <div class="w-full flex flex-col gap-6 min-w-0">
-            <div id="inventory-panel" class="bg-white p-5 border border-gray-200 shadow-sm flex-1 overflow-y-auto max-h-[500px]">
-                <h2 class="text-[10px] tracking-[0.2em] font-bold mb-3 border-b border-gray-100 pb-2">CURRENT INVENTORY</h2>
-                <h3 class="text-[10px] font-bold text-gray-400 mb-2 mt-3 tracking-widest">NEW ARRIVALS</h3>
-                <div id="list-newArrivals" class="space-y-2 mb-5"></div>
-                <h3 class="text-[10px] font-bold text-gray-400 mb-2 tracking-widest">TRENDING NOW</h3>
-                <div id="list-trending" class="space-y-2 mb-5"></div>
+                    <h3 class="text-[10px] tracking-widest font-black text-[#1a2e15] mt-8 mb-4 pt-6 border-t border-[#c2c9c0]/50 uppercase">PAYMENT LINKS</h3>
+                    <div>
+                        <label class="block text-[10px] font-bold tracking-wider text-[#6a7c64] mb-1">REVOLUT LINK</label>
+                        <input type="url" id="contactRevolut" placeholder="https://revolut.me/username" class="input-field p-2.5 text-xs font-bold" oninput="updateContact()">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold tracking-wider text-[#6a7c64] mb-1">PAYPAL LINK</label>
+                        <input type="url" id="contactPaypal" placeholder="https://paypal.me/username" class="input-field p-2.5 text-xs font-bold" oninput="updateContact()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- REVIEWS SECTION -->
+            <div id="section-reviews" class="hidden animate-fade-in pb-20 p-5">
+                <div class="flex justify-between items-end mb-6 border-b border-[#c2c9c0]/50 pb-4">
+                    <div>
+                        <h2 class="text-xl md:text-2xl font-black uppercase tracking-widest text-[#1a2e15]">Review Moderation</h2>
+                        <p class="text-[10px] text-[#6a7c64] tracking-widest uppercase mt-1 font-bold">Approve or delete customer reviews</p>
+                    </div>
+                </div>
                 
-                <h3 class="text-[10px] font-bold text-gray-400 mb-2 tracking-widest">UPCOMING TEASERS</h3>
-                <div id="list-upcoming" class="space-y-2"></div>
+                <div class="bg-white border border-[#c2c9c0] shadow-sm">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-[#f9f6f0] border-b border-[#c2c9c0]">
+                                <th class="p-3 text-[10px] font-black tracking-widest text-[#1a2e15] uppercase">Product</th>
+                                <th class="p-3 text-[10px] font-black tracking-widest text-[#1a2e15] uppercase">Customer & Rating</th>
+                                <th class="p-3 text-[10px] font-black tracking-widest text-[#1a2e15] uppercase">Review</th>
+                                <th class="p-3 text-[10px] font-black tracking-widest text-[#1a2e15] uppercase text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reviews-list"></tbody>
+                    </table>
+                    <div id="reviews-empty" class="hidden text-center py-10">
+                        <p class="text-[10px] font-bold tracking-widest uppercase text-[#6a7c64]">No pending or approved reviews.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FOOTER SECTION -->
+            <div id="section-footer" class="hidden p-5">
+                <h2 class="text-[10px] tracking-[0.2em] font-black text-[#1a2e15] mb-2 uppercase border-b border-[#c2c9c0]/50 pb-3">FOOTER PAGE CONTENT</h2>
+                <p class="text-[10px] text-[#6a7c64] font-bold tracking-widest uppercase mb-6 mt-4">Edit content for each footer link. HTML is supported. Changes sync instantly.</p>
+                <div class="space-y-4 max-h-[75vh] overflow-y-auto hide-scrollbar pr-2" id="footer-edit-list"></div>
+                
+                <div class="border-t border-[#c2c9c0]/50 pt-6 mt-6">
+                    <p class="text-[10px] font-black text-[#1a2e15] tracking-widest uppercase mb-3">ADD NEW PAGE</p>
+                    <div class="flex gap-3 mb-3">
+                        <input type="text" id="newFooterKey" placeholder="page-key (e.g. faq)" class="w-1/2 input-field p-2.5 text-xs lowercase font-bold">
+                        <input type="text" id="newFooterTitle" placeholder="Page Title" class="w-1/2 input-field p-2.5 text-xs font-bold uppercase">
+                    </div>
+                    <button onclick="addFooterPage()" class="w-full bg-[#1a2e15] text-[#d4af37] border border-[#d4af37] py-3 text-[10px] tracking-widest font-black hover:bg-[#2c4c23] transition-colors shadow-md">+ ADD FOOTER PAGE</button>
+                </div>
+            </div>
+
+            <!-- SUBSCRIBERS SECTION -->
+            <div id="section-subscribers" class="hidden p-5">
+                <div class="flex justify-between items-center mb-6 border-b border-[#c2c9c0]/50 pb-4">
+                    <h2 class="text-[10px] tracking-widest font-black text-[#1a2e15] uppercase">NEWSLETTER SUBSCRIBERS</h2>
+                    <button onclick="exportSubscribers()" class="text-[10px] bg-[#1a2e15] text-[#d4af37] border border-[#d4af37] px-4 py-2 font-black tracking-widest hover:bg-[#2c4c23] transition-colors shadow-sm">EXPORT CSV</button>
+                </div>
+
+                <div class="mb-6 p-4 border border-[#d4af37]/30 bg-[#fdfbf7] shadow-sm">
+                    <h3 class="text-[10px] font-black tracking-widest text-[#d4af37] uppercase mb-2">SEND DIGITAL GIFT CARD</h3>
+                    <p class="text-[9px] text-[#1a2e15] font-bold tracking-widest uppercase mb-3">Set the amount and code below, then click "GIFT" next to any subscriber in the list below.</p>
+                    <div class="flex gap-2">
+                        <input type="number" id="giftCardAmount" placeholder="€ Amount" class="w-24 input-field p-2 text-xs font-bold">
+                        <input type="text" id="giftCardCode" placeholder="Code (e.g. GIFT50)" class="flex-1 input-field p-2 text-xs uppercase font-bold">
+                    </div>
+                </div>
+
+                <div class="max-h-[75vh] overflow-y-auto hide-scrollbar pr-2 border border-[#c2c9c0] bg-white shadow-sm">
+                    <table class="w-full text-[10px]">
+                        <thead class="bg-[#f9f6f0] text-[#1a2e15] font-black tracking-widest border-b border-[#c2c9c0]">
+                            <tr>
+                                <th class="text-left p-4 uppercase">EMAIL</th>
+                                <th class="text-left p-4 uppercase">DATE</th>
+                                <th class="text-right p-4 uppercase">ACTION</th>
+                            </tr>
+                        </thead>
+                        <tbody id="subscribers-list"></tbody>
+                    </table>
+                    <p id="subscribers-empty" class="text-[10px] font-bold tracking-widest uppercase text-[#6a7c64] text-center py-10">No subscribers yet.</p>
+                </div>
+            </div>
+            
+        </div>
+
+        <div class="w-full flex flex-col gap-8 min-w-0">
+            <div id="inventory-panel" class="panel-box p-6 flex-1 overflow-y-auto max-h-[85vh]">
+                <h2 class="text-[10px] tracking-[0.2em] font-black mb-4 border-b border-[#c2c9c0]/50 pb-3 text-[#1a2e15] uppercase">CURRENT INVENTORY</h2>
+                <h3 class="text-[10px] font-black text-[#d4af37] mb-3 mt-4 tracking-widest uppercase">NEW ARRIVALS</h3>
+                <div id="list-newArrivals" class="space-y-3 mb-6"></div>
+                <h3 class="text-[10px] font-black text-[#d4af37] mb-3 tracking-widest uppercase">TRENDING NOW</h3>
+                <div id="list-trending" class="space-y-3 mb-6"></div>
+                
+                <h3 class="text-[10px] font-black text-[#d4af37] mb-3 tracking-widest uppercase">PRE-ORDER DROPS</h3>
+                <div id="list-upcoming" class="space-y-3"></div>
             </div>
 
             <div class="bg-black text-white p-5 shadow-sm hidden">
@@ -342,22 +619,74 @@
         </div>
     </div>
 
-    <!-- TOAST NOTIFICATION FOR SUCCESSFUL UPLOADS -->
-    <div id="admin-toast" class="fixed bottom-6 right-6 bg-green-600 text-white px-6 py-4 text-[10px] tracking-[0.2em] font-bold transform translate-y-24 opacity-0 transition-all duration-300 z-50 shadow-xl flex items-center gap-3">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+    <div id="admin-toast" class="fixed bottom-8 right-8 bg-[#2c4c23] text-[#d4af37] border border-[#d4af37] px-6 py-4 text-[10px] tracking-[0.2em] font-black transform translate-y-24 opacity-0 transition-all duration-300 z-50 shadow-2xl flex items-center gap-3 uppercase">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d4af37" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>
         <span id="admin-toast-text">LIVE STORE UPDATED!</span>
     </div>
 
-    <!-- Firebase SDKs -->
+   <!-- FIREBASE ENGINE & SECURE ADMIN LOCK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script> 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    
-    <!-- Link to your external JS files -->
-    <script src="js/firebase-config.js"></script>
-    <script src="js/admin.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-functions.js"></script>    
 
-       <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-    <script src="js/main.js"></script>
+    <!-- 1. LOAD CONFIG FIRST (Initializes Firebase) -->
+    <script src="js/firebase-config.js"></script>
+
+    <!-- 2. SET DB SHORTCUT AFTER CONFIG LOADS -->
+    <script>if(typeof firebase!=="undefined"&&firebase.database){window.db=firebase.database();}</script>
+
+    <!-- 3. AUTH & ADMIN SCRIPTS -->
+    <script>
+        firebase.auth().onAuthStateChanged((user) => {
+            if (!user) {
+                window.location.href = "login.html";
+                return;
+            }
+
+            const allowedAdmins = [
+                "MS15g8h5ELPmMcuBijhEC7loGws2", 
+                "PASTE_SECOND_UID_HERE"         
+            ]; 
+
+            if (!allowedAdmins.includes(user.uid)) {
+                alert("UNAUTHORIZED ACCESS: You do not have permission to view this page.");
+                window.location.href = "index.html";
+                return;
+            }
+
+            const userCountDisplay = document.getElementById('user-count-display');
+            if (userCountDisplay) {
+                firebase.database().ref('users').on('value', (snap) => {
+                    const val = snap.val();
+                    const count = (val && typeof val === 'object') ? Object.keys(val).length : 0;
+                    userCountDisplay.textContent = count + ' USERS';
+                }, (err) => {
+                    console.error('[ADMIN] User count read FAILED:', err.code, err.message);
+                    userCountDisplay.textContent = 'ERR USERS';
+                });
+            }
+        });
+    </script>
+    <script src="js/admin.js?v=update13"></script>
+
+<!-- NOTIFY ME MODAL -->
+<div id="notify-modal" class="fixed inset-0 bg-[#1a2e15]/80 z-[200] hidden items-center justify-center backdrop-blur-sm" onclick="if(event.target===this)closeNotifyModal()">
+  <div class="bg-[#f9f6f0] p-6 md:p-8 max-w-md w-full mx-4 border border-[#d4af37] shadow-2xl relative">
+    <button onclick="closeNotifyModal()" class="absolute top-4 right-4 text-2xl text-[#d4af37] hover:text-[#1a2e15]">&times;</button>
+    <h3 class="text-xl font-black tracking-widest mb-2 text-[#1a2e15] uppercase">Back In Stock Alert</h3>
+    <p class="text-[10px] text-[#6a7c64] font-bold tracking-widest uppercase mb-6">We'll email you the moment this piece is available again.</p>
+    
+    <div class="mb-4">
+      <label class="block text-[10px] font-black tracking-widest text-[#1a2e15] mb-3 uppercase">SELECT YOUR SIZE</label>
+      <div id="notify-size-options" class="flex flex-wrap gap-3"></div>
+    </div>
+    
+    <button onclick="submitNotifyRequest()" class="w-full bg-[#1a2e15] text-[#d4af37] border border-[#d4af37] py-4 text-[10px] tracking-[0.2em] font-black hover:bg-[#2c4c23] transition-colors shadow-lg mb-3">NOTIFY ME</button>
+    <p id="notify-error" class="text-[10px] text-red-600 font-black tracking-widest hidden uppercase text-center"></p>
+  </div>
+</div>
 
 </body>
 </html>

@@ -6,6 +6,7 @@ import {
     updateProfile,
     sendEmailVerification,
     sendPasswordResetEmail,
+    signOut,
     GoogleAuthProvider,
     OAuthProvider,
     signInWithPopup 
@@ -59,7 +60,7 @@ toggleMode.addEventListener('click', () => {
 
 form.addEventListener('submit', (e) => {
     e.preventDefault();
-    const email = emailInput.value;
+    const email = emailInput.value.trim();
     const password = passwordInput.value;
 
     const handleError = (error) => {
@@ -82,17 +83,20 @@ form.addEventListener('submit', (e) => {
         signInWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
                 const user = userCredential.user;
-                if (!user.emailVerified) {
-                    errorMessage.innerHTML = 'Please verify your email before signing in. <a href="#" id="resend-link" style="text-decoration:underline;color:#666;">Resend email</a>';
-                    document.getElementById('resend-link').addEventListener('click', (ev) => {
-                        ev.preventDefault();
-                        sendEmailVerification(user).then(() => {
-                            errorMessage.textContent = "Verification email resent. Check your inbox.";
-                        });
-                    });
-                    firebase.auth().signOut();
-                    return;
-                }
+                
+                // TEMPORARILY DISABLED FOR TESTING
+                // if (!user.emailVerified) {
+                //     errorMessage.innerHTML = 'Please verify your email before signing in. <a href="#" id="resend-link" style="text-decoration:underline;color:#666;">Resend email</a>';
+                //     document.getElementById('resend-link').addEventListener('click', (ev) => {
+                //         ev.preventDefault();
+                //         sendEmailVerification(user).then(() => {
+                //             errorMessage.textContent = "Verification email resent. Check your inbox.";
+                //         });
+                //     });
+                //     signOut(auth);
+                //     return;
+                // }
+                
                 window.location.href = "dashboard.html";
             })
             .catch(handleError);
@@ -120,7 +124,7 @@ form.addEventListener('submit', (e) => {
                     });
                 }).then(() => {
                     errorMessage.style.color = "#16a34a";
-                    errorMessage.textContent = "Account created! Please check your email to verify before signing in.";
+                    errorMessage.textContent = "Account created! You can now log in directly (verification bypassed for testing).";
                     isLoginMode = true;
                     authButton.textContent = "SIGN IN";
                     toggleMode.textContent = "Need an account? Sign up here.";
@@ -131,23 +135,29 @@ form.addEventListener('submit', (e) => {
             .catch(handleError);
     }
 });
-
-// Forgot Password
-document.getElementById('forgot-password').addEventListener('click', (e) => {
+// Temporarily stripped-down test version for Password Reset
+document.getElementById('forgot-password').addEventListener('click', async (e) => {
     e.preventDefault();
-    const email = emailInput.value.trim();
+    let email = emailInput.value.trim();
+    
     if (!email) {
-        errorMessage.textContent = "Please enter your email address first, then click Forgot Password.";
-        return;
+        email = window.prompt("Please enter your email address to reset your password:");
+        if (!email || !email.trim()) return;
+        emailInput.value = email;
     }
-    sendPasswordResetEmail(auth, email)
-        .then(() => {
-            errorMessage.style.color = "#16a34a";
-            errorMessage.textContent = "Password reset email sent. Check your inbox.";
-        })
-        .catch((err) => {
-            errorMessage.textContent = err.message.replace("Firebase:", "");
-        });
+    
+    errorMessage.style.color = "#666";
+    errorMessage.textContent = "Sending reset link...";
+    
+    try {
+        await sendPasswordResetEmail(auth, email);
+        
+        errorMessage.style.color = "#16a34a";
+        errorMessage.textContent = "Test email sent! Check your inbox and spam folder.";
+    } catch (err) {
+        errorMessage.style.color = "#dc2626";
+        errorMessage.textContent = err.message.replace("Firebase:", "");
+    }
 });
 
 document.getElementById('google-login').addEventListener('click', () => {

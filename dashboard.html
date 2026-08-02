@@ -3,326 +3,957 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAYAND | Dashboard</title>
+    <title>SAYAND | My Account</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
-        body { font-family: 'Inter', sans-serif; background: #f5f5f5; margin: 0; display: flex; height: 100vh; }
-        
-        .sidebar { width: 250px; background: #fff; padding: 40px 30px; box-shadow: 2px 0 5px rgba(0,0,0,0.02); display: flex; flex-direction: column; }
-        .sidebar h1 { font-weight: 800; letter-spacing: -1px; margin: 0 0 50px 0; font-size: 24px; }
-        .nav-link { color: #666; text-decoration: none; font-size: 14px; font-weight: 600; margin-bottom: 20px; letter-spacing: 0.05em; transition: color 0.2s; cursor: pointer; }
-        .nav-link:hover, .nav-link.active { color: #000; }
-        .spacer { flex-grow: 1; }
-        #sign-out-btn { background: none; border: none; color: #dc2626; text-align: left; padding: 0; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; cursor: pointer; letter-spacing: 0.05em; }
-        
-        .main-content { flex-grow: 1; padding: 40px 60px; overflow-y: auto; }
-        .header { margin-bottom: 40px; border-bottom: 1px solid #ddd; padding-bottom: 20px; }
-        .header h2 { margin: 0; font-size: 28px; font-weight: 600; letter-spacing: -0.5px; }
-        .user-email { color: #666; font-size: 14px; margin-top: 10px; }
-        .user-name { color: #000; font-size: 16px; font-weight: 600; margin-top: 4px; }
-        .verified-badge { display: inline-block; background: #16a34a; color: #fff; font-size: 10px; padding: 2px 8px; border-radius: 2px; margin-left: 8px; vertical-align: middle; }
-        .unverified-badge { display: inline-block; background: #dc2626; color: #fff; font-size: 10px; padding: 2px 8px; border-radius: 2px; margin-left: 8px; vertical-align: middle; cursor: pointer; }
-        
-        .dashboard-section { display: none; animation: fadeIn 0.3s ease-in; }
-        .dashboard-section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-
-        .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; }
-        .card { background: #fff; padding: 30px; border: 1px solid #eee; }
-        .card h3 { margin: 0 0 15px 0; font-size: 16px; }
-        .card p { color: #666; font-size: 14px; line-height: 1.6; margin: 0; }
-        .action-btn { display: inline-block; margin-top: 20px; padding: 10px 20px; background: #000; color: #fff; text-decoration: none; font-size: 11px; font-weight: 600; letter-spacing: 0.1em; border: none; cursor: pointer; }
-        .action-btn:hover { background: #333; }
-        .action-btn:disabled { background: #ccc; cursor: not-allowed; }
-        
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; font-size: 12px; font-weight: 600; color: #666; margin-bottom: 8px; letter-spacing: 0.05em; }
-        .form-group input { width: 100%; padding: 12px; border: 1px solid #ddd; font-family: 'Inter', sans-serif; font-size: 14px; box-sizing: border-box; }
-        .form-group input:focus { outline: none; border-color: #000; }
-        .form-group input:read-only { background: #f9f9f9; color: #999; }
-        
-        .save-msg { font-size: 12px; color: #16a34a; margin-top: 8px; min-height: 18px; }
-        
-        .address-card { background: #fff; border: 1px solid #eee; padding: 20px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
-        .address-info { font-size: 14px; color: #333; }
-        .address-label { font-size: 11px; font-weight: 600; color: #666; letter-spacing: 0.1em; margin-bottom: 6px; }
-        .delete-btn { background: none; border: 1px solid #dc2626; color: #dc2626; padding: 6px 12px; font-size: 11px; cursor: pointer; font-weight: 600; }
-        .delete-btn:hover { background: #dc2626; color: #fff; }
-        
-        .order-card { background: #fff; border: 1px solid #eee; padding: 20px; margin-bottom: 15px; }
-        .order-header { display: flex; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px solid #f5f5f5; padding-bottom: 12px; }
-        .order-id { font-weight: 700; font-size: 14px; }
-        .order-date { font-size: 12px; color: #999; }
-        .order-items { font-size: 13px; color: #666; line-height: 1.6; }
-        .order-total { font-weight: 700; font-size: 14px; margin-top: 10px; text-align: right; }
-        
-        .empty-state { text-align: center; padding: 40px; color: #999; font-size: 14px; }
-        
-        @media (max-width: 768px) {
-            body { flex-direction: column; height: auto; }
-            .sidebar { width: 100%; padding: 20px; flex-direction: row; flex-wrap: wrap; gap: 10px; box-sizing: border-box; }
-            .sidebar h1 { margin: 0 20px 0 0; font-size: 20px; }
-            .nav-link { margin: 0 15px 0 0; font-size: 12px; }
-            .spacer { display: none; }
-            #sign-out-btn { margin-left: auto; }
-            .main-content { padding: 20px; }
-            .card-grid { grid-template-columns: 1fr; }
-        }
+        body { font-family: 'Inter', sans-serif; background-color: #f9f6f0; color: #1a2e15;}
+        .dashboard-tab { color: #6a7c64; padding: 1rem; border-left: 3px solid transparent; transition: all 0.3s; font-weight: 600;}
+        .dashboard-tab:hover { color: #d4af37; background-color: rgba(44, 76, 35, 0.05);}
+        .dashboard-tab.active { font-weight: 800; color: #d4af37; border-left: 3px solid #d4af37; background-color: #1a2e15; border-radius: 0 8px 8px 0;}
+        .input-field { width: 100%; border: 1px solid #c2c9c0; padding: 0.75rem 1rem; font-size: 0.75rem; outline: none; transition: all 0.2s; background: #fff; color: #1a2e15;}
+        .input-field:focus { border-color: #d4af37; box-shadow: 0 0 0 1px #d4af37; }
+        .panel-box { background: white; border: 1px solid #c2c9c0; box-shadow: 0 4px 20px rgba(0,0,0,0.03); border-top: 3px solid #2c4c23;}
     </style>
+<base target="_blank">
+<base target="_blank">
+<base target="_blank">
 </head>
-<body>
+<body class="antialiased">
 
-    <div class="sidebar">
-        <h1>SAYAND</h1>
-        <a class="nav-link active" data-tab="overview">Overview</a>
-        <a class="nav-link" data-tab="orders">Order History</a>
-        <a class="nav-link" data-tab="settings">Settings</a>
-        <a href="index.html" class="nav-link">Back to Store</a>
+    <div id="tracking-modal" class="fixed inset-0 bg-[#1a2e15]/90 z-[120] hidden items-center justify-center p-4 md:p-8 backdrop-blur-sm" onclick="if(event.target===this)closeTrackingModal()">
+        <div class="bg-[#f9f6f0] w-full max-w-3xl flex flex-col max-h-[90vh] shadow-2xl relative animate-fade-in border border-[#d4af37]">
+            <div class="flex justify-between items-center p-6 border-b border-[#d4af37]/30 bg-[#1a2e15] sticky top-0 z-10">
+                <div>
+                    <h3 class="text-lg md:text-xl font-black tracking-[0.1em] uppercase text-[#d4af37]">LIVE PACKAGE TRACKING</h3>
+                    <p class="text-[10px] tracking-widest text-white mt-1 uppercase" id="modal-tracking-number"></p>
+                </div>
+                <button onclick="closeTrackingModal()" class="text-3xl leading-none text-[#d4af37] hover:text-white transition-colors">&times;</button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-4 md:p-8 bg-white min-h-[60vh]" id="YQContainer"></div>
+        </div>
+    </div>
+
+    <nav class="bg-[#1a2e15] border-b border-[#d4af37]/30 px-6 py-4 flex justify-between items-center sticky top-0 z-50 shadow-md">
+<a href="index.html" onclick="event.preventDefault(); var p=window.location.pathname; if(p==='/'||p.endsWith('index.html')||p===''){location.reload();}else{window.location.href='index.html';}" class="text-xl md:text-2xl font-black tracking-tighter hover:opacity-70 transition-opacity text-[#d4af37]">SAYAND</a>        <div class="flex items-center gap-6">
+            <a href="index.html" class="text-[10px] tracking-[0.2em] font-bold text-white hover:text-[#d4af37] transition-colors">STOREFRONT</a>
+            <button id="sign-out-btn" class="text-[10px] tracking-[0.2em] font-bold text-red-400 hover:text-red-300 transition-colors">SIGN OUT</button>
+        </div>
+    </nav>
+
+    <div id="toast" class="toast z-[100] bg-[#d4af37] text-[#1a2e15] font-black fixed bottom-[-100px] left-1/2 transform -translate-x-1/2 px-6 py-3 text-[10px] tracking-[0.2em] transition-all duration-300 shadow-xl uppercase">UPDATED</div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 flex flex-col md:flex-row gap-12">
         
-        <div class="spacer"></div>
-        <button id="sign-out-btn">SIGN OUT</button>
+        <div class="w-full md:w-64 flex-shrink-0">
+            <h1 class="text-3xl font-black tracking-tighter uppercase mb-2 text-[#1a2e15]">MY ACCOUNT</h1>
+            <p id="user-greeting" class="text-xs text-[#2c4c23] tracking-wider mb-3 uppercase font-bold">Loading profile...</p>
+            
+            <div id="vip-badge" class="inline-block bg-[#1a2e15] text-[#d4af37] border border-[#d4af37] text-[9px] tracking-[0.3em] px-3 py-1 mb-10 font-black shadow-lg">MEMBER</div>
+            
+            <div class="flex md:flex-col gap-2 overflow-x-auto hide-scrollbar pb-2 md:pb-0 pr-4">
+                <button onclick="switchTab('overview')" data-tab="overview" class="dashboard-tab active text-[10px] tracking-[0.2em] text-left whitespace-nowrap">OVERVIEW</button>
+                <button onclick="switchTab('orders')" data-tab="orders" class="dashboard-tab text-[10px] tracking-[0.2em] text-left whitespace-nowrap">ORDER HISTORY</button>
+                <button onclick="switchTab('wishlist')" data-tab="wishlist" class="dashboard-tab text-[10px] tracking-[0.2em] text-left whitespace-nowrap">SAVED ITEMS</button>
+                <button onclick="switchTab('sizing')" data-tab="sizing" class="dashboard-tab text-[10px] tracking-[0.2em] text-left whitespace-nowrap">MY ATELIER FIT</button>
+                <button onclick="switchTab('address')" data-tab="address" class="dashboard-tab text-[10px] tracking-[0.2em] text-left whitespace-nowrap">ADDRESS BOOK</button>
+                <button onclick="switchTab('profile')" data-tab="profile" class="dashboard-tab text-[10px] tracking-[0.2em] text-left whitespace-nowrap">ACCOUNT DETAILS</button>
+            </div>
+        </div>
+
+        <div class="flex-1 min-w-0">
+            
+            <div id="tab-overview" class="block animate-fade-in">
+                <h2 class="text-sm font-black tracking-[0.2em] mb-6 uppercase border-b border-[#2c4c23]/20 pb-4 text-[#1a2e15]">ACCOUNT OVERVIEW</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div class="panel-box p-6">
+                        <h3 class="text-[10px] font-black tracking-widest text-[#d4af37] mb-4">PERSONAL INFO</h3>
+                        <p id="overview-name" class="text-sm font-black text-[#1a2e15] mb-1">...</p>
+                        <p id="overview-email" class="text-xs text-[#2c4c23] mb-4 font-medium">...</p>
+                        <button onclick="switchTab('profile')" class="text-[10px] font-black tracking-widest border-b border-[#2c4c23] text-[#2c4c23] pb-1 hover:text-[#d4af37] hover:border-[#d4af37] transition-colors">EDIT PROFILE</button>
+                    </div>
+                    <div class="panel-box p-6 flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-[10px] font-black tracking-widest text-[#d4af37] mb-4">LATEST ORDER</h3>
+                            <div id="overview-latest-order">
+                                <p class="text-xs text-[#2c4c23] italic font-medium">No recent orders.</p>
+                            </div>
+                        </div>
+                        <button onclick="switchTab('orders')" class="text-[10px] font-black tracking-widest border-b border-[#2c4c23] text-[#2c4c23] pb-1 hover:text-[#d4af37] hover:border-[#d4af37] transition-colors w-fit mt-4">VIEW ALL ORDERS</button>
+                    </div>
+                </div>
+
+                <!-- REFERRAL PROGRAM -->
+                <div class="panel-box p-6 mt-6">
+                    <h3 class="text-[10px] font-black tracking-widest text-[#d4af37] mb-2 uppercase">Atelier Referral</h3>
+<p class="text-xs text-[#2c4c23] mb-4 font-medium">Share your code. When a friend signs up and completes their first order, you both receive a 10% discount code.</p>                    <div class="bg-[#1a2e15] p-4 flex items-center justify-between border border-[#d4af37]">
+                        <span id="referral-code-display" class="text-[#d4af37] text-sm font-black tracking-widest uppercase">...</span>
+                        <button onclick="copyReferral()" class="text-[10px] font-black text-[#d4af37] border border-[#d4af37] px-4 py-2 hover:bg-[#d4af37] hover:text-[#1a2e15] transition-colors uppercase">COPY</button>
+                    </div>
+                </div>
+
+                <!-- 🟢 NEW: REWARDS & PROMOS PANEL -->
+                <div class="panel-box p-6 mt-6">
+                    <h3 class="text-[10px] font-black tracking-widest text-[#d4af37] mb-2 uppercase">My Rewards & Promos</h3>
+                    <p class="text-xs text-[#2c4c23] mb-4 font-medium">Exclusive discount codes earned from referrals and VIP perks.</p>
+                    <div id="rewards-list" class="space-y-3">
+                        <p class="text-xs text-[#2c4c23] italic font-medium">No rewards yet. Share your referral code to start earning!</p>
+                    </div>
+                </div>
+                <!-- 🟢 END NEW PANEL -->
+
+            <div id="tab-orders" class="hidden animate-fade-in">
+                <h2 class="text-sm font-black tracking-[0.2em] mb-6 uppercase border-b border-[#2c4c23]/20 pb-4 text-[#1a2e15]">ORDER HISTORY</h2>
+                <div id="user-orders-list" class="space-y-6">
+                    <div class="panel-box p-8 text-center">
+                        <div class="w-12 h-12 border-4 border-[#eef2ec] rounded-full border-t-[#2c4c23] animate-spin mx-auto mb-4"></div>
+                        <p class="text-xs text-[#2c4c23] font-bold">Loading your purchase history...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-wishlist" class="hidden animate-fade-in">
+                <h2 class="text-sm font-black tracking-[0.2em] mb-6 uppercase border-b border-[#2c4c23]/20 pb-4 text-[#1a2e15]">SAVED COLLECTION</h2>
+                <div id="dashboard-wishlist-grid" class="grid grid-cols-2 md:grid-cols-3 gap-6"></div>
+            </div>
+
+            <div id="tab-sizing" class="hidden animate-fade-in">
+                <h2 class="text-sm font-black tracking-[0.2em] mb-6 uppercase border-b border-[#2c4c23]/20 pb-4 text-[#1a2e15]">MY ATELIER FIT PROFILE</h2>
+                <div class="panel-box p-6 md:p-8">
+                    <p class="text-xs text-[#2c4c23] mb-8 leading-relaxed font-medium">Save your standard sizes. We will automatically select them for you while you shop to provide a seamless bespoke experience.</p>
+                    <form id="sizing-form" class="space-y-6 max-w-md">
+                        <div class="grid grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-[10px] font-black tracking-wider text-[#d4af37] mb-2">OUTERWEAR / COAT</label>
+                                <select id="size-coat" class="input-field border border-[#c2c9c0] w-full p-3 text-xs font-bold">
+                                    <option value="">Select Size</option>
+                                    <option value="XS">XS</option><option value="S">S</option><option value="M">M</option><option value="L">L</option><option value="XL">XL</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black tracking-wider text-[#d4af37] mb-2">TOP / SHIRT</label>
+                                <select id="size-top" class="input-field border border-[#c2c9c0] w-full p-3 text-xs font-bold">
+                                    <option value="">Select Size</option>
+                                    <option value="XS">XS</option><option value="S">S</option><option value="M">M</option><option value="L">L</option><option value="XL">XL</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black tracking-wider text-[#d4af37] mb-2">BOTTOM / PANT</label>
+                                <select id="size-bottom" class="input-field border border-[#c2c9c0] w-full p-3 text-xs font-bold">
+                                    <option value="">Select Size</option>
+                                    <option value="28">28</option><option value="30">30</option><option value="32">32</option><option value="34">34</option><option value="36">36</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black tracking-wider text-[#d4af37] mb-2">SHOE SIZE (EU)</label>
+                                <select id="size-shoe" class="input-field border border-[#c2c9c0] w-full p-3 text-xs font-bold">
+                                    <option value="">Select Size</option>
+                                    <option value="38">38</option><option value="39">39</option><option value="40">40</option><option value="41">41</option><option value="42">42</option><option value="43">43</option><option value="44">44</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="button" onclick="saveSizing()" id="btn-save-sizing" class="w-full bg-[#1a2e15] text-[#d4af37] py-4 text-xs tracking-[0.2em] font-black hover:bg-[#2c4c23] transition-colors mt-4 shadow-lg border border-[#d4af37]">SAVE SIZING</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="tab-address" class="hidden animate-fade-in">
+                <h2 class="text-sm font-black tracking-[0.2em] mb-6 uppercase border-b border-[#2c4c23]/20 pb-4 text-[#1a2e15]">ADDRESS BOOK</h2>
+
+                <!-- Saved Addresses List -->
+                <div id="address-book-list" class="space-y-4 mb-8"></div>
+
+                <div class="panel-box p-6 md:p-8">
+                    <h3 class="text-[10px] font-black tracking-widest text-[#d4af37] mb-4 uppercase">ADD NEW ADDRESS</h3>
+                    <form id="address-form" class="space-y-4 max-w-lg">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div><label class="block text-[10px] font-black tracking-wider text-[#d4af37] mb-1">FIRST NAME</label><input type="text" id="addr-first" class="input-field w-full border border-[#c2c9c0] p-3 text-xs font-bold"></div>
+                            <div><label class="block text-[10px] font-bold tracking-wider text-[#d4af37] mb-1">LAST NAME</label><input type="text" id="addr-last" class="input-field w-full border border-[#c2c9c0] p-3 text-xs font-bold"></div>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black tracking-wider text-[#d4af37] mb-1">STREET ADDRESS</label>
+                            <input type="text" id="addr-street" class="input-field w-full border border-[#c2c9c0] p-3 text-xs font-bold" autocomplete="off">
+                            <p id="maps-fallback" class="text-[10px] text-[#d4af37] font-bold mt-1 hidden">⚠️ Address autocomplete unavailable. Please type manually.</p>
+                        </div>
+                        <div><label class="block text-[10px] font-black tracking-wider text-[#d4af37] mb-1">APARTMENT / SUITE</label><input type="text" id="addr-apt" class="input-field w-full border border-[#c2c9c0] p-3 text-xs font-bold"></div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div><label class="block text-[10px] font-black tracking-wider text-[#d4af37] mb-1">CITY</label><input type="text" id="addr-city" class="input-field w-full border border-[#c2c9c0] p-3 text-xs font-bold"></div>
+                            <div><label class="block text-[10px] font-black tracking-wider text-[#d4af37] mb-1">POSTAL / ZIP</label><input type="text" id="addr-zip" class="input-field w-full border border-[#c2c9c0] p-3 text-xs font-bold"></div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div><label class="block text-[10px] font-black tracking-wider text-[#d4af37] mb-1">COUNTRY</label><input type="text" id="addr-country" class="input-field w-full border border-[#c2c9c0] p-3 text-xs font-bold"></div>
+                            <div><label class="block text-[10px] font-black tracking-wider text-[#d4af37] mb-1">PHONE NUMBER</label><input type="text" id="addr-phone" class="input-field w-full border border-[#c2c9c0] p-3 text-xs font-bold"></div>
+                        </div>
+                        <div class="flex items-center gap-3 mt-2">
+                            <input type="checkbox" id="addr-preferred" class="w-4 h-4 text-[#2c4c23] focus:ring-[#2c4c23]">
+                            <label for="addr-preferred" class="text-[11px] font-black tracking-[0.1em] uppercase text-[#2c4c23]">Set as preferred address</label>
+                        </div>
+                        <button type="button" onclick="saveAddress()" id="btn-save-addr" class="w-full bg-[#1a2e15] text-[#d4af37] py-4 text-xs tracking-[0.2em] font-black hover:bg-[#2c4c23] transition-colors mt-6 shadow-lg border border-[#d4af37]">SAVE ADDRESS</button>
+                    </form>
+                </div>
+            </div>
+
+ <div id="tab-profile" class="hidden animate-fade-in">
+    <h2 class="text-sm font-black tracking-[0.2em] mb-6 uppercase border-b border-[#2c4c23]/20 pb-4 text-[#1a2e15]">ACCOUNT DETAILS</h2>
+    <div class="panel-box p-6 md:p-8">
+        <div class="space-y-6 max-w-md">
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-[10px] font-black tracking-wider text-[#d4af37] mb-2">FIRST NAME</label>
+                    <input type="text" id="profile-first-name" class="w-full border border-[#c2c9c0] p-3 text-xs bg-[#eef2ec] cursor-not-allowed text-[#2c4c23] font-bold" readonly>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black tracking-wider text-[#d4af37] mb-2">LAST NAME</label>
+                    <input type="text" id="profile-last-name" class="w-full border border-[#c2c9c0] p-3 text-xs bg-[#eef2ec] cursor-not-allowed text-[#2c4c23] font-bold" readonly>
+                </div>
+            </div>
+            <div>
+                <label class="block text-[10px] font-black tracking-wider text-[#d4af37] mb-2">EMAIL ADDRESS</label>
+                <input type="email" id="profile-email" class="w-full border border-[#c2c9c0] p-3 text-xs bg-[#eef2ec] text-[#2c4c23] cursor-not-allowed font-bold" readonly>
+                <p class="text-[9px] text-[#2c4c23] mt-2 font-bold uppercase tracking-wider opacity-70">Core account details are locked for security.</p>
+            </div>
+            <div>
+                <label class="block text-[10px] font-black tracking-wider text-[#d4af37] mb-2">DATE OF BIRTH</label>
+                <input type="date" id="profile-dob" class="w-full border border-[#c2c9c0] p-3 text-xs text-[#2c4c23] font-bold">
+                <p class="text-[9px] text-[#2c4c23] mt-2 font-bold uppercase tracking-wider opacity-70">Required for birthday rewards and age verification.</p>
+            </div>
+            <button type="button" onclick="saveProfile()" id="btn-save-profile" class="w-full bg-[#1a2e15] text-[#d4af37] py-4 text-xs tracking-[0.2em] font-black hover:bg-[#2c4c23] transition-colors shadow-lg border border-[#d4af37]">SAVE CHANGES</button>
+            <div class="pt-4 border-t border-[#d4af37]/30">
+                <p class="text-[10px] tracking-wider text-[#1a2e15] uppercase font-black">MEMBER SINCE: <span id="profile-joined" class="text-[#d4af37] ml-2">...</span></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+        </div>
     </div>
 
-    <div class="main-content">
-        <div class="header">
-            <h2 id="page-title">My Account</h2>
-            <div class="user-name" id="display-name">Loading...</div>
-            <div class="user-email" id="display-email">Loading...</div>
-        </div>
-
-        <div id="section-overview" class="dashboard-section active">
-            <div class="card-grid">
-                <div class="card">
-                    <h3>Account Overview</h3>
-                    <p>Welcome back to your SAYAND account. Manage your profile, track orders, and update your preferences.</p>
-                    <div style="margin-top: 20px; font-size: 13px; color: #666;">
-                        <p><strong>Member Since:</strong> <span id="member-since">-</span></p>
-                        <p style="margin-top: 8px;"><strong>Account Status:</strong> <span id="account-status">Active</span></p>
-                    </div>
-                </div>
-                <div class="card">
-                    <h3>Quick Links</h3>
-                    <p>Jump to your most used sections.</p>
-                    <div style="margin-top: 15px;">
-                        <a href="#" class="action-btn" onclick="switchTab('orders'); return false;" style="margin-right: 10px;">VIEW ORDERS</a>
-                        <a href="#" class="action-btn" onclick="switchTab('settings'); return false;" style="background: #fff; color: #000; border: 1px solid #000;">SETTINGS</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="section-orders" class="dashboard-section">
-            <div class="card">
-                <h3>Your Orders</h3>
-                <div id="orders-container">
-                    <div class="empty-state">You haven't placed any orders yet.</div>
-                </div>
-                <a href="index.html" class="action-btn" style="margin-top: 20px;">SHOP NOW</a>
-            </div>
-        </div>
-
-        <div id="section-settings" class="dashboard-section">
-            <div class="card-grid">
-                <div class="card">
-                    <h3>Profile Details</h3>
-                    <div class="form-group">
-                        <label>Full Name</label>
-                        <input type="text" id="settings-name">
-                    </div>
-                    <div class="form-group">
-                        <label>Email Address</label>
-                        <input type="email" id="settings-email" readonly>
-                    </div>
-                    <button class="action-btn" id="save-name-btn" onclick="saveName()">SAVE NAME</button>
-                    <div class="save-msg" id="save-msg"></div>
-                    <p style="font-size: 12px; color: #999; margin-top: 15px;">To update your password, use the Sign Out and "Forgot Password" flow on the login page.</p>
-                </div>
-                <div class="card">
-                    <h3>Shipping Addresses</h3>
-                    <div id="addresses-container"></div>
-                    <div class="form-group" style="margin-top: 20px;">
-                        <label>Add New Address</label>
-                        <input type="text" id="new-address" placeholder="e.g. 123 Main St, Milan, Italy">
-                    </div>
-                    <button class="action-btn" onclick="addAddress()">ADD ADDRESS</button>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
     <script src="js/firebase-config.js"></script>
+    <script type="text/javascript" src="//www.17track.net/externalcall.js"></script>
 
     <script>
-    let currentUser = null;
+        let currentUserUid = null;
 
-    firebase.auth().onAuthStateChanged((user) => {
-        if (!user) {
-            window.location.href = 'login.html';
-        } else {
-            currentUser = user;
-            document.getElementById('display-email').textContent = user.email;
-            document.getElementById('settings-email').value = user.email;
+        function showDashboardToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+
+        window.switchTab = function(tabName) {
+            const tabs = ['overview', 'orders', 'wishlist', 'sizing', 'address', 'profile'];
+            tabs.forEach(t => document.getElementById('tab-' + t).classList.add('hidden'));
+            document.querySelectorAll('.dashboard-tab').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('tab-' + tabName).classList.remove('hidden');
+            document.querySelector(`.dashboard-tab[data-tab="${tabName}"]`).classList.add('active');
+        };
+
+        window.openTrackingModal = function(trackingStr) {
+            document.getElementById('tracking-modal').classList.remove('hidden');
+            document.getElementById('tracking-modal').classList.add('flex');
+            document.getElementById('modal-tracking-number').innerText = 'CODE: ' + trackingStr;
+            document.body.style.overflow = 'hidden';
             
-            const name = user.displayName || 'SAYAND Member';
-            document.getElementById('display-name').textContent = name;
-            document.getElementById('settings-name').value = name;
+            document.getElementById('YQContainer').innerHTML = ''; 
             
-            const metadata = user.metadata;
-            if (metadata && metadata.creationTime) {
-                document.getElementById('member-since').textContent = new Date(metadata.creationTime).toLocaleDateString();
+            setTimeout(() => {
+                if(typeof YQV5 !== 'undefined') {
+                    YQV5.trackSingle({
+                        YQ_ContainerId: "YQContainer",
+                        YQ_Height: 500,
+                        YQ_Fc: "0",
+                        YQ_Lang: "en",
+                        YQ_Num: trackingStr
+                    });
+                } else {
+                    document.getElementById('YQContainer').innerHTML = '<p class="text-sm text-center text-gray-500 mt-10">Tracking engine currently loading. Please check your connection.</p>';
+                }
+            }, 100);
+        };
+
+        window.closeTrackingModal = function() {
+            document.getElementById('tracking-modal').classList.add('hidden');
+            document.getElementById('tracking-modal').classList.remove('flex');
+            document.body.style.overflow = '';
+        };
+
+        window.cancelUserOrder = function(orderId) {
+            if(confirm("Are you sure you want to cancel this order? This action cannot be undone.")) {
+                const updates = {};
+                updates['orders/' + orderId + '/status'] = 'Canceled (By User)';
+                updates['users/' + currentUserUid + '/orders/' + orderId + '/status'] = 'Canceled (By User)';
+                firebase.database().ref().update(updates)
+                .then(() => { showDashboardToast("ORDER CANCELED"); })
+                .catch(e => alert("Error: " + e.message));
             }
+        };
+
+        window.requestRefund = function(orderId) {
+            if(confirm("Request a return and refund? Our Atelier team will review your request and provide a carrier QR code for pick-up.")) {
+                const updates = {};
+                updates['orders/' + orderId + '/status'] = 'Return Requested';
+                updates['users/' + currentUserUid + '/orders/' + orderId + '/status'] = 'Return Requested';
+                firebase.database().ref().update(updates)
+                .then(() => { showDashboardToast("RETURN REQUEST SUBMITTED"); })
+                .catch(e => alert("Error: " + e.message));
+            }
+        };
+
+        // ─── ADDRESS BOOK ───
+        function loadAddressBook() {
+            const container = document.getElementById('address-book-list');
+            if (!container || !currentUserUid) return;
             
-            // Email verification badge
-            const statusEl = document.getElementById('account-status');
-            if (user.emailVerified) {
-                statusEl.innerHTML = 'Active <span class="verified-badge">VERIFIED</span>';
+            firebase.database().ref(`users/${currentUserUid}/addressBook`).on('value', (snap) => {
+                const data = snap.val() || {};
+                container.innerHTML = '';
+                
+                if (Object.keys(data).length === 0) {
+                    container.innerHTML = '<p class="text-xs text-[#2c4c23] italic font-medium">No saved addresses yet.</p>';
+                    return;
+                }
+                
+                Object.entries(data).forEach(([key, addr]) => {
+                    const isPreferred = addr.preferred ? '<span class="text-[10px] font-black text-[#d4af37] tracking-widest ml-2">[PREFERRED]</span>' : '';
+                    const div = document.createElement('div');
+                    div.className = 'panel-box p-4 flex flex-col sm:flex-row justify-between items-start gap-4';
+                    div.innerHTML = `
+                        <div>
+                            <p class="text-xs font-black text-[#1a2e15] mb-1">${addr.firstName || ''} ${addr.lastName || ''}${isPreferred}</p>
+                            <p class="text-[10px] text-[#2c4c23] font-medium">${addr.street || ''} ${addr.apt || ''}</p>
+                            <p class="text-[10px] text-[#2c4c23] font-medium">${addr.city || ''}, ${addr.zip || ''}</p>
+                            <p class="text-[10px] text-[#2c4c23] font-medium">${addr.country || ''}</p>
+                            <p class="text-[10px] text-[#2c4c23] font-medium mt-1">${addr.phone || ''}</p>
+                        </div>
+                        <div class="flex gap-3">
+                            ${!addr.preferred ? `<button onclick="setPreferredAddress('${key}')" class="text-[9px] font-black tracking-widest text-[#2c4c23] hover:text-[#d4af37] border-b border-[#2c4c23] pb-0.5 transition-colors">SET PREFERRED</button>` : ''}
+                            <button onclick="deleteAddress('${key}')" class="text-[9px] font-black tracking-widest text-red-600 hover:text-red-400 border-b border-red-200 pb-0.5 transition-colors">DELETE</button>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+            });
+        }
+
+        window.setPreferredAddress = function(key) {
+            if (!currentUserUid) return;
+            const updates = {};
+            firebase.database().ref(`users/${currentUserUid}/addressBook`).once('value').then(snap => {
+                const data = snap.val() || {};
+                Object.keys(data).forEach(k => {
+                    updates[`users/${currentUserUid}/addressBook/${k}/preferred`] = false;
+                });
+                updates[`users/${currentUserUid}/addressBook/${key}/preferred`] = true;
+                return firebase.database().ref().update(updates);
+            }).then(() => {
+                showDashboardToast('PREFERRED ADDRESS UPDATED');
+            }).catch(err => {
+                console.error(err);
+                alert('Error updating preferred address');
+            });
+        };
+
+        window.deleteAddress = function(key) {
+            if (!currentUserUid) return;
+            if (!confirm('Are you sure you want to delete this address?')) return;
+            firebase.database().ref(`users/${currentUserUid}/addressBook/${key}`).remove()
+                .then(() => showDashboardToast('ADDRESS DELETED'))
+                .catch(err => {
+                    console.error(err);
+                    alert('Error deleting address');
+                });
+        };
+
+        firebase.auth().onAuthStateChanged(async (user) => {
+            if (!user) {
+                window.location.href = "login.html";
+                return;
+            }
+            currentUserUid = user.uid;
+
+            const userSnap = await firebase.database().ref(`users/${user.uid}`).once('value');
+            const userData = userSnap.val();
+            
+            if (userData) {
+                const fName = userData.firstName || '';
+                const lName = userData.lastName || '';
+                
+                document.getElementById('user-greeting').textContent = `WELCOME, ${fName}`;
+                document.getElementById('overview-name').textContent = `${fName} ${lName}`.toUpperCase();
+                document.getElementById('overview-email').textContent = user.email;
+
+                document.getElementById('profile-first-name').value = fName;
+                document.getElementById('profile-last-name').value = lName;
+                document.getElementById('profile-email').value = user.email;
+               
+                document.getElementById('profile-first-name').value = fName;
+document.getElementById('profile-last-name').value = lName;
+document.getElementById('profile-email').value = user.email;
+
+// Load DOB if it exists
+if (userData.dateOfBirth) {
+    document.getElementById('profile-dob').value = userData.dateOfBirth;
+}
+
+
+                if(userData.createdAt) {
+                    const date = new Date(userData.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
+                    document.getElementById('profile-joined').textContent = date;
+                }
+
+                // Referral code
+                const referralRef = firebase.database().ref(`users/${currentUserUid}/referralCode`);
+                referralRef.once('value').then(snap => {
+                    let code = snap.val();
+                    if (!code) {
+                        code = 'REF-' + currentUserUid.slice(-6).toUpperCase();
+                        referralRef.set(code);
+                    }
+                    const el = document.getElementById('referral-code-display');
+                    if (el) el.innerText = code;
+                });
+
+                if(userData.sizing) {
+                    if(userData.sizing.coat) document.getElementById('size-coat').value = userData.sizing.coat;
+                    if(userData.sizing.top) document.getElementById('size-top').value = userData.sizing.top;
+                    if(userData.sizing.bottom) document.getElementById('size-bottom').value = userData.sizing.bottom;
+                    if(userData.sizing.shoe) document.getElementById('size-shoe').value = userData.sizing.shoe;
+                }
+
+                if(userData.address) {
+                    document.getElementById('addr-first').value = userData.address.firstName || '';
+                    document.getElementById('addr-last').value = userData.address.lastName || '';
+                    document.getElementById('addr-street').value = userData.address.street || '';
+                    document.getElementById('addr-apt').value = userData.address.apt || '';
+                    document.getElementById('addr-city').value = userData.address.city || '';
+                    document.getElementById('addr-zip').value = userData.address.zip || '';
+                    document.getElementById('addr-country').value = userData.address.country || '';
+                    document.getElementById('addr-phone').value = userData.address.phone || '';
+                }
+
             } else {
-                statusEl.innerHTML = 'Active <span class="unverified-badge" onclick="resendVerification()" title="Click to resend verification email">UNVERIFIED</span>';
+                document.getElementById('user-greeting').textContent = user.email;
+                document.getElementById('profile-email').value = user.email;
+            }
+
+            loadSavedItems();
+            loadAddressBook();
+
+const ordersRef = firebase.database().ref(`users/${user.uid}/orders`);            
+            ordersRef.on('value', (snapshot) => {
+                const ordersData = snapshot.val();
+                console.log('[DASHBOARD] Orders update:', ordersData ? Object.keys(ordersData).length : 0, 'orders');
+                const container = document.getElementById('user-orders-list');
+                const latestOrderContainer = document.getElementById('overview-latest-order');
+                const vipBadge = document.getElementById('vip-badge');
+                
+                if (!ordersData) {
+                    vipBadge.textContent = "MEMBER";
+                    container.innerHTML = `
+                        <div class="panel-box p-12 text-center">
+                            <p class="text-sm font-black tracking-widest text-[#2c4c23] mb-4">NO ORDERS YET</p>
+                            <a href="index.html" class="bg-[#1a2e15] text-[#d4af37] px-8 py-4 text-[10px] tracking-[0.2em] font-black hover:bg-[#2c4c23] transition-colors inline-block shadow-lg border border-[#d4af37]">START SHOPPING</a>
+                        </div>`;
+                    latestOrderContainer.innerHTML = '<p class="text-xs text-[#2c4c23] italic font-medium">No recent orders.</p>';
+                    return;
+                }
+
+                const ordersArray = Object.keys(ordersData).map(key => ({ id: key, ...ordersData[key] }));
+                ordersArray.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+                const getSafeStatus = (rawStatus) => {
+                    if (!rawStatus) return 'Pending';
+                    const s = rawStatus.toLowerCase();
+                    if (s.includes('pend')) return 'Pending';
+                    if (s.includes('verify')) return 'Verifying';
+                    if (s.includes('process') || s.includes('prepar')) return 'Processing';
+                    if (s.includes('ship')) return 'Shipped';
+                    if (s.includes('deliver')) return 'Delivered';
+                    if (s.includes('request') || s.includes('return')) return 'Return Requested';
+                    if (s.includes('refund')) return 'Refunded';
+                    if (s.includes('cancel')) return 'Canceled';
+                    return 'Pending'; 
+                };
+
+                let count200 = 0, count500 = 0, count700 = 0;
+                ordersArray.forEach(o => {
+                    const status = getSafeStatus(o.status);
+                    if (status !== 'Canceled' && status !== 'Refunded') {
+                        let amt = o.totalAmount || 0;
+                        if (amt >= 700) count700++;
+                        if (amt >= 500) count500++;
+                        if (amt >= 200) count200++;
+                    }
+                });
+
+                if (count700 >= 10) {
+                    vipBadge.textContent = "ATELIER ELITE";
+                    vipBadge.className = "inline-block bg-[#1a2e15] text-[#d4af37] border border-[#d4af37] text-[9px] tracking-[0.3em] px-3 py-1 mb-10 font-black shadow-lg";
+                } else if (count500 >= 6) {
+                    vipBadge.textContent = "ATELIER PRESTIGE";
+                    vipBadge.className = "inline-block bg-[#d4af37] text-[#1a2e15] border border-[#1a2e15] text-[9px] tracking-[0.3em] px-3 py-1 mb-10 font-black shadow-lg";
+                } else if (count200 >= 3) {
+                    vipBadge.textContent = "ATELIER VIP";
+                    vipBadge.className = "inline-block bg-[#2c4c23] text-white border border-[#2c4c23] text-[9px] tracking-[0.3em] px-3 py-1 mb-10 font-black shadow-lg";
+                } else if (ordersArray.length >= 1) {
+                    vipBadge.textContent = "INSIDER";
+                    vipBadge.className = "inline-block bg-white text-[#1a2e15] border border-[#1a2e15] text-[9px] tracking-[0.3em] px-3 py-1 mb-10 font-black shadow-lg";
+                } else {
+                    vipBadge.textContent = "MEMBER";
+                    vipBadge.className = "inline-block bg-white text-[#2c4c23] border border-[#2c4c23]/30 text-[9px] tracking-[0.3em] px-3 py-1 mb-10 font-black shadow-lg";
+                }
+
+                const latest = ordersArray[0];
+                const latestSafeStatus = getSafeStatus(latest.status);
+                
+                let latestStatusColor = latestSafeStatus === 'Pending' ? 'text-orange-500' : 
+                                        latestSafeStatus === 'Verifying' ? 'text-yellow-600' :
+                                        latestSafeStatus === 'Processing' ? 'text-blue-500' :
+                                        latestSafeStatus === 'Shipped' ? 'text-blue-700' : 
+                                        latestSafeStatus === 'Delivered' ? 'text-[#2c4c23]' : 
+                                        latestSafeStatus === 'Return Requested' ? 'text-purple-600' :
+                                        latestSafeStatus === 'Refunded' ? 'text-purple-500' : 'text-red-600';
+
+                const latestDisplayStatus = {
+                    'Pending': 'PENDING',
+                    'Verifying': 'VERIFYING PAYMENT',
+                    'Processing': 'PREPARING SHIPMENT',
+                    'Shipped': 'SHIPPED',
+                    'Delivered': 'DELIVERED',
+                    'Return Requested': 'RETURN PENDING APPROVAL',
+                    'Refunded': 'REFUNDED',
+                    'Canceled': 'CANCELED'
+                }[latestSafeStatus];
+
+                latestOrderContainer.innerHTML = `
+                    <p class="text-xs font-black mb-1 text-[#1a2e15]">ORDER #${latest.id.slice(-6).toUpperCase()}</p>
+                    <p class="text-[10px] font-bold tracking-wider ${latestStatusColor} uppercase mb-2">${latestDisplayStatus}</p>
+                    <p class="text-xs font-bold text-[#2c4c23]">€${(latest.totalAmount || 0).toFixed(2)} EUR</p>
+                `;
+
+                container.innerHTML = ordersArray.map(order => {
+                    const date = order.date ? new Date(order.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Recently';
+                    const safeStatus = getSafeStatus(order.status);
+                    
+                    const itemsList = Object.values(order.items || {}).map(item => `
+                        <div class="flex items-center gap-4 mt-4 bg-white p-4 border border-[#c2c9c0]">
+                            <img src="${item.image}" class="w-16 h-20 object-cover border border-[#c2c9c0] bg-white">
+                            <div class="flex-1">
+                                <p class="text-[10px] font-black tracking-wider uppercase text-[#1a2e15]">${item.name}</p>
+                                <p class="text-[10px] text-[#2c4c23] font-bold uppercase mt-1">QTY: ${item.quantity} &nbsp;|&nbsp; SIZE: ${item.size}</p>
+                            </div>
+                            <p class="text-[10px] font-black text-[#1a2e15]">€${(item.price * item.quantity).toFixed(2)}</p>
+                        </div>
+                    `).join('');
+
+                    let statusColor = safeStatus === 'Pending' ? 'text-orange-500' : 
+                                      safeStatus === 'Verifying' ? 'text-yellow-600' :
+                                      safeStatus === 'Processing' ? 'text-blue-500' :
+                                      safeStatus === 'Shipped' ? 'text-blue-700' : 
+                                      safeStatus === 'Delivered' ? 'text-[#2c4c23]' : 
+                                      safeStatus === 'Return Requested' ? 'text-purple-600' :
+                                      safeStatus === 'Refunded' ? 'text-purple-500' : 'text-red-600';
+
+                    const displayStatus = {
+                        'Pending': 'PENDING',
+                        'Verifying': 'VERIFYING PAYMENT',
+                        'Processing': 'PREPARING SHIPMENT',
+                        'Shipped': 'SHIPPED',
+                        'Delivered': 'DELIVERED',
+                        'Return Requested': 'RETURN PENDING APPROVAL',
+                        'Refunded': 'REFUNDED',
+                        'Canceled': 'CANCELED'
+                    }[safeStatus];
+
+                    const stages = ['Pending', 'Verifying', 'Processing', 'Shipped', 'Delivered'];
+                    let currentStageIndex = stages.indexOf(safeStatus);
+                    let isCanceled = ['Refunded', 'Canceled', 'Return Requested'].includes(safeStatus);
+
+                    let progressPercentage = 0;
+                    if (currentStageIndex === 0) progressPercentage = 10;
+                    else if (currentStageIndex === 1) progressPercentage = 35;
+                    else if (currentStageIndex === 2) progressPercentage = 60;
+                    else if (currentStageIndex === 3) progressPercentage = 85;
+                    else if (currentStageIndex === 4) progressPercentage = 100;
+
+                    let timelineHTML = '';
+                    if (isCanceled) {
+                        timelineHTML = `<div class="my-6 p-4 bg-[#f9f6f0] text-[#1a2e15] text-[10px] font-black tracking-widest text-center border border-[#d4af37] uppercase">STATUS: ${displayStatus}</div>`;
+                    } else {
+                        timelineHTML = `
+                            <div class="my-6 pt-2">
+                                <div class="overflow-hidden h-[4px] mb-3 text-xs flex rounded bg-[#eef2ec] border border-[#c2c9c0]">
+                                    <div style="width: ${progressPercentage}%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-[#d4af37] transition-all duration-1000"></div>
+                                </div>
+                                <div class="flex justify-between text-[7px] sm:text-[9px] font-black tracking-widest text-[#2c4c23]/50">
+                                    <span class="${currentStageIndex >= 0 ? 'text-[#1a2e15]' : ''}">PENDING</span>
+                                    <span class="${currentStageIndex >= 1 ? 'text-[#1a2e15]' : ''} text-center">VERIFYING</span>
+                                    <span class="${currentStageIndex >= 2 ? 'text-[#1a2e15]' : ''} text-center">PREPARING</span>
+                                    <span class="${currentStageIndex >= 3 ? 'text-[#1a2e15]' : ''} text-center">SHIPPED</span>
+                                    <span class="${currentStageIndex >= 4 ? 'text-[#1a2e15]' : ''} text-right">DELIVERED</span>
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    let actionButtonsHTML = '';
+                    if (['Pending', 'Verifying', 'Processing'].includes(safeStatus)) {
+                        actionButtonsHTML = `<button onclick="cancelUserOrder('${order.id}')" class="mt-6 w-full bg-white border border-red-200 text-red-600 px-4 py-3 text-[10px] tracking-widest font-black hover:bg-red-50 transition-colors shadow-sm">CANCEL ORDER</button>`;
+                    } else if (['Shipped', 'Delivered'].includes(safeStatus)) {
+                        actionButtonsHTML = `<button onclick="requestRefund('${order.id}')" class="mt-6 w-full bg-white border border-[#2c4c23] text-[#1a2e15] px-4 py-3 text-[10px] tracking-widest font-black hover:bg-[#eef2ec] transition-colors shadow-sm">REQUEST RETURN / REFUND</button>`;
+                    }
+
+                    let returnQrHTML = order.returnQrUrl ? `
+                        <div class="mt-4 pt-4 border-t border-[#d4af37]/30">
+                            <a href="${order.returnQrUrl}" download="SAYAND_Return_Label" target="_blank" class="w-full bg-[#1a2e15] text-[#d4af37] border border-[#d4af37] px-8 py-3 text-[10px] tracking-widest font-black hover:bg-[#2c4c23] transition-colors flex items-center justify-center gap-2 shadow-lg">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                DOWNLOAD RETURN QR CODE
+                            </a>
+                            <p class="text-[9px] text-[#2c4c23] mt-2 tracking-wide text-center font-bold">Present this QR code to the carrier during pick-up.</p>
+                        </div>
+                    ` : '';
+
+                    let trackingHTML = order.tracking ? `
+                        <div class="mt-6 pt-6 border-t border-[#d4af37]/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                            <div>
+                                <p class="text-[9px] font-black text-[#d4af37] tracking-widest uppercase">CARRIER TRACKING CODE</p>
+                                <p class="text-xs font-mono mt-1 text-[#1a2e15] font-black uppercase">${order.tracking}</p>
+                            </div>
+                            <button onclick="openTrackingModal('${order.tracking.replace(/'/g, "\\'")}')" class="w-full md:w-auto bg-[#1a2e15] text-[#d4af37] border border-[#d4af37] px-8 py-3 text-[10px] tracking-widest font-black hover:bg-[#2c4c23] transition-colors flex items-center justify-center gap-2 shadow-lg">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><circle cx="12" cy="11" r="3"/></svg>
+                                TRACK IN-SITE
+                            </button>
+                        </div>
+                    ` : '';
+
+                    return `
+                        <div class="panel-box p-6 md:p-8">
+                            <div class="flex justify-between items-start mb-2 border-b border-[#d4af37]/30 pb-4">
+                                <div>
+                                    <h3 class="text-xs font-black tracking-wider mb-1 text-[#1a2e15]">ORDER #${order.id.slice(-6).toUpperCase()}</h3>
+                                    <p class="text-[10px] text-[#2c4c23] uppercase tracking-widest font-bold">${date}</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-[10px] font-black tracking-wider ${statusColor} uppercase">${displayStatus}</p>
+                                    <p class="text-xs font-black mt-1 text-[#1a2e15]">€${(order.totalAmount || 0).toFixed(2)} EUR</p>
+                                </div>
+                            </div>
+                            
+                            ${timelineHTML}
+
+                            <div class="mt-6 bg-[#f9f6f0] p-4 border border-[#c2c9c0]">
+                                <h4 class="text-[9px] font-black text-[#d4af37] tracking-widest uppercase">Items Included</h4>
+                                ${itemsList}
+                            </div>
+                            
+                            ${actionButtonsHTML}
+                            ${returnQrHTML}
+                            ${trackingHTML}
+                        </div>
+                    `;
+                }).join('');
+            }, (error) => {
+                console.error('Error loading orders:', error);
+                const container = document.getElementById('user-orders-list');
+                const latestOrderContainer = document.getElementById('overview-latest-order');
+                const vipBadge = document.getElementById('vip-badge');
+                
+                if (container) {
+                    container.innerHTML = `
+                        <div class="panel-box p-12 text-center">
+                            <p class="text-sm font-black tracking-widest text-[#2c4c23] mb-4">NO ORDERS YET</p>
+                            <a href="index.html" class="bg-[#1a2e15] text-[#d4af37] px-8 py-4 text-[10px] tracking-[0.2em] font-black hover:bg-[#2c4c23] transition-colors inline-block shadow-lg border border-[#d4af37]">START SHOPPING</a>
+                        </div>`;
+                }
+                if (latestOrderContainer) {
+                    latestOrderContainer.innerHTML = '<p class="text-xs text-[#2c4c23] italic font-medium">No recent orders.</p>';
+                }
+                if (vipBadge) {
+                    vipBadge.textContent = "MEMBER";
+                }
+            });
+        });
+
+        window.copyReferral = function() {
+            const code = document.getElementById('referral-code-display').innerText;
+            navigator.clipboard.writeText(code).then(() => {
+                showDashboardToast('CODE COPIED');
+            });
+        };
+
+// Referral code
+                const referralRef = firebase.database().ref(`users/${currentUserUid}/referralCode`);
+                referralRef.once('value').then(snap => {
+                    let code = snap.val();
+                    if (!code) {
+                        code = 'REF-' + currentUserUid.slice(-6).toUpperCase();
+                        referralRef.set(code);
+                    }
+                    const el = document.getElementById('referral-code-display');
+                    if (el) el.innerText = code;
+                });
+
+                // 🟢 NEW: FETCH & DISPLAY REWARDS
+                const rewardsRef = firebase.database().ref(`users/${currentUserUid}/rewards`);
+                rewardsRef.on('value', snap => {
+                    const container = document.getElementById('rewards-list');
+                    if (!container) return;
+                    
+                    const data = snap.val();
+                    if (!data) {
+                        container.innerHTML = '<p class="text-xs text-[#2c4c23] italic font-medium">No rewards yet. Share your referral code to start earning!</p>';
+                        return;
+                    }
+                    
+                    let html = '';
+                    Object.values(data).forEach(reward => {
+                        html += `
+                        <div class="bg-[#f9f6f0] border border-[#c2c9c0] p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+                            <div>
+                                <p class="text-[10px] font-black text-[#1a2e15] tracking-widest uppercase">${reward.type}</p>
+                                <p class="text-xs text-[#d4af37] font-bold mt-1">${reward.amount}</p>
+                            </div>
+                            <div class="flex items-center gap-2 w-full md:w-auto">
+                                <span class="bg-white border border-[#c2c9c0] px-4 py-2 text-xs font-mono font-black text-[#1a2e15] flex-1 md:flex-none text-center tracking-widest">${reward.code}</span>
+                                <button onclick="navigator.clipboard.writeText('${reward.code}'); showDashboardToast('CODE COPIED');" class="bg-[#1a2e15] text-[#d4af37] border border-[#d4af37] px-4 py-2 text-[10px] font-black tracking-widest hover:bg-[#2c4c23] transition-colors uppercase">COPY</button>
+                            </div>
+                        </div>`;
+                    });
+                    container.innerHTML = html;
+                });
+                // 🟢 END REWARDS LISTENER
+
+        window.saveSizing = function() {
+            if(!currentUserUid) return;
+            const btn = document.getElementById('btn-save-sizing');
+            btn.innerText = "SAVING...";
+            
+            const sizingData = {
+                coat: document.getElementById('size-coat').value,
+                top: document.getElementById('size-top').value,
+                bottom: document.getElementById('size-bottom').value,
+                shoe: document.getElementById('size-shoe').value
+            };
+
+            firebase.database().ref(`users/${currentUserUid}/sizing`).set(sizingData).then(() => {
+                showDashboardToast("SIZES SAVED");
+                btn.innerText = "SAVE SIZING";
+            });
+        };
+
+        window.saveAddress = async function() {
+            if(!currentUserUid) return;
+            const btn = document.getElementById('btn-save-addr');
+            btn.innerText = "SAVING...";
+            
+            const isPreferred = document.getElementById('addr-preferred').checked;
+            const addrData = {
+                firstName: document.getElementById('addr-first').value.trim(),
+                lastName: document.getElementById('addr-last').value.trim(),
+                street: document.getElementById('addr-street').value.trim(),
+                apt: document.getElementById('addr-apt').value.trim(),
+                city: document.getElementById('addr-city').value.trim(),
+                zip: document.getElementById('addr-zip').value.trim(),
+                country: document.getElementById('addr-country').value.trim(),
+                phone: document.getElementById('addr-phone').value.trim(),
+                preferred: isPreferred
+            };
+
+            const newAddrKey = firebase.database().ref().push().key;
+            const updates = {};
+            
+            if (isPreferred) {
+                const snap = await firebase.database().ref(`users/${currentUserUid}/addressBook`).once('value');
+                const existing = snap.val() || {};
+                Object.keys(existing).forEach(k => {
+                    updates[`users/${currentUserUid}/addressBook/${k}/preferred`] = false;
+                });
             }
             
-            loadOrders();
-            loadAddresses();
-        }
-    });
-
-    function resendVerification() {
-        if (currentUser && !currentUser.emailVerified) {
-            currentUser.sendEmailVerification().then(() => {
-                alert('Verification email sent. Please check your inbox.');
-            }).catch((err) => {
-                alert('Error: ' + err.message);
+            updates[`users/${currentUserUid}/addressBook/${newAddrKey}`] = addrData;
+            updates[`users/${currentUserUid}/address`] = addrData;
+            
+            firebase.database().ref().update(updates).then(() => {
+                showDashboardToast("ADDRESS SAVED");
+                btn.innerText = "SAVE ADDRESS";
+                document.getElementById('address-form').reset();
+                document.getElementById('addr-preferred').checked = false;
+            }).catch(e => {
+                alert("Error: " + e.message);
+                btn.innerText = "SAVE ADDRESS";
             });
-        }
-    }
+        };
 
-    function saveName() {
-        if (!currentUser) return;
-        const newName = document.getElementById('settings-name').value.trim();
-        if (!newName) {
-            document.getElementById('save-msg').textContent = "Name cannot be empty.";
-            document.getElementById('save-msg').style.color = "#dc2626";
-            return;
-        }
-        
-        const parts = newName.split(' ');
-        const firstName = parts[0] || '';
-        const lastName = parts.slice(1).join(' ') || '';
-        
-        currentUser.updateProfile({ displayName: newName }).then(() => {
-            document.getElementById('display-name').textContent = newName;
-            return firebase.database().ref('users/' + currentUser.uid).update({
-                fullName: newName,
-                firstName: firstName,
-                lastName: lastName
-            });
-        }).then(() => {
-            document.getElementById('save-msg').textContent = "Name saved successfully.";
-            document.getElementById('save-msg').style.color = "#16a34a";
-            setTimeout(() => { document.getElementById('save-msg').textContent = ""; }, 3000);
-        }).catch((err) => {
-            document.getElementById('save-msg').textContent = "Error: " + err.message;
-            document.getElementById('save-msg').style.color = "#dc2626";
-        });
-    }
-
-    document.querySelectorAll('.nav-link').forEach(link => {
-        link.addEventListener('click', function(e) {
-            if (this.dataset.tab) {
-                e.preventDefault();
-                switchTab(this.dataset.tab);
+        function loadSavedItems() {
+            const wishlistStr = localStorage.getItem('sayand_wishlist');
+            const grid = document.getElementById('dashboard-wishlist-grid');
+            
+            if (!wishlistStr || wishlistStr === '[]') {
+                grid.innerHTML = `
+                    <div class="col-span-full panel-box p-12 text-center">
+                        <p class="text-sm font-black tracking-widest text-[#2c4c23] mb-4">NO SAVED ITEMS</p>
+                        <a href="index.html" class="bg-[#1a2e15] text-[#d4af37] px-8 py-4 text-[10px] tracking-[0.2em] font-black hover:bg-[#2c4c23] transition-colors inline-block shadow-lg border border-[#d4af37]">EXPLORE COLLECTION</a>
+                    </div>`;
+                return;
             }
-        });
-    });
 
-    function switchTab(tabName) {
-        document.querySelectorAll('.dashboard-section').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-        
-        document.getElementById('section-' + tabName).classList.add('active');
-        document.querySelector('[data-tab="' + tabName + '"]').classList.add('active');
-        
-        const titles = { overview: 'My Account', orders: 'Order History', settings: 'Account Settings' };
-        document.getElementById('page-title').textContent = titles[tabName] || 'My Account';
-    }
-
-    document.getElementById('sign-out-btn').addEventListener('click', () => {
-        firebase.auth().signOut().then(() => {
-            window.location.href = 'index.html';
-        });
-    });
-
-    function loadOrders() {
-        const orders = JSON.parse(localStorage.getItem('sayand_orders') || '[]');
-        const container = document.getElementById('orders-container');
-        
-        if (orders.length === 0) {
-            container.innerHTML = '<div class="empty-state">You haven\'t placed any orders yet. Your order history will appear here after checkout.</div>';
-            return;
-        }
-        
-        container.innerHTML = orders.map((order, index) => {
-            const items = order.items || [];
-            const itemsText = items.map(i => `${i.qty}x ${i.name} (${i.size})`).join('<br>');
-            return `
-                <div class="order-card">
-                    <div class="order-header">
-                        <span class="order-id">ORDER #${10000 + index}</span>
-                        <span class="order-date">${new Date(order.date).toLocaleDateString()}</span>
+            const items = JSON.parse(wishlistStr);
+            grid.innerHTML = items.map(item => {
+                const safeName = encodeURIComponent(item.name);
+                return `
+                    <div class="group cursor-pointer flex flex-col" onclick="window.location.href='product.html?item=${safeName}'">
+                        <div class="aspect-[3/4] bg-[#eef2ec] overflow-hidden mb-3 relative">
+                            <img src="${item.img}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        </div>
+                        <div class="flex flex-col items-start text-left w-full px-1">
+                            <h4 class="text-[11px] font-semibold tracking-wide text-[#1a2e15] truncate uppercase w-full group-hover:text-[#d4af37] transition-colors mb-1">${item.name}</h4>
+                            <p class="text-[11px] text-[#1a2e15] font-medium">€${item.price}</p>
+                        </div>
                     </div>
-                    <div class="order-items">${itemsText}</div>
-                    <div class="order-total">TOTAL: $${order.total}</div>
-                </div>
-            `;
-        }).join('');
-    }
-
-    function loadAddresses() {
-        if (!currentUser) return;
-        const addresses = JSON.parse(localStorage.getItem('sayand_addresses_' + currentUser.uid) || '[]');
-        const container = document.getElementById('addresses-container');
-        
-        if (addresses.length === 0) {
-            container.innerHTML = '<p style="font-size: 13px; color: #999;">No saved addresses yet.</p>';
-            return;
+                `;
+            }).join('');
         }
-        
-        container.innerHTML = addresses.map((addr, i) => `
-            <div class="address-card">
-                <div>
-                    <div class="address-label">ADDRESS ${i + 1}</div>
-                    <div class="address-info">${addr}</div>
-                </div>
-                <button class="delete-btn" onclick="deleteAddress(${i})">REMOVE</button>
-            </div>
-        `).join('');
-    }
 
-    function addAddress() {
-        if (!currentUser) return;
-        const input = document.getElementById('new-address');
-        const val = input.value.trim();
-        if (!val) return;
-        
-        const key = 'sayand_addresses_' + currentUser.uid;
-        const addresses = JSON.parse(localStorage.getItem(key) || '[]');
-        addresses.push(val);
-        localStorage.setItem(key, JSON.stringify(addresses));
-        input.value = '';
-        loadAddresses();
-    }
+        document.getElementById('sign-out-btn').addEventListener('click', () => {
+            firebase.auth().signOut().then(() => {
+                window.location.href = "login.html";
+            });
+        });
 
-    function deleteAddress(index) {
-        if (!currentUser) return;
-        const key = 'sayand_addresses_' + currentUser.uid;
-        const addresses = JSON.parse(localStorage.getItem(key) || '[]');
-        addresses.splice(index, 1);
-        localStorage.setItem(key, JSON.stringify(addresses));
-        loadAddresses();
-    }
+        // ─── GOOGLE MAPS AUTOCOMPLETE ───
+        window.initAddressAutocomplete = function() {
+            const addressInput = document.getElementById('addr-street');
+            const fallbackMsg = document.getElementById('maps-fallback');
+            
+            if (!addressInput) {
+                console.error('[DASHBOARD] Address input not found for autocomplete');
+                return;
+            }
+
+            if (typeof google === 'undefined' || !google.maps || !google.maps.places) {
+                console.error('[DASHBOARD] Google Maps API not loaded.');
+                if (fallbackMsg) fallbackMsg.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                const autocomplete = new google.maps.places.Autocomplete(addressInput, {
+                    types: ['address'],
+                    fields: ['address_components', 'name', 'formatted_address']
+                });
+
+                addressInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') { 
+                        e.preventDefault(); 
+                    }
+                });
+
+                autocomplete.addListener('place_changed', function() {
+                    const place = autocomplete.getPlace();
+                    if (!place || !place.address_components) {
+                        console.warn('[DASHBOARD] No address_components in selected place');
+                        return;
+                    }
+
+                    document.getElementById('addr-city').value = '';
+                    document.getElementById('addr-zip').value = '';
+                    document.getElementById('addr-country').value = '';
+
+                    for (const component of place.address_components) {
+                        const types = component.types;
+                        if (types.includes('locality') || types.includes('postal_town') || types.includes('sublocality')) {
+                            document.getElementById('addr-city').value = component.long_name;
+                        }
+                        if (types.includes('postal_code')) {
+                            document.getElementById('addr-zip').value = component.long_name;
+                        }
+                        if (types.includes('country')) {
+                            document.getElementById('addr-country').value = component.long_name;
+                        }
+                    }
+                    
+                    if (!addressInput.value.trim() && place.formatted_address) {
+                        addressInput.value = place.formatted_address;
+                    }
+                    
+                    console.log('[DASHBOARD] Address filled from Google Maps:', place.name || place.formatted_address);
+                });
+                
+                console.log('[DASHBOARD] Google Maps autocomplete initialized successfully');
+            } catch (err) {
+                console.error('[DASHBOARD] Failed to init autocomplete:', err);
+                if (fallbackMsg) fallbackMsg.classList.remove('hidden');
+            }
+        };
+
+        // Timeout fallback for Google Maps API loading
+        window.mapsLoadTimeout = setTimeout(() => {
+            const fallbackMsg = document.getElementById('maps-fallback');
+            if (typeof google === 'undefined' || !google.maps || !google.maps.places) {
+                console.error('[DASHBOARD] Google Maps API failed to load within 5 seconds.');
+                if (fallbackMsg) fallbackMsg.classList.remove('hidden');
+            }
+        }, 5000);
+
+        // Retry wrapper in case script loads late
+        window.initMapsWithRetry = function() {
+            if (typeof google !== 'undefined' && google.maps && google.maps.places) {
+                if (window.mapsLoadTimeout) clearTimeout(window.mapsLoadTimeout);
+                initAddressAutocomplete();
+            } else {
+                console.warn('[DASHBOARD] Google Maps not ready, retrying in 500ms...');
+                setTimeout(initMapsWithRetry, 500);
+            }
+        };
+
+        window.gm_authFailure = function() {
+            console.error('[DASHBOARD] Google Maps API authentication failed.');
+            const fallbackMsg = document.getElementById('maps-fallback');
+            if (fallbackMsg) fallbackMsg.classList.remove('hidden');
+        };
+
+        window.saveProfile = async function() {
+            if (!currentUserUid) {
+                showDashboardToast('NOT LOGGED IN');
+                return;
+            }
+            const dobInput = document.getElementById('profile-dob');
+            if (!dobInput) {
+                alert('DOB field missing');
+                return;
+            }
+            const dob = dobInput.value;
+            if (!dob) {
+                showDashboardToast('PLEASE ENTER A VALID DATE');
+                return;
+            }
+            const btn = document.getElementById('btn-save-profile');
+            if (btn) {
+                btn.innerText = 'SAVING...';
+                btn.disabled = true;
+            }
+            try {
+                await firebase.database().ref('users/' + currentUserUid).update({ dateOfBirth: dob });
+                showDashboardToast('PROFILE UPDATED');
+            } catch (err) {
+                console.error('[SAYAND] DOB save error:', err);
+                alert('Save failed: ' + err.message);
+            } finally {
+                if (btn) {
+                    btn.innerText = 'SAVE CHANGES';
+                    btn.disabled = false;
+                }
+            }
+        };
     </script>
+
+    <!-- Google Maps API -->
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD8RHTg2bBV_mclB6RKb_nz_Cdk8C48pls&libraries=places&callback=initMapsWithRetry"></script>
 </body>
 </html>
