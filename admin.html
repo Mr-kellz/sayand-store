@@ -669,24 +669,8 @@
             }
         });
     </script>
-    <script src="js/admin.js?v=update13"></script>
+    <script src="js/admin.js?v=update17"></script>
 
-<!-- NOTIFY ME MODAL -->
-<div id="notify-modal" class="fixed inset-0 bg-[#1a2e15]/80 z-[200] hidden items-center justify-center backdrop-blur-sm" onclick="if(event.target===this)closeNotifyModal()">
-  <div class="bg-[#f9f6f0] p-6 md:p-8 max-w-md w-full mx-4 border border-[#d4af37] shadow-2xl relative">
-    <button onclick="closeNotifyModal()" class="absolute top-4 right-4 text-2xl text-[#d4af37] hover:text-[#1a2e15]">&times;</button>
-    <h3 class="text-xl font-black tracking-widest mb-2 text-[#1a2e15] uppercase">Back In Stock Alert</h3>
-    <p class="text-[10px] text-[#6a7c64] font-bold tracking-widest uppercase mb-6">We'll email you the moment this piece is available again.</p>
-    
-    <div class="mb-4">
-      <label class="block text-[10px] font-black tracking-widest text-[#1a2e15] mb-3 uppercase">SELECT YOUR SIZE</label>
-      <div id="notify-size-options" class="flex flex-wrap gap-3"></div>
-    </div>
-    
-    <button onclick="submitNotifyRequest()" class="w-full bg-[#1a2e15] text-[#d4af37] border border-[#d4af37] py-4 text-[10px] tracking-[0.2em] font-black hover:bg-[#2c4c23] transition-colors shadow-lg mb-3">NOTIFY ME</button>
-    <p id="notify-error" class="text-[10px] text-red-600 font-black tracking-widest hidden uppercase text-center"></p>
-  </div>
-</div>
 
 </body>
 </html>

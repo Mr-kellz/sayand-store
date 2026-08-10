@@ -87,10 +87,19 @@
             document.getElementById('error-state').classList.remove('hidden');
         }
 
-        firebase.auth().onAuthStateChanged(async (user) => {
+      firebase.auth().onAuthStateChanged(async (user) => {
+            // 1. SECURITY CHECK: Make sure the user is actually signed in
+            if (!user) {
+                document.getElementById('loading-state').classList.add('hidden');
+                document.getElementById('error-state').classList.remove('hidden');
+                document.querySelector('#error-state p:nth-child(2)').textContent = "Please sign in to view your secure payment details.";
+                return;
+            }
+
             if (orderId) {
                 try {
-                    const snap = await firebase.database().ref(`orders/${orderId}`).once('value');
+                    // 2. SECURE QUERY: Pull the order from the user's private folder to bypass global security blocks
+                    const snap = await firebase.database().ref(`users/${user.uid}/orders/${orderId}`).once('value');
                     const order = snap.val();
                     
                     if (!order) throw new Error('Order not found');
@@ -105,7 +114,7 @@
                     const btn = document.getElementById('payment-btn');
                     if (order.paymentUrl && order.paymentUrl !== '#') {
                         btn.href = order.paymentUrl;
-                        // Update button text based on method
+                        
                         if (order.paymentMethod === 'WhatsApp') {
                             btn.textContent = 'OPEN WHATSAPP TO PAY';
                         } else if (order.paymentMethod === 'PayPal') {

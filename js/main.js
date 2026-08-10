@@ -229,6 +229,24 @@ window.usePromoCode = async function(code) {
     }
 };
 
+// ─── ANNOUNCEMENT PROMO CALCULATOR ───
+window.getActiveAnnouncementPromo = function() {
+    const data = window.SAYAND_PRODUCTS;
+    // Check if the store data exists and if a promo is currently active
+    if (!data || !data.announcement || !data.announcement.active || !data.announcement.isPromo) return null;
+    
+    const now = new Date().getTime();
+    const endDate = data.announcement.promoEndDate ? new Date(data.announcement.promoEndDate).getTime() : 0;
+    
+    // If the promo timer has expired, return null so it stops applying
+    if (now > endDate) return null; 
+    
+    return {
+        minAmount: parseFloat(data.announcement.promoMinAmount) || 0,
+        percent: parseFloat(data.announcement.promoPercent) || 0
+    };
+};
+
 window.calculateAnnouncementDiscount = function(subtotal) {
     const promo = window.getActiveAnnouncementPromo();
     if (!promo) return 0;
@@ -524,13 +542,13 @@ window.renderEditorialSlide = function(idx) {
                     }
                 });
 
-                if(foundProduct) {
-                    const safeData = encodeURIComponent(JSON.stringify(foundProduct));
+             if(foundProduct) {
+                    const safeName = encodeURIComponent(foundProduct.name);
                     const activeSale = isSaleActive(foundProduct);
                     const displayPrice = activeSale ? foundProduct.salePrice : foundProduct.price;
                     
                     const spotHTML = `
-                        <div class="absolute w-6 h-6 -ml-3 -mt-3 group pointer-events-auto cursor-pointer flex items-center justify-center" style="left: ${spot.x}%; top: ${spot.y}%;" onclick="openProductDetail('${safeData}')">
+                        <div class="absolute w-6 h-6 -ml-3 -mt-3 group pointer-events-auto cursor-pointer flex items-center justify-center" style="left: ${spot.x}%; top: ${spot.y}%;" onclick="window.location.href='product.html?item=${safeName}'">
                             <div class="absolute w-full h-full bg-white/60 rounded-full animate-ping"></div>
                             <div class="relative w-2 h-2 bg-white rounded-full shadow-[0_0_15px_rgba(0,0,0,0.5)] border border-gray-200"></div>
                             

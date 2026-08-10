@@ -1,7 +1,7 @@
 // js/firebase-config.js
 const firebaseConfig = {
     apiKey: "AIzaSyD00XzBiIM2OQQQVmygspFIWxjExDwkldk",
-    authDomain: "sayand-store.firebaseapp.com",
+    authDomain: "thesayand.com",
     projectId: "sayand-store",
     storageBucket: "sayand-store.firebasestorage.app",
     messagingSenderId: "232440912424",

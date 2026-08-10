@@ -189,6 +189,26 @@
         const errorBox = document.getElementById('error-message');
         const authBtn = document.getElementById('auth-button');
 
+        // --- AUTO-FILL REFERRAL CODE FROM URL ---
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const refCode = urlParams.get('ref');
+            
+            if (refCode) {
+                // Automatically flip the page from "Sign In" to "Create Account"
+                if (isLoginMode) {
+                    document.getElementById('toggle-mode').click();
+                }
+                
+                // Paste the code into the box and make it visually clear it worked
+                const refInput = document.getElementById('referralCode');
+                refInput.value = refCode;
+                refInput.style.borderColor = '#d4af37';
+                refInput.style.backgroundColor = '#f9f6f0';
+            }
+        });
+        // ----------------------------------------
+
         window.toggleVisibility = function(inputId, btn) {
             const input = document.getElementById(inputId);
             if (input.type === 'password') {
@@ -338,7 +358,15 @@ document.getElementById('referralCode').value = '';
                         authBtn.disabled = false;
                     }
                 } catch (error) {
-                    errorBox.innerText = error.message;
+                    if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                        errorBox.innerText = "Incorrect email or password. Please try again.";
+                    } else if (error.code === 'auth/too-many-requests') {
+                        errorBox.innerText = "Too many failed attempts. Please reset your password or try again later.";
+                    } else if (error.code === 'auth/invalid-email') {
+                        errorBox.innerText = "Please enter a valid email address.";
+                    } else {
+                        errorBox.innerText = "An error occurred. Please try again.";
+                    }
                     authBtn.innerText = 'SIGN IN';
                     authBtn.disabled = false;
                 }
@@ -436,11 +464,15 @@ document.getElementById('referralCode').value = '';
                     authBtn.innerText = 'CREATE ACCOUNT';
                     authBtn.disabled = false;
 
-                } catch (error) {
+               } catch (error) {
                     if (error.code === 'auth/email-already-in-use') {
                         errorBox.innerText = "This email is already registered. Please sign in instead.";
+                    } else if (error.code === 'auth/weak-password') {
+                        errorBox.innerText = "Your password is too weak. Please use at least 6 characters.";
+                    } else if (error.code === 'auth/invalid-email') {
+                        errorBox.innerText = "Please enter a valid email address.";
                     } else {
-                        errorBox.innerText = error.message; 
+                        errorBox.innerText = "Unable to create account. Please try again.";
                     }
                      authBtn.innerText = 'CREATE ACCOUNT';
                      authBtn.disabled = false;
@@ -508,18 +540,24 @@ document.getElementById('referralCode').value = '';
             forgotBtn.innerText = "SENDING LINK...";
             errorBox.innerText = "";
 
-            try {
+       try {
                 const sendResetFn = firebase.functions().httpsCallable('requestPasswordReset');
                 const result = await sendResetFn({ email: email });
 
                 if (result.data && result.data.success) {
                     alert("A password reset link has been securely sent to " + email);
                 } else {
-                    errorBox.innerText = result.data ? result.data.message : "Error generating link. Please try again.";
+                    // Prevent ugly JSON/Brevo errors from showing to the customer
+                    const errorMsg = result.data ? result.data.message : "";
+                    if (errorMsg.includes("Brevo") || errorMsg.includes("Server error") || errorMsg.includes("IP")) {
+                         errorBox.innerText = "Email service temporarily unavailable. Please try again later.";
+                    } else {
+                         errorBox.innerText = "Unable to send reset link. Please check your email and try again.";
+                    }
                 }
             } catch (error) {
                 console.error("Reset Error:", error);
-                errorBox.innerText = error.message;
+                errorBox.innerText = "Unable to connect to the server. Please try again.";
             } finally {
                 forgotBtn.innerText = originalText;
             }
@@ -542,10 +580,18 @@ document.getElementById('referralCode').value = '';
                     });
                 }
                 window.location.href = "dashboard.html";
-            } catch (error) {
-                errorBox.innerText = error.message;
+          } catch (error) {
+            // If the user just closed the window, ignore it and clear the error box
+            if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
+                errorBox.innerText = '';
+                console.log("Login window closed by user.");
+            } else {
+                // For real errors, show a clean message without the technical Firebase code
+                errorBox.innerText = "Login failed. Please try again.";
+                console.error(error);
             }
         }
+    }
 
         document.getElementById('google-login').addEventListener('click', () => {
             handleSocialLogin(new firebase.auth.GoogleAuthProvider());
@@ -582,6 +628,41 @@ document.getElementById('referralCode').value = '';
                 }
             }
         });
+
+       // ─── GENERATE & SEND OTP VERIFICATION CODE ───
+        window.generateAndSendVerificationCode = async function(uid, email, firstName) {
+            try {
+                // 1. Generate the 6-digit code
+                const code = Math.floor(100000 + Math.random() * 900000).toString();
+                
+                // 2. Save it to Firebase Database (Required for the verify button to work)
+                await firebase.database().ref(`users/${uid}`).update({
+                    verificationCode: code
+                });
+                
+                // 3. Send email via Brevo
+                const sendEmailFn = firebase.functions().httpsCallable('sendStoreEmail');
+                await sendEmailFn({
+                    type: 'signup_verification',
+                    payload: { email: email, firstName: firstName || 'there', verificationCode: code }
+                });
+                
+                console.log("Verification email triggered successfully.");
+                
+                // 4. Open the OTP Modal on the screen
+                document.getElementById('verify-email-display').innerText = email;
+                document.getElementById('verification-modal').classList.add('active');
+                
+                return code;
+            } catch (error) {
+                console.error("Error sending verification email:", error);
+                const errorDisplay = document.getElementById('error-message');
+                if (errorDisplay) {
+                    errorDisplay.innerText = "Failed to send verification email. Please try again.";
+                }
+                throw error;
+            }
+        };
 
     </script>
 </body>

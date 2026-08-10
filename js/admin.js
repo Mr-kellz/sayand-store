@@ -423,6 +423,96 @@ window.issueReturnCode = async function(orderId) {
     }
 };
 
+// ─── SEND VIP ATELIER INVITATION ───
+window.inviteToAtelier = async function(email, firstName) {
+    if(!confirm(`Send an exclusive VIP Atelier invitation to ${email}?`)) return;
+    
+    try {
+        if (typeof showAdminToast === 'function') showAdminToast("SENDING INVITATION...");
+        const sendEmailFn = firebase.functions().httpsCallable('sendStoreEmail');
+        await sendEmailFn({
+            type: 'vip_invite', 
+            payload: {
+                recipientEmails: [email],
+                firstName: firstName || 'there',
+                shopUrl: "https://thesayand.com/"
+            }
+        });
+        showAdminToast("VIP INVITATION SENT!");
+    } catch (err) {
+        alert("Error sending VIP invite: " + err.message);
+    }
+};
+
+// ─── SEND RESTOCK NOTIFICATIONS (SUBSCRIBERS + WAITLIST) ───
+window.notifyRestock = async function(productName) {
+    const safeProdId = productName.replace(/[^a-zA-Z0-9]/g, '_');
+    if(!confirm(`Send "Back in Stock" emails to ALL subscribers AND waitlist members for "${productName}"?`)) return;
+    
+    // 1. Find the product's image and price from the database memory
+    let foundProduct = null;
+    const allProducts = [...(database.newArrivals || []), ...(database.trending || [])];
+    foundProduct = allProducts.find(p => p.name === productName);
+    
+    const productPrice = foundProduct ? (foundProduct.salePrice || foundProduct.price) : ''; 
+    const productImage = foundProduct ? (foundProduct.images && foundProduct.images[0] ? foundProduct.images[0] : foundProduct.img) : '';
+
+    try {
+        if (typeof showAdminToast === 'function') showAdminToast("FETCHING SUBSCRIBERS & WAITLIST...");
+        
+        const emails = [];
+        
+        // 2. Fetch General Subscribers First
+        const subSnap = await db.ref("subscribers").once("value");
+        if (subSnap.exists()) {
+            subSnap.forEach((child) => {
+                const sub = child.val();
+                if (sub.email && !emails.includes(sub.email)) {
+                    emails.push(sub.email);
+                }
+            });
+        }
+        
+        // 3. Fetch Specific Waitlist (stockNotifications)
+        const waitlistSnap = await db.ref(`stockNotifications/${safeProdId}`).once('value');
+        if(waitlistSnap.exists()) {
+            const requests = waitlistSnap.val();
+            Object.values(requests).forEach(req => {
+                if(req.email && !emails.includes(req.email)) {
+                    emails.push(req.email);
+                }
+            });
+        }
+        
+        if(emails.length === 0) {
+            return alert("No subscribers or waitlist members found to email.");
+        }
+        
+        if (typeof showAdminToast === 'function') showAdminToast(`EMAILING ${emails.length} USERS...`);
+        
+        // 4. Trigger Brevo Email via Cloud Function (Now passing ALL template variables)
+        const sendEmailFn = firebase.functions().httpsCallable('sendStoreEmail');
+        await sendEmailFn({
+            type: 'restock', 
+            payload: {
+                recipientEmails: emails,
+                productName: productName,
+                productPrice: productPrice,
+                productImage: productImage,
+                productUrl: `https://thesayand.com/product.html?item=${encodeURIComponent(productName)}`
+            }
+        });
+        
+        // 5. Wipe ONLY the specific waitlist clean
+        await db.ref(`stockNotifications/${safeProdId}`).remove();
+        
+        showAdminToast(`RESTOCK ALERTS SENT TO ${emails.length} USERS!`);
+        
+    } catch (err) {
+        alert("Error sending restock alerts: " + err.message);
+    }
+};
+
 window.renderOrders = function(data) {
     const container = document.getElementById('orders-list');
     if(!container) return;
@@ -946,7 +1036,7 @@ window.sendPromoToSubscribers = async function(code, amountOrPercent, type) {
             bodyText: `We have sent you a €${amountOrPercent} gift card to use on your next order.`,
             discountText: `€${amountOrPercent}`,
             promoCode: code,
-            shopUrl: "https://thesayand.com/"
+            shopUrl: "https://thesayand.com/collection.html"
         };
     } else {
         emailType = 'promo'; 

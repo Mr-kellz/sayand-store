@@ -16,9 +16,7 @@
         .input-field:focus { border-color: #d4af37; box-shadow: 0 0 0 1px #d4af37; }
         .panel-box { background: white; border: 1px solid #c2c9c0; box-shadow: 0 4px 20px rgba(0,0,0,0.03); border-top: 3px solid #2c4c23;}
     </style>
-<base target="_blank">
-<base target="_blank">
-<base target="_blank">
+
 </head>
 <body class="antialiased">
 
@@ -84,14 +82,18 @@
                     </div>
                 </div>
 
-                <!-- REFERRAL PROGRAM -->
-                <div class="panel-box p-6 mt-6">
-                    <h3 class="text-[10px] font-black tracking-widest text-[#d4af37] mb-2 uppercase">Atelier Referral</h3>
-<p class="text-xs text-[#2c4c23] mb-4 font-medium">Share your code. When a friend signs up and completes their first order, you both receive a 10% discount code.</p>                    <div class="bg-[#1a2e15] p-4 flex items-center justify-between border border-[#d4af37]">
-                        <span id="referral-code-display" class="text-[#d4af37] text-sm font-black tracking-widest uppercase">...</span>
-                        <button onclick="copyReferral()" class="text-[10px] font-black text-[#d4af37] border border-[#d4af37] px-4 py-2 hover:bg-[#d4af37] hover:text-[#1a2e15] transition-colors uppercase">COPY</button>
-                    </div>
-                </div>
+ <!-- REFERRAL PROGRAM -->
+<div class="panel-box p-6 mt-6">
+    <h3 class="text-[10px] font-black tracking-widest text-[#d4af37] mb-2 uppercase">Atelier Referral</h3>
+    <p class="text-xs text-[#2c4c23] mb-4 font-medium">Share your code. When a friend signs up and completes their first order, you both receive a 10% discount code.</p>                    
+    <div class="bg-[#1a2e15] p-4 flex flex-col sm:flex-row sm:items-center justify-between border border-[#d4af37] gap-4">
+        <span id="referral-code-display" class="text-[#d4af37] text-sm font-black tracking-widest uppercase">...</span>
+        <div class="flex gap-2 w-full sm:w-auto">
+            <button id="copy-code-btn" onclick="copyReferral()" class="min-w-[100px] flex-1 sm:flex-none text-[10px] font-black text-[#d4af37] border border-[#d4af37] px-4 py-2 hover:bg-[#d4af37] hover:text-[#1a2e15] transition-colors uppercase text-center">COPY CODE</button>
+            <button onclick="shareReferralLink()" class="min-w-[100px] flex-1 sm:flex-none text-[10px] font-black bg-[#d4af37] text-[#1a2e15] border border-[#d4af37] px-4 py-2 hover:bg-transparent hover:text-[#d4af37] transition-colors uppercase text-center">SHARE LINK</button>
+        </div>
+    </div>
+</div>
 
                 <!-- 🟢 NEW: REWARDS & PROMOS PANEL -->
                 <div class="panel-box p-6 mt-6">
@@ -102,6 +104,7 @@
                     </div>
                 </div>
                 <!-- 🟢 END NEW PANEL -->
+            </div>
 
             <div id="tab-orders" class="hidden animate-fade-in">
                 <h2 class="text-sm font-black tracking-[0.2em] mb-6 uppercase border-b border-[#2c4c23]/20 pb-4 text-[#1a2e15]">ORDER HISTORY</h2>
@@ -215,8 +218,7 @@
             </div>
             <div>
                 <label class="block text-[10px] font-black tracking-wider text-[#d4af37] mb-2">DATE OF BIRTH</label>
-                <input type="date" id="profile-dob" class="w-full border border-[#c2c9c0] p-3 text-xs text-[#2c4c23] font-bold">
-                <p class="text-[9px] text-[#2c4c23] mt-2 font-bold uppercase tracking-wider opacity-70">Required for birthday rewards and age verification.</p>
+<input type="date" id="profile-dob" class="w-full border border-[#c2c9c0] p-3 text-xs text-[#2c4c23] font-bold appearance-none bg-white rounded-none box-border block">                <p class="text-[9px] text-[#2c4c23] mt-2 font-bold uppercase tracking-wider opacity-70">Required for birthday rewards and age verification.</p>
             </div>
             <button type="button" onclick="saveProfile()" id="btn-save-profile" class="w-full bg-[#1a2e15] text-[#d4af37] py-4 text-xs tracking-[0.2em] font-black hover:bg-[#2c4c23] transition-colors shadow-lg border border-[#d4af37]">SAVE CHANGES</button>
             <div class="pt-4 border-t border-[#d4af37]/30">
@@ -262,8 +264,10 @@
             
             document.getElementById('YQContainer').innerHTML = ''; 
             
-            setTimeout(() => {
+    let attempts = 0;
+            const checkYQ = setInterval(() => {
                 if(typeof YQV5 !== 'undefined') {
+                    clearInterval(checkYQ);
                     YQV5.trackSingle({
                         YQ_ContainerId: "YQContainer",
                         YQ_Height: 500,
@@ -272,7 +276,11 @@
                         YQ_Num: trackingStr
                     });
                 } else {
-                    document.getElementById('YQContainer').innerHTML = '<p class="text-sm text-center text-gray-500 mt-10">Tracking engine currently loading. Please check your connection.</p>';
+                    attempts++;
+                    if (attempts > 30) { // Gives the engine 3 full seconds to load before failing
+                        clearInterval(checkYQ);
+                        document.getElementById('YQContainer').innerHTML = '<p class="text-sm text-center text-[#6a7c64] font-bold tracking-widest uppercase mt-10">Tracking engine failed to load. Please disable ad-blockers or try again later.</p>';
+                    }
                 }
             }, 100);
         };
@@ -392,10 +400,7 @@
                 document.getElementById('profile-last-name').value = lName;
                 document.getElementById('profile-email').value = user.email;
                
-                document.getElementById('profile-first-name').value = fName;
-document.getElementById('profile-last-name').value = lName;
-document.getElementById('profile-email').value = user.email;
-
+ 
 // Load DOB if it exists
 if (userData.dateOfBirth) {
     document.getElementById('profile-dob').value = userData.dateOfBirth;
@@ -453,12 +458,12 @@ const ordersRef = firebase.database().ref(`users/${user.uid}/orders`);
                 const latestOrderContainer = document.getElementById('overview-latest-order');
                 const vipBadge = document.getElementById('vip-badge');
                 
-                if (!ordersData) {
+ if (!ordersData) {
                     vipBadge.textContent = "MEMBER";
                     container.innerHTML = `
                         <div class="panel-box p-12 text-center">
                             <p class="text-sm font-black tracking-widest text-[#2c4c23] mb-4">NO ORDERS YET</p>
-                            <a href="index.html" class="bg-[#1a2e15] text-[#d4af37] px-8 py-4 text-[10px] tracking-[0.2em] font-black hover:bg-[#2c4c23] transition-colors inline-block shadow-lg border border-[#d4af37]">START SHOPPING</a>
+                            <a href="collection.html" target="_self" class="bg-[#1a2e15] text-[#d4af37] px-8 py-4 text-[10px] tracking-[0.2em] font-black hover:bg-[#2c4c23] transition-colors inline-block shadow-lg border border-[#d4af37]">START SHOPPING</a>
                         </div>`;
                     latestOrderContainer.innerHTML = '<p class="text-xs text-[#2c4c23] italic font-medium">No recent orders.</p>';
                     return;
@@ -680,13 +685,49 @@ const ordersRef = firebase.database().ref(`users/${user.uid}/orders`);
             });
         });
 
+  // 1. The Copy Code Button (Now changes to "COPIED!")
         window.copyReferral = function() {
             const code = document.getElementById('referral-code-display').innerText;
             navigator.clipboard.writeText(code).then(() => {
-                showDashboardToast('CODE COPIED');
+                const btn = document.getElementById('copy-code-btn');
+                
+                // Change text and colors to show it worked
+                btn.innerText = 'COPIED!';
+                btn.classList.add('bg-[#d4af37]', 'text-[#1a2e15]');
+                
+                // Revert back to normal after 2.5 seconds
+                setTimeout(() => {
+                    btn.innerText = 'COPY CODE';
+                    btn.classList.remove('bg-[#d4af37]', 'text-[#1a2e15]');
+                }, 2500);
             });
         };
 
+        // 2. The Native Share Button (Opens phone's share menu)
+        window.shareReferralLink = async function() {
+            const code = document.getElementById('referral-code-display').innerText;
+            const link = `https://thesayand.com/login?ref=${code}`;
+            const shareMessage = `You have been invited to the SAYAND Atelier.\n\nUse my exclusive link to create your account and receive 10% off your first order:`;
+            
+            // Check if the device supports the native Apple/Android Share Menu
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: 'SAYAND Atelier Invitation',
+                        text: shareMessage,
+                        url: link
+                    });
+                } catch (err) {
+                    // Do nothing if the user just swipes down to cancel the share menu
+                    console.log('Share menu closed.');
+                }
+            } else {
+                // FALLBACK: If they are on an old desktop computer that doesn't have a share menu, copy it instead
+                navigator.clipboard.writeText(shareMessage + '\n\n' + link).then(() => {
+                    showDashboardToast('LINK COPIED TO CLIPBOARD');
+                });
+            }
+        };
 // Referral code
                 const referralRef = firebase.database().ref(`users/${currentUserUid}/referralCode`);
                 referralRef.once('value').then(snap => {
@@ -794,11 +835,11 @@ const ordersRef = firebase.database().ref(`users/${user.uid}/orders`);
             const wishlistStr = localStorage.getItem('sayand_wishlist');
             const grid = document.getElementById('dashboard-wishlist-grid');
             
-            if (!wishlistStr || wishlistStr === '[]') {
+  if (!wishlistStr || wishlistStr === '[]') {
                 grid.innerHTML = `
                     <div class="col-span-full panel-box p-12 text-center">
                         <p class="text-sm font-black tracking-widest text-[#2c4c23] mb-4">NO SAVED ITEMS</p>
-                        <a href="index.html" class="bg-[#1a2e15] text-[#d4af37] px-8 py-4 text-[10px] tracking-[0.2em] font-black hover:bg-[#2c4c23] transition-colors inline-block shadow-lg border border-[#d4af37]">EXPLORE COLLECTION</a>
+                        <a href="collection.html" target="_self" class="bg-[#1a2e15] text-[#d4af37] px-8 py-4 text-[10px] tracking-[0.2em] font-black hover:bg-[#2c4c23] transition-colors inline-block shadow-lg border border-[#d4af37]">EXPLORE COLLECTION</a>
                     </div>`;
                 return;
             }

@@ -508,10 +508,9 @@ exports.requestPasswordReset = functions.https.onCall(async (data, context) => {
     }
 });
 
-exports.checkBirthdays = functions.pubsub.schedule('0 9 * * *').onRun(async (context) => {
+exports.checkBirthdays = functions.pubsub.schedule('0 9 * * *').timeZone('Europe/Rome').onRun(async (context) => {
     const today = new Date();
-    const currentMonth = today.getMonth() + 1;
-    const currentDay = today.getDate();
+    const currentMonth = today.getMonth() + 1;    const currentDay = today.getDate();
     const currentYear = today.getFullYear();
 
     const usersSnap = await admin.database().ref('users').once('value');
@@ -532,7 +531,7 @@ exports.checkBirthdays = functions.pubsub.schedule('0 9 * * *').onRun(async (con
                     const birthdayCode = 'BDAY' + uid.slice(-6).toUpperCase();
 
                     const expiryDate = new Date();
-                    expiryDate.setDate(expiryDate.getDate() + 5);
+                    expiryDate.setDate(expiryDate.getDate() + 14);
                     expiryDate.setHours(23, 59, 59, 999);
                     const expiryTimestamp = expiryDate.getTime();
 
@@ -566,4 +565,16 @@ exports.checkBirthdays = functions.pubsub.schedule('0 9 * * *').onRun(async (con
         }
     }
     return null;
+});
+
+// ─── AUTOMATICALLY CLEAN UP DELETED USERS ───
+exports.cleanupDeletedUser = functions.auth.user().onDelete(async (user) => {
+    const uid = user.uid;
+    try {
+        // Deletes the user's profile from the database
+        await admin.database().ref(`users/${uid}`).remove();
+        console.log(`✅ Successfully wiped database profile for deleted user: ${uid}`);
+    } catch (error) {
+        console.error(`❌ Error wiping database profile for user ${uid}:`, error.message);
+    }
 });

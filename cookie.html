@@ -49,9 +49,10 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script src="js/firebase-config.js"></script>
-    <script>
-        if (typeof db !== 'undefined') {
-            db.ref("mainStore/footer/cookie").once("value").then(snap => {
+<script>
+        if (typeof firebase !== 'undefined' && firebase.database) {
+            // Replaced 'db.ref' with the explicit Firebase command
+            firebase.database().ref("mainStore/footer/terms").once("value").then(snap => {
                 if (snap.exists()) {
                     const data = snap.val();
                     if (data.title) document.querySelector('h1').innerText = data.title;

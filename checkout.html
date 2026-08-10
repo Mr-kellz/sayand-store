@@ -30,10 +30,7 @@
         
         .maps-fallback-msg { font-size: 10px; color: #d4af37; font-weight: 800; letter-spacing: 0.05em; margin-top: 4px; display: none; }
     </style>
-<base target="_blank">
-<base target="_blank">
-<base target="_blank">
-<base target="_blank">
+
 </head>
 <body class="antialiased" id="checkout-body">
 
@@ -1082,6 +1079,24 @@ updates['/publicOrderIndex/' + orderId.slice(-6).toUpperCase()] = {
                     }
                 });
             }
+
+            // ─── SINGLE-USE PROMO CODE SELF-DESTRUCT ───
+            if (appliedPromo && appliedPromo.code) {
+                const usedCode = appliedPromo.code.toUpperCase();
+                
+                // SAFETY LOCK: Only delete codes that start with "BDAY" or "REF"
+                if (usedCode.startsWith('BDAY') || usedCode.startsWith('REF')) {
+                    
+                    // Add the deletion commands directly to your main Firebase updates payload
+                    updates[`mainStore/discountCodes/${usedCode}`] = null;
+                    updates[`mainStore/discountCodeExpiry/${usedCode}`] = null;
+                    
+                    console.log(`Unique VIP code ${usedCode} set for permanent destruction.`);
+                } else {
+                    console.log(`General store code ${usedCode} was used and remains active.`);
+                }
+            }
+            // ───────────────────────────────────────────
 
             await firebase.database().ref().update(updates);
             await firebase.database().ref(`users/${currentUser.uid}/cart`).remove();
