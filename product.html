@@ -287,18 +287,17 @@
                     <img id="detail-model-img" src="" class="w-full object-cover" style="display:none;">
                 </div>
 
-                <div class="mt-10 border-t border-[#c2c9c0]/50 pt-8">
-                    <div class="accordion-item mb-4">
-                        <div class="accordion-header flex justify-between cursor-pointer" onclick="toggleAccordion(this)">
-                            <span class="text-[10px] font-black tracking-widest text-[#1a2e15] uppercase">SHIPPING AND RETURNS</span>
-                            <span class="accordion-icon text-[#d4af37] font-bold">+</span>
-                        </div>
-                        <div class="accordion-body hidden mt-3">
-                            <p class="text-xs text-[#6a7c64] font-medium leading-relaxed">Standard delivery within 3-5 business days. Express delivery available for select locations. Free returns within 30 days of purchase.</p>
-                        </div>
-                    </div>
-                </div>
-
+   <div class="mt-10 border-t border-[#c2c9c0]/50 pt-8">
+    <div class="mb-4">
+        <button type="button" class="w-full flex justify-between items-center text-left cursor-pointer" onclick="const body = this.nextElementSibling; const icon = this.querySelector('.acc-icon'); body.classList.toggle('hidden'); icon.innerText = body.classList.contains('hidden') ? '+' : '-';">
+            <span class="text-[10px] font-black tracking-widest text-[#1a2e15] uppercase">SHIPPING AND RETURNS</span>
+            <span class="acc-icon text-[#d4af37] font-bold text-lg leading-none">+</span>
+        </button>
+        <div class="hidden mt-4">
+            <p class="text-xs text-[#6a7c64] font-medium leading-relaxed">Standard delivery within 3-5 business days. Express delivery available for select locations. Free returns within 30 days of purchase.</p>
+        </div>
+    </div>
+</div>
                 <div class="mt-16 mb-10">
                     <h3 class="text-[10px] font-black tracking-widest text-[#6a7c64] mb-6 uppercase">COMPLETE YOUR LOOK</h3>
                     <div id="detail-related" class="grid grid-cols-3 gap-3 md:gap-6"></div>
@@ -488,6 +487,20 @@ window.toggleProductZoom = function() {
             img.style.transformOrigin = 'center center';
             img.style.transform = 'scale(1)';
         }
+    }
+};
+
+// --- ACCORDION TOGGLE FOR SHIPPING & RETURNS ---
+window.toggleAccordion = function(element) {
+    const body = element.nextElementSibling;
+    const icon = element.querySelector('.accordion-icon');
+    
+    if (body.classList.contains('hidden')) {
+        body.classList.remove('hidden');
+        icon.innerText = '-';
+    } else {
+        body.classList.add('hidden');
+        icon.innerText = '+';
     }
 };
 </script>
