@@ -7,6 +7,8 @@
     <link rel="icon" type="image/png" href="https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/SAYAND%20Intertwined%20S%26A%20Monogram.png?alt=media&token=4a0c7abb-0150-4d22-94fc-d58f901a45f6">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- 🟢 ADDED GLOBAL STYLESHEET LINK -->
+    <link rel="stylesheet" href="css/style.css?v=site-4">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f9f6f0; color: #1a2e15; }
         .input-field { width: 100%; border: 1px solid #c2c9c0; padding: 0.75rem 1rem; font-size: 0.75rem; outline: none; transition: all 0.2s; background: #fff; color: #1a2e15; }
@@ -14,11 +16,22 @@
         .panel-box { background: white; border: 1px solid #c2c9c0; box-shadow: 0 4px 20px rgba(0,0,0,0.03); border-top: 3px solid #2c4c23; }
     </style>
 
+    <link rel="stylesheet" href="css/i18n.css?v=site-4">
+    <script src="js/translations.js?secureCheckout=1&orderSecurity=1&v=site-4"></script>
+    <script src="js/i18n.js?v=site-4"></script>
+    <link rel="stylesheet" href="css/site-updates.css?v=site-4">
+    <script src="js/consent.js?v=site-4"></script>
+
+    <meta name="description" content="Access your SAYAND account and shopping services securely.">
+    <link rel="canonical" href="https://thesayand.com/track-order">
+    <meta name="robots" content="noindex, follow">
+    <meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/SAYAND%20Intertwined%20S%26A%20Monogram.png?alt=media&token=4a0c7abb-0150-4d22-94fc-d58f901a45f6">
+    <script src="js/site-updates.js?v=site-4"></script>
 </head>
 <body class="antialiased min-h-screen flex flex-col">
 
     <nav class="bg-[#1a2e15] border-b border-[#d4af37]/30 px-6 py-4 flex justify-between items-center sticky top-0 z-50 shadow-md">
-        <a href="index.html" class="text-2xl font-black tracking-tighter text-[#d4af37]">SAYAND</a>
+        <a href="index.html" class="notranslate text-2xl font-black tracking-tighter text-[#d4af37]">SAYAND</a>
         <a href="index.html" class="text-[10px] tracking-[0.2em] font-bold text-white hover:text-[#d4af37] transition-colors">&larr; BACK TO STORE</a>
     </nav>
 
@@ -59,6 +72,7 @@
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="js/firebase-config.js"></script>
 
     <script>
@@ -72,7 +86,6 @@
         const rawInputId = document.getElementById('track-order-id').value.trim();
         const email = document.getElementById('track-email').value.trim().toLowerCase();
 
-        // 🟢 FIX: Removes spaces and `#` symbols, but keeps `-` because Firebase IDs need it!
         const cleanInputId = rawInputId.replace(/[^a-zA-Z0-9-]/g, '');
 
         if (!cleanInputId) {
@@ -97,37 +110,38 @@
             let order = null;
             let matchedId = null;
 
-            // 1. Try direct lookup first (if full ID was entered)
-            try {
-                const directSnap = await firebase.database().ref('orders/' + cleanInputId).once('value');
-                if (directSnap.exists()) {
-                    order = directSnap.val();
-                    matchedId = cleanInputId;
-                }
-            } catch(e) {
-                // Ignore error here to allow the fallback to run
+            // Wait for Firebase to restore the signed-in session before querying.
+            const user = await new Promise((resolve) => {
+                const unsubscribe = firebase.auth().onAuthStateChanged((current) => {
+                    unsubscribe();
+                    resolve(current);
+                });
+            });
+            if (!user) {
+                errorText.textContent = 'Please sign in to the account used for this order, then return to this page.';
+                const link = document.createElement('a');
+                link.href = 'login.html';
+                link.className = 'underline font-bold block mt-3';
+                link.textContent = 'SIGN IN';
+                errorText.appendChild(link);
+                errorDiv.classList.remove('hidden');
+                btn.innerText = 'TRACK ORDER';
+                btn.disabled = false;
+                return;
             }
-
-            // 2. Fallback: Search orders to match the 6-character code suffix
-            if (!order) {
-                const allSnap = await firebase.database().ref('orders').once('value');
-                if (allSnap.exists()) {
-                    const allOrders = allSnap.val();
-                    for (const [id, data] of Object.entries(allOrders)) {
-                        if (id.slice(-6).toUpperCase() === cleanInputId.toUpperCase()) {
-                            order = data;
-                            matchedId = id;
-                            break;
-                        }
-                    }
-                }
-            }
+            const ownOrders = await firebase.database().ref('orders')
+                .orderByChild('userId').equalTo(user.uid).once('value');
+            const matches = Object.entries(ownOrders.val() || {}).filter(([id, data]) =>
+                (id === cleanInputId || id.slice(-6).toUpperCase() === cleanInputId.toUpperCase()) &&
+                String(data.shippingInfo && data.shippingInfo.email || '').toLowerCase() === email
+            );
+            if (matches.length === 1) [matchedId, order] = matches[0];
 
             btn.innerText = 'TRACK ORDER';
             btn.disabled = false;
 
             if (!order) {
-                errorText.innerText = 'Order not found. Please check your Order ID.';
+                errorText.innerText = 'No matching order was found in your account. Check the Order ID and order email address.';
                 errorDiv.classList.remove('hidden');
                 return;
             }
@@ -159,6 +173,9 @@
                 'Pending': 'PENDING',
                 'Verifying': 'VERIFYING PAYMENT',
                 'Processing': 'PREPARING SHIPMENT',
+                'Paid': 'PREPARING SHIPMENT',
+                'Payment Review': 'PAYMENT RECEIVED — UNDER REVIEW',
+                'Return Approved': 'RETURN APPROVED',
                 'Shipped': 'SHIPPED',
                 'Delivered': 'DELIVERED',
                 'Return Requested': 'RETURN PENDING APPROVAL',
@@ -172,7 +189,7 @@
                     <div class="flex items-center gap-4 py-4 border-b border-[#c2c9c0]/30 last:border-0">
                         <img src="${item.image}" class="w-14 h-18 object-cover border border-[#c2c9c0]">
                         <div class="flex-1">
-                            <p class="text-[10px] font-black tracking-wider uppercase text-[#1a2e15]">${item.name}</p>
+                            <p class="text-[10px] font-black tracking-wider uppercase text-[#1a2e15]">${SayandI18n.productHTML(item)}</p>
                             <p class="text-[10px] text-[#6a7c64] font-bold uppercase mt-1">QTY: ${item.quantity} | SIZE: ${item.size}</p>
                         </div>
                         <p class="text-[10px] font-black text-[#1a2e15]">€${(item.price * item.quantity).toFixed(2)}</p>
@@ -220,5 +237,6 @@
         }
     };
     </script>
+    
 </body>
 </html>

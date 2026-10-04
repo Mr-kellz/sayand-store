@@ -55,3 +55,6 @@
 .price-sale { color: #dc2626; font-weight: 600; }
 .wishlist-empty { text-align: center; padding: 60px 20px; }
 .blend-diff { mix-blend-mode: difference; color: white; }
+
+/* Preserve the existing announcement offset. */
+nav.announcement-active { top: 32px !important; }

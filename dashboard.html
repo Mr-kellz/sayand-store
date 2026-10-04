@@ -6,7 +6,7 @@
     <title>SAYAND | My Account</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
+   <link rel="stylesheet" href="css/style.css?v=site-4">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f9f6f0; color: #1a2e15;}
         .dashboard-tab { color: #6a7c64; padding: 1rem; border-left: 3px solid transparent; transition: all 0.3s; font-weight: 600;}
@@ -17,6 +17,16 @@
         .panel-box { background: white; border: 1px solid #c2c9c0; box-shadow: 0 4px 20px rgba(0,0,0,0.03); border-top: 3px solid #2c4c23;}
     </style>
 
+    <link rel="stylesheet" href="css/i18n.css?v=site-4">
+    <script src="js/translations.js?orderSync=1&v=return-upload-1"></script>
+    <script src="js/i18n.js?v=site-4"></script>
+    <link rel="stylesheet" href="css/site-updates.css?v=site-4">
+    <script src="js/consent.js?v=site-4"></script>
+
+    <meta name="description" content="Access your SAYAND account and shopping services securely.">
+    <link rel="canonical" href="https://thesayand.com/dashboard">
+    <meta name="robots" content="noindex, follow">
+    <script src="js/site-updates.js?v=site-4"></script>
 </head>
 <body class="antialiased">
 
@@ -34,7 +44,9 @@
     </div>
 
     <nav class="bg-[#1a2e15] border-b border-[#d4af37]/30 px-6 py-4 flex justify-between items-center sticky top-0 z-50 shadow-md">
-<a href="index.html" onclick="event.preventDefault(); var p=window.location.pathname; if(p==='/'||p.endsWith('index.html')||p===''){location.reload();}else{window.location.href='index.html';}" class="text-xl md:text-2xl font-black tracking-tighter hover:opacity-70 transition-opacity text-[#d4af37]">SAYAND</a>        <div class="flex items-center gap-6">
+        <!-- 🟢 ADDED NOTRANSLATE HERE -->
+        <a href="index.html" onclick="event.preventDefault(); var p=window.location.pathname; if(p==='/'||p.endsWith('index.html')||p===''){location.reload();}else{window.location.href='index.html';}" class="notranslate text-xl md:text-2xl font-black tracking-tighter hover:opacity-70 transition-opacity text-[#d4af37]">SAYAND</a>        
+        <div class="flex items-center gap-6">
             <a href="index.html" class="text-[10px] tracking-[0.2em] font-bold text-white hover:text-[#d4af37] transition-colors">STOREFRONT</a>
             <button id="sign-out-btn" class="text-[10px] tracking-[0.2em] font-bold text-red-400 hover:text-red-300 transition-colors">SIGN OUT</button>
         </div>
@@ -64,6 +76,7 @@
             
             <div id="tab-overview" class="block animate-fade-in">
                 <h2 class="text-sm font-black tracking-[0.2em] mb-6 uppercase border-b border-[#2c4c23]/20 pb-4 text-[#1a2e15]">ACCOUNT OVERVIEW</h2>
+                <p id="profile-status" role="status" class="hidden text-xs text-[#2c4c23] mb-6"></p>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div class="panel-box p-6">
                         <h3 class="text-[10px] font-black tracking-widest text-[#d4af37] mb-4">PERSONAL INFO</h3>
@@ -82,20 +95,21 @@
                     </div>
                 </div>
 
- <!-- REFERRAL PROGRAM -->
-<div class="panel-box p-6 mt-6">
-    <h3 class="text-[10px] font-black tracking-widest text-[#d4af37] mb-2 uppercase">Atelier Referral</h3>
-    <p class="text-xs text-[#2c4c23] mb-4 font-medium">Share your code. When a friend signs up and completes their first order, you both receive a 10% discount code.</p>                    
-    <div class="bg-[#1a2e15] p-4 flex flex-col sm:flex-row sm:items-center justify-between border border-[#d4af37] gap-4">
-        <span id="referral-code-display" class="text-[#d4af37] text-sm font-black tracking-widest uppercase">...</span>
-        <div class="flex gap-2 w-full sm:w-auto">
-            <button id="copy-code-btn" onclick="copyReferral()" class="min-w-[100px] flex-1 sm:flex-none text-[10px] font-black text-[#d4af37] border border-[#d4af37] px-4 py-2 hover:bg-[#d4af37] hover:text-[#1a2e15] transition-colors uppercase text-center">COPY CODE</button>
-            <button onclick="shareReferralLink()" class="min-w-[100px] flex-1 sm:flex-none text-[10px] font-black bg-[#d4af37] text-[#1a2e15] border border-[#d4af37] px-4 py-2 hover:bg-transparent hover:text-[#d4af37] transition-colors uppercase text-center">SHARE LINK</button>
-        </div>
-    </div>
-</div>
+                <!-- REFERRAL PROGRAM -->
+                <div class="panel-box p-6 mt-6">
+                    <h3 class="text-[10px] font-black tracking-widest text-[#d4af37] mb-2 uppercase">Atelier Referral</h3>
+                    <p class="text-xs text-[#2c4c23] mb-4 font-medium">Share your code. When a friend signs up and completes their first order, you both receive a 10% discount code.</p>                    
+                    <div class="bg-[#1a2e15] p-4 flex flex-col sm:flex-row sm:items-center justify-between border border-[#d4af37] gap-4">
+                        <!-- 🟢 ADDED NOTRANSLATE HERE -->
+                        <span id="referral-code-display" class="notranslate text-[#d4af37] text-sm font-black tracking-widest uppercase">...</span>
+                        <div class="flex gap-2 w-full sm:w-auto">
+                            <button id="copy-code-btn" onclick="copyReferral()" class="min-w-[100px] flex-1 sm:flex-none text-[10px] font-black text-[#d4af37] border border-[#d4af37] px-4 py-2 hover:bg-[#d4af37] hover:text-[#1a2e15] transition-colors uppercase text-center">COPY CODE</button>
+                            <button onclick="shareReferralLink()" class="min-w-[100px] flex-1 sm:flex-none text-[10px] font-black bg-[#d4af37] text-[#1a2e15] border border-[#d4af37] px-4 py-2 hover:bg-transparent hover:text-[#d4af37] transition-colors uppercase text-center">SHARE LINK</button>
+                        </div>
+                    </div>
+                </div>
 
-                <!-- 🟢 NEW: REWARDS & PROMOS PANEL -->
+                <!-- REWARDS & PROMOS PANEL -->
                 <div class="panel-box p-6 mt-6">
                     <h3 class="text-[10px] font-black tracking-widest text-[#d4af37] mb-2 uppercase">My Rewards & Promos</h3>
                     <p class="text-xs text-[#2c4c23] mb-4 font-medium">Exclusive discount codes earned from referrals and VIP perks.</p>
@@ -103,7 +117,6 @@
                         <p class="text-xs text-[#2c4c23] italic font-medium">No rewards yet. Share your referral code to start earning!</p>
                     </div>
                 </div>
-                <!-- 🟢 END NEW PANEL -->
             </div>
 
             <div id="tab-orders" class="hidden animate-fade-in">
@@ -197,36 +210,36 @@
                 </div>
             </div>
 
- <div id="tab-profile" class="hidden animate-fade-in">
-    <h2 class="text-sm font-black tracking-[0.2em] mb-6 uppercase border-b border-[#2c4c23]/20 pb-4 text-[#1a2e15]">ACCOUNT DETAILS</h2>
-    <div class="panel-box p-6 md:p-8">
-        <div class="space-y-6 max-w-md">
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-[10px] font-black tracking-wider text-[#d4af37] mb-2">FIRST NAME</label>
-                    <input type="text" id="profile-first-name" class="w-full border border-[#c2c9c0] p-3 text-xs bg-[#eef2ec] cursor-not-allowed text-[#2c4c23] font-bold" readonly>
+            <div id="tab-profile" class="hidden animate-fade-in">
+                <h2 class="text-sm font-black tracking-[0.2em] mb-6 uppercase border-b border-[#2c4c23]/20 pb-4 text-[#1a2e15]">ACCOUNT DETAILS</h2>
+                <div class="panel-box p-6 md:p-8">
+                    <div class="space-y-6 max-w-md">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[10px] font-black tracking-wider text-[#d4af37] mb-2">FIRST NAME</label>
+                                <input type="text" id="profile-first-name" class="w-full border border-[#c2c9c0] p-3 text-xs bg-white text-[#2c4c23] font-bold" maxlength="100" autocomplete="given-name">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black tracking-wider text-[#d4af37] mb-2">LAST NAME</label>
+                                <input type="text" id="profile-last-name" class="w-full border border-[#c2c9c0] p-3 text-xs bg-white text-[#2c4c23] font-bold" maxlength="100" autocomplete="family-name">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black tracking-wider text-[#d4af37] mb-2">EMAIL ADDRESS</label>
+                            <input type="email" id="profile-email" class="w-full border border-[#c2c9c0] p-3 text-xs bg-[#eef2ec] text-[#2c4c23] cursor-not-allowed font-bold" readonly>
+                            <p class="text-[9px] text-[#2c4c23] mt-2 font-bold uppercase tracking-wider opacity-70">Your sign-in email is managed by your login account.</p>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black tracking-wider text-[#d4af37] mb-2">DATE OF BIRTH</label>
+            <input type="date" id="profile-dob" class="w-full border border-[#c2c9c0] p-3 text-xs text-[#2c4c23] font-bold appearance-none bg-white rounded-none box-border block">                <p class="text-[9px] text-[#2c4c23] mt-2 font-bold uppercase tracking-wider opacity-70">Optional. Add your birthday if you would like birthday rewards.</p>
+                        </div>
+                        <button type="button" onclick="saveProfile()" id="btn-save-profile" class="w-full bg-[#1a2e15] text-[#d4af37] py-4 text-xs tracking-[0.2em] font-black hover:bg-[#2c4c23] transition-colors shadow-lg border border-[#d4af37]">SAVE CHANGES</button>
+                        <div class="pt-4 border-t border-[#d4af37]/30">
+                            <p class="text-[10px] tracking-wider text-[#1a2e15] uppercase font-black">MEMBER SINCE: <span id="profile-joined" class="text-[#d4af37] ml-2">...</span></p>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-[10px] font-black tracking-wider text-[#d4af37] mb-2">LAST NAME</label>
-                    <input type="text" id="profile-last-name" class="w-full border border-[#c2c9c0] p-3 text-xs bg-[#eef2ec] cursor-not-allowed text-[#2c4c23] font-bold" readonly>
-                </div>
             </div>
-            <div>
-                <label class="block text-[10px] font-black tracking-wider text-[#d4af37] mb-2">EMAIL ADDRESS</label>
-                <input type="email" id="profile-email" class="w-full border border-[#c2c9c0] p-3 text-xs bg-[#eef2ec] text-[#2c4c23] cursor-not-allowed font-bold" readonly>
-                <p class="text-[9px] text-[#2c4c23] mt-2 font-bold uppercase tracking-wider opacity-70">Core account details are locked for security.</p>
-            </div>
-            <div>
-                <label class="block text-[10px] font-black tracking-wider text-[#d4af37] mb-2">DATE OF BIRTH</label>
-<input type="date" id="profile-dob" class="w-full border border-[#c2c9c0] p-3 text-xs text-[#2c4c23] font-bold appearance-none bg-white rounded-none box-border block">                <p class="text-[9px] text-[#2c4c23] mt-2 font-bold uppercase tracking-wider opacity-70">Required for birthday rewards and age verification.</p>
-            </div>
-            <button type="button" onclick="saveProfile()" id="btn-save-profile" class="w-full bg-[#1a2e15] text-[#d4af37] py-4 text-xs tracking-[0.2em] font-black hover:bg-[#2c4c23] transition-colors shadow-lg border border-[#d4af37]">SAVE CHANGES</button>
-            <div class="pt-4 border-t border-[#d4af37]/30">
-                <p class="text-[10px] tracking-wider text-[#1a2e15] uppercase font-black">MEMBER SINCE: <span id="profile-joined" class="text-[#d4af37] ml-2">...</span></p>
-            </div>
-        </div>
-    </div>
-</div>
 
         </div>
     </div>
@@ -240,6 +253,34 @@
 
     <script>
         let currentUserUid = null;
+        let customerOrdersRef = null;
+        let customerAuthVersion = 0;
+        let customerRewardsRef = null;
+        let customerAddressRef = null;
+        let profileReadFailed = false;
+
+        function showProfileStatus(message) {
+            const el = document.getElementById('profile-status');
+            el.textContent = message;
+            el.classList.toggle('hidden', !message);
+        }
+
+        function renderProfile(user, data) {
+            const first = typeof data.firstName === 'string' ? data.firstName : '';
+            const last = typeof data.lastName === 'string' ? data.lastName : '';
+            const name = [first, last].filter(Boolean).join(' ');
+            document.getElementById('user-greeting').textContent = first ? `WELCOME, ${first}` : (user.email || 'MY ACCOUNT');
+            document.getElementById('overview-name').textContent = name ? name.toUpperCase() : 'Add your name in Account Details';
+            document.getElementById('overview-email').textContent = user.email || 'No email available';
+            document.getElementById('profile-first-name').value = first;
+            document.getElementById('profile-last-name').value = last;
+            document.getElementById('profile-email').value = user.email || '';
+            document.getElementById('profile-dob').value = data.dateOfBirth || '';
+            const joined = data.createdAt || (user.metadata && user.metadata.creationTime);
+            const date = joined ? new Date(joined) : null;
+            document.getElementById('profile-joined').textContent = date && !Number.isNaN(date.getTime())
+                ? date.toLocaleDateString('en-US', {year:'numeric', month:'long'}) : 'Not available';
+        }
 
         function showDashboardToast(msg) {
             const toast = document.getElementById('toast');
@@ -295,7 +336,7 @@
             if(confirm("Are you sure you want to cancel this order? This action cannot be undone.")) {
                 const updates = {};
                 updates['orders/' + orderId + '/status'] = 'Canceled (By User)';
-                updates['users/' + currentUserUid + '/orders/' + orderId + '/status'] = 'Canceled (By User)';
+
                 firebase.database().ref().update(updates)
                 .then(() => { showDashboardToast("ORDER CANCELED"); })
                 .catch(e => alert("Error: " + e.message));
@@ -303,10 +344,10 @@
         };
 
         window.requestRefund = function(orderId) {
-            if(confirm("Request a return and refund? Our Atelier team will review your request and provide a carrier QR code for pick-up.")) {
+            if(confirm("Request a return and refund? Our team will review your request and provide the courier return instructions.")) {
                 const updates = {};
                 updates['orders/' + orderId + '/status'] = 'Return Requested';
-                updates['users/' + currentUserUid + '/orders/' + orderId + '/status'] = 'Return Requested';
+
                 firebase.database().ref().update(updates)
                 .then(() => { showDashboardToast("RETURN REQUEST SUBMITTED"); })
                 .catch(e => alert("Error: " + e.message));
@@ -318,7 +359,10 @@
             const container = document.getElementById('address-book-list');
             if (!container || !currentUserUid) return;
             
-            firebase.database().ref(`users/${currentUserUid}/addressBook`).on('value', (snap) => {
+            const addressUid = currentUserUid;
+            customerAddressRef = firebase.database().ref(`users/${addressUid}/addressBook`);
+            customerAddressRef.on('value', (snap) => {
+                if (currentUserUid !== addressUid) return;
                 const data = snap.val() || {};
                 container.innerHTML = '';
                 
@@ -346,6 +390,8 @@
                     `;
                     container.appendChild(div);
                 });
+            }, () => {
+                if (currentUserUid === addressUid) container.textContent = 'Unable to load addresses. Please refresh to try again.';
             });
         }
 
@@ -379,51 +425,40 @@
         };
 
         firebase.auth().onAuthStateChanged(async (user) => {
+            const authVersion = ++customerAuthVersion;
+            if (customerOrdersRef) customerOrdersRef.off('value');
+            customerOrdersRef = null;
+            if (customerRewardsRef) customerRewardsRef.off('value');
+            if (customerAddressRef) customerAddressRef.off('value');
+            customerRewardsRef = null;
+            customerAddressRef = null;
+            currentUserUid = null;
             if (!user) {
                 window.location.href = "login.html";
                 return;
             }
             currentUserUid = user.uid;
 
-            const userSnap = await firebase.database().ref(`users/${user.uid}`).once('value');
-            const userData = userSnap.val();
-            
-            if (userData) {
-                const fName = userData.firstName || '';
-                const lName = userData.lastName || '';
-                
-                document.getElementById('user-greeting').textContent = `WELCOME, ${fName}`;
-                document.getElementById('overview-name').textContent = `${fName} ${lName}`.toUpperCase();
-                document.getElementById('overview-email').textContent = user.email;
+            profileReadFailed = false;
+            document.getElementById('btn-save-profile').disabled = true;
+            renderProfile(user, {});
+            showProfileStatus('Loading your profile…');
+            let userData = {};
+            try {
+                const userSnap = await firebase.database().ref(`users/${user.uid}`).once('value');
+                if (authVersion !== customerAuthVersion) return;
+                userData = userSnap.val() || {};
+                renderProfile(user, userData);
+                showProfileStatus(userData.firstName ? '' : 'Your profile details are incomplete. Open Account Details to add and save your name.');
+                document.getElementById('btn-save-profile').disabled = false;
+            } catch (error) {
+                if (authVersion !== customerAuthVersion) return;
+                profileReadFailed = true;
+                showProfileStatus('Unable to load your profile. Please refresh before saving changes.');
+                console.error('Profile load failed:', error.code);
+            }
 
-                document.getElementById('profile-first-name').value = fName;
-                document.getElementById('profile-last-name').value = lName;
-                document.getElementById('profile-email').value = user.email;
-               
- 
-// Load DOB if it exists
-if (userData.dateOfBirth) {
-    document.getElementById('profile-dob').value = userData.dateOfBirth;
-}
-
-
-                if(userData.createdAt) {
-                    const date = new Date(userData.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
-                    document.getElementById('profile-joined').textContent = date;
-                }
-
-                // Referral code
-                const referralRef = firebase.database().ref(`users/${currentUserUid}/referralCode`);
-                referralRef.once('value').then(snap => {
-                    let code = snap.val();
-                    if (!code) {
-                        code = 'REF-' + currentUserUid.slice(-6).toUpperCase();
-                        referralRef.set(code);
-                    }
-                    const el = document.getElementById('referral-code-display');
-                    if (el) el.innerText = code;
-                });
-
+            {
                 if(userData.sizing) {
                     if(userData.sizing.coat) document.getElementById('size-coat').value = userData.sizing.coat;
                     if(userData.sizing.top) document.getElementById('size-top').value = userData.sizing.top;
@@ -442,15 +477,15 @@ if (userData.dateOfBirth) {
                     document.getElementById('addr-phone').value = userData.address.phone || '';
                 }
 
-            } else {
-                document.getElementById('user-greeting').textContent = user.email;
-                document.getElementById('profile-email').value = user.email;
             }
 
+            loadReferralAndRewards(user.uid);
             loadSavedItems();
             loadAddressBook();
 
-const ordersRef = firebase.database().ref(`users/${user.uid}/orders`);            
+// Read live canonical records, not the checkout-time user copy.
+const ordersRef = firebase.database().ref('orders').orderByChild('userId').equalTo(user.uid);
+            customerOrdersRef = ordersRef;            
             ordersRef.on('value', (snapshot) => {
                 const ordersData = snapshot.val();
                 console.log('[DASHBOARD] Orders update:', ordersData ? Object.keys(ordersData).length : 0, 'orders');
@@ -474,7 +509,9 @@ const ordersRef = firebase.database().ref(`users/${user.uid}/orders`);
 
                 const getSafeStatus = (rawStatus) => {
                     if (!rawStatus) return 'Pending';
-                    const s = rawStatus.toLowerCase();
+                    const s = String(rawStatus).trim().toLowerCase();
+                    if (s === 'paid') return 'Processing';
+                    if (s === 'return approved') return 'Return Approved';
                     if (s.includes('pend')) return 'Pending';
                     if (s.includes('verify')) return 'Verifying';
                     if (s.includes('process') || s.includes('prepar')) return 'Processing';
@@ -522,7 +559,7 @@ const ordersRef = firebase.database().ref(`users/${user.uid}/orders`);
                                         latestSafeStatus === 'Processing' ? 'text-blue-500' :
                                         latestSafeStatus === 'Shipped' ? 'text-blue-700' : 
                                         latestSafeStatus === 'Delivered' ? 'text-[#2c4c23]' : 
-                                        latestSafeStatus === 'Return Requested' ? 'text-purple-600' :
+                                        ['Return Requested', 'Return Approved'].includes(latestSafeStatus) ? 'text-purple-600' :
                                         latestSafeStatus === 'Refunded' ? 'text-purple-500' : 'text-red-600';
 
                 const latestDisplayStatus = {
@@ -532,6 +569,7 @@ const ordersRef = firebase.database().ref(`users/${user.uid}/orders`);
                     'Shipped': 'SHIPPED',
                     'Delivered': 'DELIVERED',
                     'Return Requested': 'RETURN PENDING APPROVAL',
+                        'Return Approved': 'RETURN APPROVED',
                     'Refunded': 'REFUNDED',
                     'Canceled': 'CANCELED'
                 }[latestSafeStatus];
@@ -550,7 +588,7 @@ const ordersRef = firebase.database().ref(`users/${user.uid}/orders`);
                         <div class="flex items-center gap-4 mt-4 bg-white p-4 border border-[#c2c9c0]">
                             <img src="${item.image}" class="w-16 h-20 object-cover border border-[#c2c9c0] bg-white">
                             <div class="flex-1">
-                                <p class="text-[10px] font-black tracking-wider uppercase text-[#1a2e15]">${item.name}</p>
+                                <p class="text-[10px] font-black tracking-wider uppercase text-[#1a2e15]">${SayandI18n.productHTML(item)}</p>
                                 <p class="text-[10px] text-[#2c4c23] font-bold uppercase mt-1">QTY: ${item.quantity} &nbsp;|&nbsp; SIZE: ${item.size}</p>
                             </div>
                             <p class="text-[10px] font-black text-[#1a2e15]">€${(item.price * item.quantity).toFixed(2)}</p>
@@ -562,7 +600,7 @@ const ordersRef = firebase.database().ref(`users/${user.uid}/orders`);
                                       safeStatus === 'Processing' ? 'text-blue-500' :
                                       safeStatus === 'Shipped' ? 'text-blue-700' : 
                                       safeStatus === 'Delivered' ? 'text-[#2c4c23]' : 
-                                      safeStatus === 'Return Requested' ? 'text-purple-600' :
+                                      ['Return Requested', 'Return Approved'].includes(safeStatus) ? 'text-purple-600' :
                                       safeStatus === 'Refunded' ? 'text-purple-500' : 'text-red-600';
 
                     const displayStatus = {
@@ -572,13 +610,14 @@ const ordersRef = firebase.database().ref(`users/${user.uid}/orders`);
                         'Shipped': 'SHIPPED',
                         'Delivered': 'DELIVERED',
                         'Return Requested': 'RETURN PENDING APPROVAL',
+                        'Return Approved': 'RETURN APPROVED',
                         'Refunded': 'REFUNDED',
                         'Canceled': 'CANCELED'
                     }[safeStatus];
 
                     const stages = ['Pending', 'Verifying', 'Processing', 'Shipped', 'Delivered'];
                     let currentStageIndex = stages.indexOf(safeStatus);
-                    let isCanceled = ['Refunded', 'Canceled', 'Return Requested'].includes(safeStatus);
+                    let isCanceled = ['Refunded', 'Canceled', 'Return Requested', 'Return Approved'].includes(safeStatus);
 
                     let progressPercentage = 0;
                     if (currentStageIndex === 0) progressPercentage = 10;
@@ -616,11 +655,11 @@ const ordersRef = firebase.database().ref(`users/${user.uid}/orders`);
 
                     let returnQrHTML = order.returnQrUrl ? `
                         <div class="mt-4 pt-4 border-t border-[#d4af37]/30">
-                            <a href="${order.returnQrUrl}" download="SAYAND_Return_Label" target="_blank" class="w-full bg-[#1a2e15] text-[#d4af37] border border-[#d4af37] px-8 py-3 text-[10px] tracking-widest font-black hover:bg-[#2c4c23] transition-colors flex items-center justify-center gap-2 shadow-lg">
+                            <a href="${order.returnQrUrl}" target="_blank" rel="noopener noreferrer" class="w-full bg-[#1a2e15] text-[#d4af37] border border-[#d4af37] px-8 py-3 text-[10px] tracking-widest font-black hover:bg-[#2c4c23] transition-colors flex items-center justify-center gap-2 shadow-lg">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                                DOWNLOAD RETURN QR CODE
+                                OPEN RETURN QR / LABEL
                             </a>
-                            <p class="text-[9px] text-[#2c4c23] mt-2 tracking-wide text-center font-bold">Present this QR code to the carrier during pick-up.</p>
+                            <p class="text-[9px] text-[#2c4c23] mt-2 tracking-wide text-center font-bold">Follow the courier instructions: show the QR code at an eligible drop-off point or during a booked collection. If you received a printable label, print and attach it as instructed.</p>
                         </div>
                     ` : '';
 
@@ -672,12 +711,12 @@ const ordersRef = firebase.database().ref(`users/${user.uid}/orders`);
                 if (container) {
                     container.innerHTML = `
                         <div class="panel-box p-12 text-center">
-                            <p class="text-sm font-black tracking-widest text-[#2c4c23] mb-4">NO ORDERS YET</p>
-                            <a href="index.html" class="bg-[#1a2e15] text-[#d4af37] px-8 py-4 text-[10px] tracking-[0.2em] font-black hover:bg-[#2c4c23] transition-colors inline-block shadow-lg border border-[#d4af37]">START SHOPPING</a>
+                            <p class="text-sm font-black tracking-widest text-[#2c4c23] mb-4">UNABLE TO LOAD ORDERS</p>
+                            <a href="index.html" class="bg-[#1a2e15] text-[#d4af37] px-8 py-4 text-[10px] tracking-[0.2em] font-black hover:bg-[#2c4c23] transition-colors inline-block shadow-lg border border-[#d4af37]">RETURN TO HOME</a>
                         </div>`;
                 }
                 if (latestOrderContainer) {
-                    latestOrderContainer.innerHTML = '<p class="text-xs text-[#2c4c23] italic font-medium">No recent orders.</p>';
+                    latestOrderContainer.innerHTML = '<p class="text-xs text-[#2c4c23] italic font-medium">Please refresh to try loading your orders again.</p>';
                 }
                 if (vipBadge) {
                     vipBadge.textContent = "MEMBER";
@@ -728,25 +767,25 @@ const ordersRef = firebase.database().ref(`users/${user.uid}/orders`);
                 });
             }
         };
-// Referral code
-                const referralRef = firebase.database().ref(`users/${currentUserUid}/referralCode`);
-                referralRef.once('value').then(snap => {
-                    let code = snap.val();
-                    if (!code) {
-                        code = 'REF-' + currentUserUid.slice(-6).toUpperCase();
-                        referralRef.set(code);
-                    }
-                    const el = document.getElementById('referral-code-display');
-                    if (el) el.innerText = code;
-                });
-
+        function loadReferralAndRewards(uid) {
+            if (!uid || currentUserUid !== uid) return;
+            const referralRef = firebase.database().ref(`users/${uid}/referralCode`);
+            referralRef.once('value').then(snap => {
+                if (currentUserUid !== uid) return;
+                document.getElementById('referral-code-display').textContent = snap.val() || ('REF-' + uid.slice(-6).toUpperCase());
+            }).catch(() => {
+                if (currentUserUid === uid) document.getElementById('referral-code-display').textContent = 'Unavailable';
+            });
                 // 🟢 NEW: FETCH & DISPLAY REWARDS
-                const rewardsRef = firebase.database().ref(`users/${currentUserUid}/rewards`);
+                const rewardsRef = firebase.database().ref(`users/${uid}/rewards`);
+                customerRewardsRef = rewardsRef;
                 rewardsRef.on('value', snap => {
+                    if (currentUserUid !== uid) return;
                     const container = document.getElementById('rewards-list');
                     if (!container) return;
                     
                     const data = snap.val();
+                SayandI18n.registerCatalog(data);
                     if (!data) {
                         container.innerHTML = '<p class="text-xs text-[#2c4c23] italic font-medium">No rewards yet. Share your referral code to start earning!</p>';
                         return;
@@ -761,14 +800,15 @@ const ordersRef = firebase.database().ref(`users/${user.uid}/orders`);
                                 <p class="text-xs text-[#d4af37] font-bold mt-1">${reward.amount}</p>
                             </div>
                             <div class="flex items-center gap-2 w-full md:w-auto">
-                                <span class="bg-white border border-[#c2c9c0] px-4 py-2 text-xs font-mono font-black text-[#1a2e15] flex-1 md:flex-none text-center tracking-widest">${reward.code}</span>
+                                <!-- 🟢 ADDED NOTRANSLATE HERE -->
+                                <span class="notranslate bg-white border border-[#c2c9c0] px-4 py-2 text-xs font-mono font-black text-[#1a2e15] flex-1 md:flex-none text-center tracking-widest">${reward.code}</span>
                                 <button onclick="navigator.clipboard.writeText('${reward.code}'); showDashboardToast('CODE COPIED');" class="bg-[#1a2e15] text-[#d4af37] border border-[#d4af37] px-4 py-2 text-[10px] font-black tracking-widest hover:bg-[#2c4c23] transition-colors uppercase">COPY</button>
                             </div>
                         </div>`;
                     });
                     container.innerHTML = html;
                 });
-                // 🟢 END REWARDS LISTENER
+        }
 
         window.saveSizing = function() {
             if(!currentUserUid) return;
@@ -853,7 +893,7 @@ const ordersRef = firebase.database().ref(`users/${user.uid}/orders`);
                             <img src="${item.img}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                         </div>
                         <div class="flex flex-col items-start text-left w-full px-1">
-                            <h4 class="text-[11px] font-semibold tracking-wide text-[#1a2e15] truncate uppercase w-full group-hover:text-[#d4af37] transition-colors mb-1">${item.name}</h4>
+                            <h4 class="text-[11px] font-semibold tracking-wide text-[#1a2e15] truncate uppercase w-full group-hover:text-[#d4af37] transition-colors mb-1">${SayandI18n.productHTML(item)}</h4>
                             <p class="text-[11px] text-[#1a2e15] font-medium">€${item.price}</p>
                         </div>
                     </div>
@@ -960,41 +1000,53 @@ const ordersRef = firebase.database().ref(`users/${user.uid}/orders`);
         };
 
         window.saveProfile = async function() {
-            if (!currentUserUid) {
-                showDashboardToast('NOT LOGGED IN');
-                return;
+            const user = firebase.auth().currentUser;
+            if (!user || user.uid !== currentUserUid) return showDashboardToast('PLEASE SIGN IN AGAIN');
+            if (profileReadFailed) return showDashboardToast('REFRESH BEFORE SAVING YOUR PROFILE');
+            const firstName = document.getElementById('profile-first-name').value.trim();
+            const lastName = document.getElementById('profile-last-name').value.trim();
+            const dob = document.getElementById('profile-dob').value;
+            if (!firstName || firstName.length > 100 || lastName.length > 100) {
+                return showDashboardToast('ENTER YOUR NAME (UP TO 100 CHARACTERS PER FIELD)');
             }
-            const dobInput = document.getElementById('profile-dob');
-            if (!dobInput) {
-                alert('DOB field missing');
-                return;
-            }
-            const dob = dobInput.value;
-            if (!dob) {
-                showDashboardToast('PLEASE ENTER A VALID DATE');
-                return;
+            if (dob) {
+                const date = new Date(dob + 'T00:00:00');
+                if (!/^\d{4}-\d{2}-\d{2}$/.test(dob) || Number.isNaN(date.getTime()) || date > new Date()) {
+                    return showDashboardToast('PLEASE ENTER A VALID BIRTH DATE');
+                }
             }
             const btn = document.getElementById('btn-save-profile');
-            if (btn) {
-                btn.innerText = 'SAVING...';
-                btn.disabled = true;
-            }
+            if (btn.disabled) return;
+            btn.textContent = 'SAVING…';
+            btn.disabled = true;
+            const uid = user.uid;
             try {
-                await firebase.database().ref('users/' + currentUserUid).update({ dateOfBirth: dob });
+                // Merge only editable fields; never replace the profile or database root.
+                await firebase.database().ref('users/' + uid).update({
+                    firstName, lastName, dateOfBirth: dob || null
+                });
+                if (currentUserUid !== uid) return;
+                document.getElementById('user-greeting').textContent = `WELCOME, ${firstName}`;
+                document.getElementById('overview-name').textContent = [firstName, lastName].filter(Boolean).join(' ').toUpperCase();
+                document.getElementById('overview-email').textContent = user.email || 'No email available';
+                showProfileStatus('');
                 showDashboardToast('PROFILE UPDATED');
-            } catch (err) {
-                console.error('[SAYAND] DOB save error:', err);
-                alert('Save failed: ' + err.message);
+            } catch (error) {
+                if (currentUserUid !== uid) return;
+                showDashboardToast('PROFILE NOT SAVED. PLEASE TRY AGAIN.');
+                console.error('Profile save failed:', error.code);
             } finally {
-                if (btn) {
-                    btn.innerText = 'SAVE CHANGES';
-                    btn.disabled = false;
+                if (currentUserUid === uid) {
+                    btn.textContent = 'SAVE CHANGES';
+                    btn.disabled = profileReadFailed;
                 }
             }
         };
     </script>
+    
 
     <!-- Google Maps API -->
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD8RHTg2bBV_mclB6RKb_nz_Cdk8C48pls&libraries=places&callback=initMapsWithRetry"></script>
+    
 </body>
 </html>

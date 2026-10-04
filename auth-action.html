@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SAYAND | Account Action</title>
+    <!-- 🟢 ADDED GLOBAL STYLESHEET LINK -->
+    <link rel="stylesheet" href="css/style.css?v=site-4">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -119,11 +121,68 @@
             color: #999;
         }
     </style>
+    <link rel="stylesheet" href="css/i18n.css?v=site-4">
+    <script src="js/translations.js?v=site-4"></script>
+    <script src="js/i18n.js?v=site-4"></script>
+    <link rel="stylesheet" href="css/site-updates.css?v=site-4">
+    <script src="js/consent.js?v=site-4"></script>
+
+    <meta name="description" content="Access your SAYAND account and shopping services securely.">
+    <link rel="canonical" href="https://thesayand.com/auth-action">
+    <meta name="robots" content="noindex, follow">
+    <script src="js/site-updates.js?v=site-4"></script>
+
+    <style>
+        /* Keep account forms and injected preference controls in one column. */
+        body { flex-direction: column; gap: 16px; }
+        body > .auth-container, body > .box {
+            flex: 0 0 auto;
+            min-width: 0;
+            overflow-wrap: anywhere;
+        }
+        body > .sayand-language-control {
+            box-sizing: border-box;
+            width: 100%;
+            max-width: 400px;
+        }
+        body > .sayand-cookie-settings {
+            box-sizing: border-box;
+            width: auto;
+            max-width: 100%;
+            margin: 0;
+        }
+        .modal-overlay {
+            inset: 0;
+            width: auto;
+            height: 100%;
+            height: 100dvh;
+            padding: 16px;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+        .modal-box {
+            box-sizing: border-box;
+            flex: 0 1 400px;
+            min-width: 0;
+            max-height: 100%;
+            overflow-y: auto;
+            overflow-wrap: anywhere;
+        }
+        @media (max-width: 480px) {
+            body { padding: 20px 16px; }
+            .auth-container, .box { padding: 28px 20px; }
+            .modal-box { padding: 32px 20px; }
+            .otp-container { gap: 6px; }
+            .otp-input { flex: 1 1 0; min-width: 0; max-width: 45px; }
+            .auth-container input, .box input { font-size: 16px; }
+        }
+    </style>
 </head>
 <body>
 
     <div class="box">
-        <div class="logo">SAYAND</div>
+        <!-- 🟢 ADDED NOTRANSLATE LOGO -->
+        <div class="logo notranslate">SAYAND</div>
         <div class="tagline">Modern Essentials</div>
         
         <div id="loading-state">
@@ -180,7 +239,6 @@
     const successSection = document.getElementById('success-section');
     const errorSection = document.getElementById('error-section');
 
-    // Validate required parameters
     if (!oobCode || !mode) {
         loadingState.classList.add('hidden');
         errorSection.classList.remove('hidden');
@@ -217,21 +275,18 @@
         const msg = document.getElementById('reset-msg');
         const btn = document.getElementById('reset-btn');
         
-        // 1. Check length
         if (pw.length < 6) {
             msg.className = 'error';
             msg.textContent = 'Password must be at least 6 characters.';
             return;
         }
         
-        // 2. Check if passwords match
         if (pw !== confirmPw) {
             msg.className = 'error';
             msg.textContent = 'Passwords do not match. Please try again.';
             return;
         }
         
-        // 3. Process the reset
         btn.disabled = true;
         btn.innerHTML = '<span class="loading"></span> Processing...';
         
@@ -248,7 +303,6 @@
             });
     }
     
-    // Quality of Life: Allow Enter key to navigate and submit
     document.getElementById('new-password').addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
             e.preventDefault();
@@ -263,5 +317,6 @@
         }
     });
     </script>
+    
 </body>
 </html>

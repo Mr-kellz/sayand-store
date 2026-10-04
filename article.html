@@ -7,33 +7,41 @@
     <link rel="icon" type="image/png" href="https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/SAYAND%20Intertwined%20S%26A%20Monogram.png?alt=media&token=4a0c7abb-0150-4d22-94fc-d58f901a45f6">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css?v=site-4">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f5f0e8; color: #0f1f0f; }
     </style>
+    <link rel="stylesheet" href="css/i18n.css?v=site-4">
+    <script src="js/translations.js?v=site-4"></script>
+    <script src="js/i18n.js?v=site-4"></script>
+    <link rel="stylesheet" href="css/site-updates.css?v=site-4">
+    <script src="js/consent.js?v=site-4"></script>
+
+    <meta name="description" content="Read the SAYAND editorial and explore the featured pieces.">
+    <link rel="canonical" href="https://thesayand.com/article">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="SAYAND | Editorial Campaign">
+    <meta property="og:description" content="Read the SAYAND editorial and explore the featured pieces.">
+    <meta property="og:url" content="https://thesayand.com/article">
+    <meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/SAYAND%20Intertwined%20S%26A%20Monogram.png?alt=media&token=4a0c7abb-0150-4d22-94fc-d58f901a45f6">
+    <script src="js/site-updates.js?v=site-4"></script>
 </head>
 <body class="antialiased overflow-x-hidden flex flex-col min-h-screen">
 
-    <!-- NAVIGATION -->
     <nav class="fixed top-0 left-0 w-full z-[99] bg-[#f5f0e8]/95 backdrop-blur-md border-b border-[#d4c9a8]">
         <div class="w-full px-4 sm:px-6 lg:px-8 xl:px-12">
             <div class="flex justify-between items-center h-16 md:h-20 relative">
                 <a href="lookbook.html" class="text-[9px] md:text-[10px] tracking-[0.2em] font-black text-[#7a8a6e] hover:text-[#0f1f0f] transition-colors uppercase">&larr; BACK TO EDITORIALS</a>
                 <div class="absolute left-1/2 transform -translate-x-1/2 z-50 pointer-events-none">
-                    <a href="index.html" class="text-2xl md:text-3xl font-black tracking-tighter leading-none pointer-events-auto text-[#0f1f0f]">SAYAND</a>
+                    <a href="index.html" class="notranslate text-2xl md:text-3xl font-black tracking-tighter leading-none pointer-events-auto text-[#0f1f0f]">SAYAND</a>
                 </div>
             </div>
         </div>
     </nav>
 
-    <!-- ARTICLE LAYOUT -->
     <main class="w-full pb-24">
-        
-        <!-- HERO MEDIA (Index 0) -->
-        <div id="art-hero" class="w-full h-[85vh] md:h-screen relative bg-[#0f1f0f] pt-16 md:pt-20">
-            <!-- Hero injected here -->
-        </div>
+        <div id="art-hero" class="w-full h-[85vh] md:h-screen relative bg-[#0f1f0f] pt-16 md:pt-20"></div>
 
-        <!-- EDITORIAL TEXT SECTION -->
         <article class="max-w-4xl mx-auto px-6 lg:px-8 py-16 md:py-24 flex flex-col items-center text-center">
             <p class="text-sm md:text-base text-gray-700 font-medium leading-relaxed mb-12 text-left w-full max-w-3xl">
                 <span class="font-black text-black mr-2">&mdash;</span> <span id="art-desc">Loading editorial...</span>
@@ -42,21 +50,16 @@
             <p id="art-subtitle" class="text-xs tracking-[0.4em] font-bold text-gray-500 uppercase"></p>
         </article>
 
-        <!-- MASONRY GALLERY (2-Small, 1-Big Pattern) -->
         <section class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
-            <div id="art-gallery" class="w-full flex flex-col gap-6 md:gap-10">
-                <!-- Grid injected here -->
-            </div>
+            <div id="art-gallery" class="w-full flex flex-col gap-6 md:gap-10"></div>
         </section>
 
     </main>
 
-    <!-- FOOTER -->
     <footer class="w-full bg-white border-t border-[#d4c9a8] pt-12 pb-8 px-4 sm:px-6 lg:px-8 mt-auto text-center">
         <p class="text-[9px] font-black tracking-[0.2em] text-[#7a8a6e] uppercase">&copy; 2026 SAYAND. ALL RIGHTS RESERVED.</p>
     </footer>
 
-    <!-- FIREBASE -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script src="js/firebase-config.js"></script>
@@ -65,6 +68,7 @@
         if (typeof firebase !== 'undefined' && firebase.database) {
             firebase.database().ref("mainStore").once("value").then(snap => {
                 const data = snap.val();
+                SayandI18n.registerCatalog(data);
                 if (!data) return;
 
                 const urlParams = new URLSearchParams(window.location.search);
@@ -76,14 +80,13 @@
                     return;
                 }
 
-                // Populate Text
-                document.getElementById('art-subtitle').innerText = article.subtitle || 'CAMPAIGN';
-                document.getElementById('art-title').innerText = article.title;
-                document.getElementById('art-desc').innerText = article.description || '';
+                SayandI18n.bind(document.getElementById('art-subtitle'), article.subtitle || 'CAMPAIGN', SayandI18n.fieldTranslations(article, 'subtitle'));
+                SayandI18n.bind(document.getElementById('art-title'), article.title || '', SayandI18n.fieldTranslations(article, 'title'));
+                SayandI18n.bind(document.getElementById('art-desc'), article.description || '', SayandI18n.fieldTranslations(article, 'description'));
 
+                if(window.SayandSEO) SayandSEO.details(article.title,article.description,article.urls && article.urls[0]);
                 const urls = article.urls || [];
 
-                // Hotspot Builder Helper
                 function buildHotspotsHtml(spotArray) {
                     if (!spotArray || spotArray.length === 0) return '';
                     return spotArray.map(spot => {
@@ -106,7 +109,6 @@
                     }).join('');
                 }
 
-                // Media Card Builder Helper
                 function createMediaCard(url, index, isBig, isHero = false) {
                     if (!url) return '';
                     const isVideo = url.toLowerCase().match(/\.(mp4|mov|webm)(\?.*)?$/) || url.includes('video');
@@ -147,7 +149,6 @@
                     </div>`;
                 }
 
-                // 1. Render Hero (Index 0)
                 const heroContainer = document.getElementById('art-hero');
                 if (urls.length > 0) {
                     heroContainer.innerHTML = createMediaCard(urls[0], 0, false, true);
@@ -155,14 +156,10 @@
                     heroContainer.style.display = 'none';
                 }
 
-                // 2. Render Masonry Gallery (Starts at Index 1)
                 const galleryContainer = document.getElementById('art-gallery');
                 let galleryHtml = '';
 
-                // Step by 3 to create the [2 small, 1 big] repeating rows
                 for (let i = 1; i < urls.length; i += 3) {
-                    
-                    // ROW A: Two Small Images (Index i and i+1)
                     if (i < urls.length) {
                         let img1 = urls[i];
                         let img2 = (i + 1 < urls.length) ? urls[i + 1] : null;
@@ -172,12 +169,11 @@
                         if (img2) {
                             galleryHtml += createMediaCard(img2, i + 1, false);
                         } else {
-                            galleryHtml += `<div></div>`; // Empty div keeps grid structure
+                            galleryHtml += `<div></div>`; 
                         }
                         galleryHtml += `</div>`;
                     }
 
-                    // ROW B: One Big Image (Index i+2)
                     if (i + 2 < urls.length) {
                         let img3 = urls[i + 2];
                         galleryHtml += `<div class="w-full mt-2 md:mt-4">`;
@@ -191,5 +187,6 @@
             });
         }
     </script>
+    
 </body>
 </html>

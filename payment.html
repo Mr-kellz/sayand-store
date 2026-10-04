@@ -8,16 +8,31 @@
     <link rel="apple-touch-icon" href="https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/SAYAND%20Intertwined%20S%26A%20Monogram.png?alt=media&token=2afe3106-31a8-4a27-960a-e0d09ee96d4f">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- 🟢 ADDED GLOBAL STYLESHEET LINK -->
+    <link rel="stylesheet" href="css/style.css?v=site-4">
     
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f9f6f0; color: #1a2e15; }
         .panel-box { background: white; border: 1px solid #c2c9c0; box-shadow: 0 4px 20px rgba(0,0,0,0.03); border-top: 3px solid #2c4c23; }
     </style>
+    <link rel="stylesheet" href="css/i18n.css?v=site-4">
+    <script src="js/translations.js?orderSecurity=1&v=site-4"></script>
+    <script src="js/i18n.js?v=site-4"></script>
+    <link rel="stylesheet" href="css/site-updates.css?v=site-4">
+    <script src="js/consent.js?v=site-4"></script>
+
+    <meta name="description" content="Access your SAYAND account and shopping services securely.">
+    <link rel="canonical" href="https://thesayand.com/payment">
+    <meta name="robots" content="noindex, follow">
+    <meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/SAYAND%20Intertwined%20S%26A%20Monogram.png?alt=media&token=2afe3106-31a8-4a27-960a-e0d09ee96d4f">
+    <script src="js/site-updates.js?v=site-4"></script>
 </head>
 <body class="antialiased min-h-screen flex flex-col">
 
     <nav class="bg-[#1a2e15] border-b border-[#d4af37]/30 px-6 py-4 flex justify-between items-center sticky top-0 z-50 shadow-md">
-<a href="index.html" onclick="if(window.location.pathname.includes('index.html')||window.location.pathname==='/'||window.location.pathname===''){location.reload();return false;}" class="text-xl md:text-2xl font-black tracking-tighter hover:opacity-70 transition-opacity text-[#d4af37]">SAYAND</a>        <span class="text-[10px] tracking-[0.2em] font-bold text-white">SECURE CHECKOUT</span>
+        <!-- 🟢 ADDED NOTRANSLATE HERE -->
+        <a href="index.html" onclick="if(window.location.pathname.includes('index.html')||window.location.pathname==='/'||window.location.pathname===''){location.reload();return false;}" class="notranslate text-xl md:text-2xl font-black tracking-tighter hover:opacity-70 transition-opacity text-[#d4af37]">SAYAND</a>        
+        <span class="text-[10px] tracking-[0.2em] font-bold text-white">SECURE CHECKOUT</span>
     </nav>
 
     <div class="flex-1 flex items-center justify-center p-6">
@@ -88,7 +103,6 @@
         }
 
       firebase.auth().onAuthStateChanged(async (user) => {
-            // 1. SECURITY CHECK: Make sure the user is actually signed in
             if (!user) {
                 document.getElementById('loading-state').classList.add('hidden');
                 document.getElementById('error-state').classList.remove('hidden');
@@ -98,11 +112,10 @@
 
             if (orderId) {
                 try {
-                    // 2. SECURE QUERY: Pull the order from the user's private folder to bypass global security blocks
-                    const snap = await firebase.database().ref(`users/${user.uid}/orders/${orderId}`).once('value');
+                    const snap = await firebase.database().ref(`orders/${orderId}`).once('value');
                     const order = snap.val();
                     
-                    if (!order) throw new Error('Order not found');
+                    if (!order || order.userId !== user.uid) throw new Error('Order not found');
 
                     document.getElementById('loading-state').classList.add('hidden');
                     document.getElementById('payment-state').classList.remove('hidden');
@@ -139,5 +152,6 @@
             }
         });
     </script>
+    
 </body>
 </html>

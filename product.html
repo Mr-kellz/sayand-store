@@ -8,7 +8,7 @@
     <link rel="apple-touch-icon" href="https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/SAYAND%20Intertwined%20S%26A%20Monogram.png?alt=media&token=4a0c7abb-0150-4d22-94fc-d58f901a45f6">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=site-4">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f9f6f0; color: #1a2e15; overflow-y: auto !important; }
         #product-detail { transform: none !important; position: relative !important; }
@@ -26,6 +26,20 @@
         #detail-image-container.zoom-active #detail-hero-img { transition: transform 0.1s ease; }
     </style>
 
+    <link rel="stylesheet" href="css/i18n.css?v=site-4">
+    <script src="js/translations.js?v=shipping-admin-1"></script>
+    <script src="js/i18n.js?v=site-4"></script>
+    <link rel="stylesheet" href="css/site-updates.css?v=site-4">
+    <script src="js/consent.js?v=site-4"></script>
+
+    <meta name="description" content="Discover this SAYAND piece, including product details, sizes and delivery information.">
+    <link rel="canonical" href="https://thesayand.com/product">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="SAYAND | Product">
+    <meta property="og:description" content="Discover this SAYAND piece, including product details, sizes and delivery information.">
+    <meta property="og:url" content="https://thesayand.com/product">
+    <meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/SAYAND%20Intertwined%20S%26A%20Monogram.png?alt=media&token=4a0c7abb-0150-4d22-94fc-d58f901a45f6">
+    <script src="js/site-updates.js?v=site-4"></script>
 </head>
 <body class="bg-[#f9f6f0] text-[#1a2e15] antialiased overflow-x-hidden flex flex-col min-h-screen">
 
@@ -294,7 +308,7 @@
             <span class="acc-icon text-[#d4af37] font-bold text-lg leading-none">+</span>
         </button>
         <div class="hidden mt-4">
-            <p class="text-xs text-[#6a7c64] font-medium leading-relaxed">Standard delivery within 3-5 business days. Express delivery available for select locations. Free returns within 30 days of purchase.</p>
+            <p class="text-xs text-[#6a7c64] font-medium leading-relaxed">Delivery within Italy: 3–7 working days. International delivery: 5–14 working days. Free returns within 30 days of purchase.</p>
         </div>
     </div>
 </div>
@@ -344,48 +358,48 @@
         <div id="recently-viewed-grid" class="flex space-x-4 md:space-x-6 overflow-x-auto hide-scrollbar pb-4 snap-x snap-mandatory"></div>
     </section>
 
-    <!-- FOOTER -->
-    <footer class="w-full bg-white border-t border-[#c2c9c0] pt-16 pb-8 px-4 sm:px-6 lg:px-8 xl:px-12 mt-auto shadow-inner">
+   <!-- FOOTER -->
+    <footer class="w-full bg-white border-t border-[#d4c9a8] pt-16 pb-8 px-4 sm:px-6 lg:px-8 xl:px-12 mt-auto shadow-inner">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
             <div>
-                <h4 class="text-[10px] tracking-[0.2em] font-black mb-6 text-[#1a2e15]">HELP</h4>
-                <ul class="space-y-3 text-xs text-[#6a7c64] font-bold">
-                    <li><a href="#" onclick="showContact();return false;" class="hover:text-[#d4af37] transition-colors">Contact Us</a></li>
-                    <li><a href="track-order.html" class="hover:text-[#d4af37] transition-colors">Track Order</a></li>
-                    <li><a href="privacy.html" class="hover:text-[#d4af37] transition-colors">Privacy Policy</a></li>
-                    <li><a href="terms.html" class="hover:text-[#d4af37] transition-colors">Terms of Use</a></li>
-                    <li><a href="cookie.html" class="hover:text-[#d4af37] transition-colors">Cookie Policy</a></li>
+                <h4 class="text-[10px] tracking-[0.2em] font-black mb-6 text-[#0f1f0f]">HELP</h4>
+                <ul class="space-y-3 text-xs text-[#7a8a6e] font-bold">
+                    <li><a href="#" onclick="showContact();return false;" class="hover:text-[#c9a227] transition-colors">Contact Us</a></li>
+                    <li><a href="shipping.html" class="hover:underline">Shipping Info</a></li>
+                    <li><a href="returns.html" class="hover:underline">Returns &amp; Exchanges</a></li>
+                    <li><a href="track-order.html" class="hover:text-[#c9a227] transition-colors">Track Order</a></li>
                 </ul>
             </div>
             <div>
-                <h4 class="text-[10px] tracking-[0.2em] font-black mb-6 text-[#1a2e15]">COMPANY</h4>
-                <ul class="space-y-3 text-xs text-[#6a7c64] font-bold">
-                    <li><a href="#" onclick="openInfoPage('about');return false;" class="hover:text-[#d4af37] transition-colors">About Us</a></li>
-                    <li><a href="#" onclick="openInfoPage('careers');return false;" class="hover:text-[#d4af37] transition-colors">Careers</a></li>
-                    <li><a href="#" onclick="openInfoPage('sustainability');return false;" class="hover:text-[#d4af37] transition-colors">Sustainability</a></li>
-                    <li><a href="#" onclick="openInfoPage('press');return false;" class="hover:text-[#d4af37] transition-colors">Press</a></li>
+                <h4 class="text-[10px] tracking-[0.2em] font-black mb-6 text-[#0f1f0f]">COMPANY</h4>
+                <ul class="space-y-3 text-xs text-[#7a8a6e] font-bold">
+                    <li><a href="#" onclick="openInfoPage('about');return false;" class="hover:text-[#c9a227] transition-colors">About Us</a></li>
+                    <li><a href="#" onclick="openInfoPage('careers');return false;" class="hover:text-[#c9a227] transition-colors">Careers</a></li>
+                    <li><a href="#" onclick="openInfoPage('sustainability');return false;" class="hover:text-[#c9a227] transition-colors">Sustainability</a></li>
+                    <!-- 🟢 ADDED NOTRANSLATE HERE TO LOCK "PRESS" -->
+                    <li><a href="#" onclick="openInfoPage('press');return false;" class="hover:text-[#c9a227] transition-colors">Press</a></li>
                 </ul>
             </div>
             <div>
-                <h4 class="text-[10px] tracking-[0.2em] font-black mb-6 text-[#1a2e15]">LEGAL</h4>
-                <ul class="space-y-3 text-xs text-[#6a7c64] font-bold">
-                    <li><a href="#" onclick="openInfoPage('privacy');return false;" class="hover:text-[#d4af37] transition-colors">Privacy Policy</a></li>
-                    <li><a href="#" onclick="openInfoPage('terms');return false;" class="hover:text-[#d4af37] transition-colors">Terms of Use</a></li>
-                    <li><a href="#" onclick="openInfoPage('cookie');return false;" class="hover:text-[#d4af37] transition-colors">Cookie Policy</a></li>
+                <h4 class="text-[10px] tracking-[0.2em] font-black mb-6 text-[#0f1f0f]">LEGAL</h4>
+                <ul class="space-y-3 text-xs text-[#7a8a6e] font-bold">
+                    <li><a href="#" onclick="openInfoPage('privacy');return false;" class="hover:text-[#c9a227] transition-colors">Privacy Policy</a></li>
+                    <li><a href="#" onclick="openInfoPage('terms');return false;" class="hover:text-[#c9a227] transition-colors">Terms of Use</a></li>
+                    <li><a href="#" onclick="openInfoPage('cookie');return false;" class="hover:text-[#c9a227] transition-colors">Cookie Policy</a></li>
                 </ul>
             </div>
             <div>
-                <h4 class="text-[10px] tracking-[0.2em] font-black mb-6 text-[#1a2e15]">FOLLOW US</h4>
+                <h4 class="text-[10px] tracking-[0.2em] font-black mb-6 text-[#0f1f0f]">FOLLOW US</h4>
                 <div class="flex space-x-4">
-                    <a id="social-ig" href="https://instagram.com/thesayand_" target="_blank" class="w-10 h-10 border border-[#c2c9c0] flex items-center justify-center text-[#1a2e15] font-black text-[10px] hover:bg-[#1a2e15] hover:border-[#1a2e15] hover:text-[#d4af37] transition-all duration-300">IG</a>
-                    <a id="social-tk" href="https://tiktok.com/@thesayand_" target="_blank" class="w-10 h-10 border border-[#c2c9c0] flex items-center justify-center text-[#1a2e15] font-black text-[10px] hover:bg-[#1a2e15] hover:border-[#1a2e15] hover:text-[#d4af37] transition-all duration-300">TK</a>
-                    <a id="social-pt" href="https://pinterest.com/thesayand_" target="_blank" class="w-10 h-10 border border-[#c2c9c0] flex items-center justify-center text-[#1a2e15] font-black text-[10px] hover:bg-[#1a2e15] hover:border-[#1a2e15] hover:text-[#d4af37] transition-all duration-300">PT</a>
+                    <a id="social-ig" href="https://instagram.com/thesayand_" target="_blank" class="w-10 h-10 border border-[#d4c9a8] flex items-center justify-center text-[#0f1f0f] font-black text-[10px] hover:bg-[#0f1f0f] hover:border-[#0f1f0f] hover:text-[#c9a227] transition-all duration-300">IG</a>
+                    <a id="social-tk" href="https://tiktok.com/@thesayand_" target="_blank" class="w-10 h-10 border border-[#d4c9a8] flex items-center justify-center text-[#0f1f0f] font-black text-[10px] hover:bg-[#0f1f0f] hover:border-[#0f1f0f] hover:text-[#c9a227] transition-all duration-300">TK</a>
+                    <a id="social-pt" href="https://pinterest.com/thesayand_" target="_blank" class="w-10 h-10 border border-[#d4c9a8] flex items-center justify-center text-[#0f1f0f] font-black text-[10px] hover:bg-[#0f1f0f] hover:border-[#0f1f0f] hover:text-[#c9a227] transition-all duration-300">PT</a>
                 </div>
-                <p id="social-handle" class="text-[10px] font-bold text-[#6a7c64] mt-4 uppercase">@thesayand_</p>
+                <p id="social-handle" class="text-[10px] font-bold text-[#7a8a6e] mt-4 uppercase">@thesayand_</p>
             </div>
         </div>
-        <div class="border-t border-[#c2c9c0] pt-8 flex flex-col md:flex-row justify-between items-center">
-            <p class="text-[9px] font-black tracking-[0.2em] text-[#6a7c64] uppercase">&copy; 2026 SAYAND. ALL RIGHTS RESERVED.</p>
+        <div class="border-t border-[#d4c9a8] pt-8 flex flex-col md:flex-row justify-between items-center">
+            <p class="text-[9px] font-black tracking-[0.2em] text-[#7a8a6e] uppercase">&copy; 2026 SAYAND. ALL RIGHTS RESERVED.</p>
             <div class="flex space-x-6 mt-4 md:mt-0">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" class="h-4 opacity-50 grayscale">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" class="h-4 opacity-50 grayscale">
@@ -436,7 +450,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="js/firebase-config.js"></script>
     
-    <script src="js/main.js?v=finalUpdate3"></script>
+    <script src="js/main.js?v=shipping-admin-1"></script>
 
 <script>
 // Override auto-zoom from main.js — PC zoom is now click-to-activate only
@@ -550,6 +564,7 @@ window.toggleAccordion = function(element) {
             window.openProductDetail(encoded);
             document.body.style.overflow = '';
             document.title = "SAYAND | " + p.name;
+            if(window.SayandSEO) SayandSEO.details(p.name,p.description,p.images && p.images[0] || p.img);
         }
 
         if (typeof window.SAYAND_PRODUCTS !== 'undefined' && window.SAYAND_PRODUCTS) {
@@ -578,6 +593,7 @@ window.toggleAccordion = function(element) {
             }
             firebase.database().ref('mainStore').once('value').then(snap => {
                 const data = snap.val();
+                SayandI18n.registerCatalog(data);
                 if (data) {
                     window.SAYAND_PRODUCTS = data; 
                     const found = findProduct(data);

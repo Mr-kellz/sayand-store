@@ -1,10 +1,44 @@
 const functions = require('firebase-functions/v1');
 const admin = require('firebase-admin');
 const https = require('https');
-
 if (!admin.apps.length) {
     admin.initializeApp();
 }
+
+const payments = require('./payment-store');
+const stripeConfig = require('./stripe-config');
+const {orderEmailParams} = require('./order-email');
+exports.createStripeCheckout = functions.https.onCall(async (data, context) => {
+    if (!context.auth) throw new functions.https.HttpsError('unauthenticated','Please sign in.');
+    if (process.env.CHECKOUT_RECOVERY_ENABLED !== 'true') throw new functions.https.HttpsError('unavailable','Checkout is temporarily paused.');
+    const id=data && data.orderId, uid=context.auth.uid;
+    if (!/^[-A-Za-z0-9_]{20}$/.test(id || '')) throw new functions.https.HttpsError('invalid-argument','Invalid order reference.');
+    try {
+        const settings=stripeConfig.config(), stripe=require('stripe')(settings.key), db=admin.database();
+        const q=await payments.quoteOrder(db,id,uid,Date.now(),settings.mode);
+        await payments.publishQuote(db,id,q);
+        let session;
+        if (q.sessionId) session=await stripe.checkout.sessions.retrieve(q.sessionId);
+        else {
+            session=await stripe.checkout.sessions.create({mode:'payment',payment_method_types:['card'],
+                currency:'eur',adaptive_pricing:{enabled:false},
+                line_items:[{price_data:{currency:'eur',product_data:{name:'SAYAND order #'+id.slice(-6).toUpperCase()},unit_amount:q.amount},quantity:1}],
+                metadata:{orderId:id,userId:uid,pricingVersion:'2',stripeMode:settings.mode},client_reference_id:id,
+                customer_email:q.shippingInfo.email,expires_at:Math.floor(q.expiresAt/1000),
+                success_url:'https://thesayand.com/success.html',cancel_url:'https://thesayand.com/checkout.html'
+            },{idempotencyKey:'sayand-v3-'+settings.mode+'-'+id});
+            stripeConfig.assertSession(session,settings);
+            await payments.recordSession(db,id,q,session);
+        }
+        stripeConfig.assertSession(session,settings);
+        if (session.status !== 'open' || !session.url) throw new Error('This checkout is no longer open.');
+        return {url:session.url,totalAmount:q.totalAmount,currency:'EUR'};
+    } catch (error) {
+        console.error('Checkout failed:',{orderId:id,code:error.code || 'internal',message:error.message});
+        throw new functions.https.HttpsError(error.code === 'failed-precondition' ? 'failed-precondition' : 'internal',
+            error.code === 'failed-precondition' ? error.message : 'Unable to prepare checkout. Please contact support.');
+    }
+});
 
 const BREVO_API_KEY = process.env.BREVO_API_KEY;
 
@@ -96,6 +130,7 @@ function sendBrevoEmail(payloadData) {
             });
         });
 
+        req.setTimeout(15000, () => req.destroy(new Error('Email request timed out; delivery requires review.')));
         req.on('error', (e) => reject(e));
         req.write(data);
         req.end();
@@ -111,6 +146,9 @@ function chunkArray(array, size) {
 }
 
 exports.sendStoreEmail = functions.https.onCall(async (data, context) => {
+    if (['order_confirmed','order_shipped','return_approved'].includes(data && data.type) && (!context.auth || context.auth.uid !== 'MS15g8h5ELPmMcuBijhEC7loGws2')) {
+        throw new functions.https.HttpsError('permission-denied','Only the store administrator can send order emails.');
+    }
     console.log("=== SEND STORE EMAIL START ===");
     console.log("Input:", JSON.stringify(data));
 
@@ -245,7 +283,7 @@ exports.sendStoreEmail = functions.https.onCall(async (data, context) => {
                 </div>
                 </td></tr>
                 <tr><td style="padding:40px;text-align:center;">
-                <p style="font-size:11px;color:#6a7c64;letter-spacing:2px;text-transform:uppercase;margin:0;">SAYAND &copy; 2026</p>
+                <p style="font-size:11px;color:#6a7c64;letter-spacing:2px;text-transform:uppercase;margin:0;">SAYAND © 2026</p>
                 </td></tr>
                 </table>
                 </td></tr>
@@ -352,29 +390,35 @@ exports.checkAbandonedCarts = functions.pubsub.schedule('every 12 hours').onRun(
     return null;
 });
 
-// ─── TELEGRAM ORDER ALERT (DUAL RECIPIENTS) ───
+// ─── TELEGRAM ORDER ALERT (ONLY ON PAID) ───
 exports.sendOrderAlert = functions.database.ref('/orders/{orderId}')
-    .onCreate((snapshot, context) => {
-        const orderData = snapshot.val();
-        const customerName = orderData.shippingInfo?.firstName || "A Customer";
-        const total = orderData.totalAmount || 0;
-        const orderIdShort = context.params.orderId.slice(-6).toUpperCase();
+    .onUpdate((change, context) => {
+        const beforeData = change.before.val();
+        const afterData = change.after.val();
 
-        const message = `🚨 <b>SAYAND NEW ORDER</b>\n\n` +
-                        `📦 Order: <b>#${orderIdShort}</b>\n` +
-                        `👤 Customer: <b>${customerName}</b>\n` +
-                        `💶 Total: <b>€${total}</b>\n` +
-                        `📧 Email: ${orderData.shippingInfo?.email || 'N/A'}\n` +
-                        `📱 Phone: ${orderData.shippingInfo?.phone || 'N/A'}\n\n` +
-                        `🔗 <a href="https://thesayand.com/admin.html">Open Dashboard</a>`;
+        // 🟢 FIX: Only trigger the Telegram alert if the status just changed to 'Paid'
+        if (beforeData.status !== 'Paid' && afterData.status === 'Paid') {
+            const customerName = afterData.shippingInfo?.firstName || "A Customer";
+            const total = afterData.totalAmount || 0;
+            const orderIdShort = context.params.orderId.slice(-6).toUpperCase();
 
-        const promises = TELEGRAM_CHAT_IDS.map(chatId =>
-            sendTelegramMessage(chatId, message)
-                .then(() => console.log(`✅ Telegram order alert sent to ${chatId}`))
-                .catch((err) => console.error(`❌ Failed for ${chatId}:`, err.message))
-        );
+            const message = `🚨 <b>SAYAND NEW PAID ORDER</b>\n\n` +
+                            `📦 Order: <b>#${orderIdShort}</b>\n` +
+                            `👤 Customer: <b>${customerName}</b>\n` +
+                            `💶 Total: <b>€${total}</b>\n` +
+                            `📧 Email: ${afterData.shippingInfo?.email || 'N/A'}\n` +
+                            `📱 Phone: ${afterData.shippingInfo?.phone || 'N/A'}\n\n` +
+                            `🔗 <a href="https://thesayand.com/admin.html">Open Dashboard</a>`;
 
-        return Promise.all(promises).then(() => null);
+            const promises = TELEGRAM_CHAT_IDS.map(chatId =>
+                sendTelegramMessage(chatId, message)
+                    .then(() => console.log(`✅ Telegram order alert sent to ${chatId}`))
+                    .catch((err) => console.error(`❌ Failed for ${chatId}:`, err.message))
+            );
+
+            return Promise.all(promises).then(() => null);
+        }
+        return null; // Do nothing if it's just a regular update
     });
 
 // ─── TELEGRAM RETURN ALERT (DUAL RECIPIENTS) ───
@@ -390,8 +434,9 @@ exports.alertOnReturnRequest = functions.database.ref('/orders/{orderId}')
                             `↩️ Order <b>#${orderIdShort}</b> requested a return/refund.\n\n` +
                             `🔗 <a href="https://thesayand.com/admin.html">Open Admin Panel</a>`;
 
-            const chatIds = TELEGRAM_CHAT_IDS.value().split(',').filter(id => id.trim());
-            const promises = chatIds.map(chatId =>                sendTelegramMessage(chatId, message)
+            // 🟢 FIX: Removed the broken '.value().split' code so it reads the Array correctly
+            const promises = TELEGRAM_CHAT_IDS.map(chatId => 
+                sendTelegramMessage(chatId, message)
                     .then(() => console.log(`✅ Telegram return alert sent to ${chatId}`))
                     .catch((err) => console.error(`❌ Failed for ${chatId}:`, err.message))
             );
@@ -576,5 +621,43 @@ exports.cleanupDeletedUser = functions.auth.user().onDelete(async (user) => {
         console.log(`✅ Successfully wiped database profile for deleted user: ${uid}`);
     } catch (error) {
         console.error(`❌ Error wiping database profile for user ${uid}:`, error.message);
+    }
+});
+// Signed Stripe events are the only source of payment confirmation.
+exports.stripeWebhook = functions.https.onRequest(async (req,res) => {
+    if (req.method !== 'POST') return res.status(405).send('Method not allowed');
+    let stripe,event,settings;
+    try { settings=stripeConfig.config(); stripe=require('stripe')(settings.key); } catch (error) { return res.status(503).send('Payment configuration unavailable'); }
+    try {
+        event=stripe.webhooks.constructEvent(req.rawBody,req.headers['stripe-signature'],settings.webhookSecret);
+    } catch (error) { return res.status(400).send('Invalid webhook signature'); }
+    if (event.livemode !== settings.live) return res.status(400).send('Webhook mode mismatch');
+    if (!['checkout.session.completed','checkout.session.async_payment_succeeded'].includes(event.type)) return res.json({received:true});
+    // Old paused sessions require separate reconciliation; never recreate deleted orders from an old event.
+    if (event.data.object.metadata?.pricingVersion !== '2') {
+        console.warn('Legacy Stripe event requires manual review:',{eventId:event.id});
+        return res.json({received:true,legacy:true});
+    }
+    try {
+        const session=await stripe.checkout.sessions.retrieve(event.data.object.id);
+        stripeConfig.assertSession(session,settings);
+        if (session.payment_status !== 'paid') return res.json({received:true});
+        const db=admin.database(), result=await payments.fulfill(db,session,Date.now());
+        if (await payments.claimEmail(db,result.id)) {
+            const order=result.order;
+            try {
+                await sendBrevoEmail({sender:{name:'SAYAND',email:'noreply@thesayand.com'},
+                    to:[{email:order.shippingInfo.email}],templateId:TEMPLATES.order_confirmed,
+                    params:orderEmailParams(order,result.id)});
+                await db.ref('paymentFulfillments/'+result.id).update({emailState:'sent',emailSentAt:Date.now()});
+            } catch (error) {
+                await db.ref('paymentFulfillments/'+result.id).update({emailState:'needs_review'});
+                console.error('Receipt email requires manual review:',{orderId:result.id});
+            }
+        }
+        return res.json({received:true});
+    } catch (error) {
+        console.error('Payment processing requires retry:',{eventId:event.id,message:error.message});
+        return res.status(500).send('Payment processing requires retry');
     }
 });

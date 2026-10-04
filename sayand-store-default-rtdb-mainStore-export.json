@@ -1,0 +1,440 @@
+{
+  "announcement": {
+    "active": true,
+    "isPromo": true,
+    "promoEndDate": "2026-07-26T16:43:00.000Z",
+    "promoMinAmount": 150,
+    "promoPercent": 7,
+    "text": "GET 7% OFF ORDERS ABOVE €150 at checkout"
+  },
+  "contact": {
+    "email": "support@thesayand.com",
+    "instagram": "https://instagram.com/thesayand_",
+    "paypal": "https://www.paypal.me/glorycarriersFE",
+    "pinterest": "https://pinterest.com/thesayand_",
+    "revolut": "https://revolut.me/osayanikbm",
+    "tiktok": "https://tiktok.com/@thesayand_",
+    "whatsapp": "+393299716798"
+  },
+  "discountCodes": {
+    "BDAYFXEOJ2": 10,
+    "BDAYLOGWS2": 10,
+    "WELCOME10": 10
+  },
+  "footer": {
+    "about": {
+      "content": "We don't do fashion that makes you choose between who you are and who the world wants you to be.\nWe started this brand to fix a gap we saw everywhere: the space between classic elegance and native authenticity. Too often, modesty was treated as an afterthought. Culture was diluted. Quality was gatekept by price tags. We decided to change that.\nThis is where Nigerian heritage meets global style. We design and curate for everyone who moves through the world with quiet confidence — men, women, and anyone who believes that what you wear should reflect your values. Our pieces span the full spectrum: sharp formalwear, elevated streetwear, timeless classics, and statement accessories that carry the weight of craftsmanship.\nEverything we make is built to last. Handwoven textiles. Ethically sourced materials. Local production. Top-tier quality at prices that don't require a second thought. We work directly with artisans because we believe the best fashion is human-made, not factory-churned.\nWe're an online store now, shipping globally, with a physical space on the horizon. But no matter how we grow, our promise stays the same: we style you with modesty. Not as a limitation — as a standard.\nRooted in culture. Crafted with purpose. Worn with pride.",
+      "title": "ABOUT US"
+    },
+    "careers": {
+      "content": "<div class=\"space-y-6\"><p class=\"text-gray-600\">Join the SAYAND team. We are always looking for passionate individuals who share our vision for modern, minimalist fashion.</p><div><h4 class=\"text-black font-bold text-sm tracking-wider mb-2\">CURRENT OPENINGS</h4><ul class=\"space-y-3 text-gray-600\"><li class=\"border-b border-gray-100 pb-3\"><strong>Junior Fashion Designer</strong> — Milan, Italy<br><span class=\"text-xs text-gray-400\">Full-time</span></li><li class=\"border-b border-gray-100 pb-3\"><strong>E-Commerce Manager</strong> — Remote<br><span class=\"text-xs text-gray-400\">Full-time</span></li><li class=\"border-b border-gray-100 pb-3\"><strong>Customer Experience Specialist</strong> — Remote<br><span class=\"text-xs text-gray-400\">Part-time</span></li></ul></div><p class=\"text-gray-600\">Send your portfolio and CV to <a href=\"mailto:careers@sayand.com\" class=\"underline hover:text-black\">careers@sayand.com</a></p></div>",
+      "title": "CAREERS"
+    },
+    "cookie": {
+      "content": "<div class=\"space-y-6 text-gray-600\"><p>SAYAND uses cookies and similar technologies to enhance your browsing experience and analyze site traffic.</p><div><h4 class=\"text-black font-bold text-sm tracking-wider mb-2\">WHAT ARE COOKIES?</h4><p>Cookies are small text files stored on your device when you visit a website. They help us remember your preferences and understand how you interact with our site.</p></div><div><h4 class=\"text-black font-bold text-sm tracking-wider mb-2\">TYPES OF COOKIES WE USE</h4><ul class=\"list-disc list-inside space-y-2\"><li><strong>Essential:</strong> Required for the website to function properly.</li><li><strong>Analytics:</strong> Help us understand how visitors interact with our site.</li><li><strong>Marketing:</strong> Used to deliver relevant advertisements and track their performance.</li></ul></div><div><h4 class=\"text-black font-bold text-sm tracking-wider mb-2\">MANAGING COOKIES</h4><p>You can manage or disable cookies through your browser settings. Please note that disabling certain cookies may affect the functionality of the website.</p></div></div>",
+      "title": "COOKIE POLICY"
+    },
+    "press": {
+      "content": "<div class=\"space-y-6\"><p class=\"text-gray-600\">For press inquiries, image requests, and collaboration proposals, please contact our communications team.</p><div><h4 class=\"text-black font-bold text-sm tracking-wider mb-2\">PRESS CONTACT</h4><p class=\"text-gray-600\">Email: <a href=\"mailto:press@sayand.com\" class=\"underline hover:text-black\">press@sayand.com</a><br>Instagram: @sayand_press</p></div><div><h4 class=\"text-black font-bold text-sm tracking-wider mb-2\">RECENT FEATURES</h4><ul class=\"space-y-3 text-gray-600\"><li class=\"border-b border-gray-100 pb-3\"><em>Vogue Italia</em> — \"The New Minimalists\" <span class=\"text-gray-400 text-xs\">March 2026</span></li><li class=\"border-b border-gray-100 pb-3\"><em>Highsnobiety</em> — \"Essential Modernity\" <span class=\"text-gray-400 text-xs\">February 2026</span></li><li class=\"border-b border-gray-100 pb-3\"><em>WWD</em> — \"SAYAND's Quiet Luxury\" <span class=\"text-gray-400 text-xs\">January 2026</span></li></ul></div></div>",
+      "title": "PRESS"
+    },
+    "privacy": {
+      "content": "<div class=\"space-y-6 text-gray-600\"><p>Last updated: June 2026</p><p>SAYAND respects your privacy and is committed to protecting your personal data. This policy explains how we collect, use, and safeguard your information.</p><div><h4 class=\"text-black font-bold text-sm tracking-wider mb-2\">1. INFORMATION WE COLLECT</h4><p>We collect personal information you provide directly (name, email, shipping address, payment details) and technical data automatically (IP address, browser type, device information).</p></div><div><h4 class=\"text-black font-bold text-sm tracking-wider mb-2\">2. HOW WE USE YOUR DATA</h4><p>Your data is used to process orders, communicate with you, improve our services, and send marketing communications (if you have opted in). We do not sell your personal data to third parties.</p></div><div><h4 class=\"text-black font-bold text-sm tracking-wider mb-2\">3. YOUR RIGHTS</h4><p>You have the right to access, correct, or delete your personal data. To exercise these rights, contact us at <a href=\"mailto:privacy@sayand.com\" class=\"underline hover:text-black\">privacy@sayand.com</a>.</p></div></div>",
+      "title": "PRIVACY POLICY"
+    },
+    "returns": {
+      "content": "<div class=\"space-y-6\"><div><h4 class=\"text-black font-bold text-sm tracking-wider mb-2\">RETURN POLICY</h4><p class=\"text-gray-600\">We accept returns within 30 days of purchase. Items must be in original condition with all tags attached and in original packaging. Sale items are final sale unless defective.</p></div><div><h4 class=\"text-black font-bold text-sm tracking-wider mb-2\">HOW TO RETURN</h4><p class=\"text-gray-600\">1. Log into your account and select the order you wish to return.<br>2. Print the prepaid return label (free for orders over $100).<<br>3. Pack the item securely and attach the label.<br>4. Drop off at any authorized shipping location.</p></div><div><h4 class=\"text-black font-bold text-sm tracking-wider mb-2\">REFUNDS</h4><p class=\"text-gray-600\">Refunds are processed within 5-7 business days after we receive your return. Original shipping charges are non-refundable.</p></div><div><h4 class=\"text-black font-bold text-sm tracking-wider mb-2\">EXCHANGES</h4><p class=\"text-gray-600\">For size exchanges, we recommend placing a new order for the correct size and returning the original item for a refund.</p></div></div>",
+      "title": "RETURNS & EXCHANGES"
+    },
+    "shipping": {
+      "content": "<div class=\"space-y-6\"><div><h4 class=\"text-black font-bold text-sm tracking-wider mb-2\">STANDARD DELIVERY</h4><p class=\"text-gray-600\">Free standard shipping on all orders over $150. Delivery within 3-5 business days. Orders are processed within 24 hours during business days.</p></div><div><h4 class=\"text-black font-bold text-sm tracking-wider mb-2\">EXPRESS DELIVERY</h4><p class=\"text-gray-600\">Available for select locations. Delivery within 1-2 business days. Flat rate of $25.</p></div><div><h4 class=\"text-black font-bold text-sm tracking-wider mb-2\">INTERNATIONAL SHIPPING</h4><p class=\"text-gray-600\">We ship worldwide via DHL Express. International orders typically arrive within 5-10 business days. Customs duties and taxes may apply and are the responsibility of the customer.</p></div><div><h4 class=\"text-black font-bold text-sm tracking-wider mb-2\">TRACKING</h4><p class=\"text-gray-600\">Once your order ships, you will receive an email with a tracking number.</p></div></div>",
+      "title": "SHIPPING INFO"
+    },
+    "size": {
+      "content": "<div class=\"space-y-6\"><p class=\"text-gray-600\">Our garments are designed with a contemporary fit. If you are between sizes, we recommend sizing up for an oversized look or down for a more fitted silhouette.</p><div class=\"overflow-x-auto\"><table class=\"w-full text-sm text-left border border-gray-200\"><thead class=\"bg-gray-50 text-xs tracking-wider font-bold\"><tr><th class=\"p-3 border-b\">SIZE</th><th class=\"p-3 border-b\">CHEST</th><th class=\"p-3 border-b\">WAIST</th><th class=\"p-3 border-b\">LENGTH</th></tr></thead><tbody class=\"text-gray-600\"><tr><td class=\"p-3 border-b\">XS</td><td class=\"p-3 border-b\">92cm / 36in</td><td class=\"p-3 border-b\">76cm / 30in</td><td class=\"p-3 border-b\">68cm / 27in</td></tr><tr><td class=\"p-3 border-b\">S</td><td class=\"p-3 border-b\">96cm / 38in</td><td class=\"p-3 border-b\">80cm / 31.5in</td><td class=\"p-3 border-b\">70cm / 27.5in</td></tr><tr><td class=\"p-3 border-b\">M</td><td class=\"p-3 border-b\">100cm / 39in</td><td class=\"p-3 border-b\">84cm / 33in</td><td class=\"p-3 border-b\">72cm / 28in</td></tr><tr><td class=\"p-3 border-b\">L</td><td class=\"p-3 border-b\">104cm / 41in</td><td class=\"p-3 border-b\">88cm / 34.5in</td><td class=\"p-3 border-b\">74cm / 29in</td></tr><tr><td class=\"p-3 border-b\">XL</td><td class=\"p-3 border-b\">108cm / 42.5in</td><td class=\"p-3 border-b\">92cm / 36in</td><td class=\"p-3 border-b\">76cm / 30in</td></tr></tbody></table></div><p class=\"text-gray-600 text-xs\">Measurements may vary slightly by style. Check individual product pages for specific measurements.</p></div>",
+      "title": "SIZE GUIDE"
+    },
+    "sustainability": {
+      "content": "<div class=\"space-y-6\"><p class=\"text-gray-600\">At SAYAND, we are committed to reducing our environmental footprint while maintaining the highest standards of quality and design.</p><div><h4 class=\"text-black font-bold text-sm tracking-wider mb-2\">OUR COMMITMENTS</h4><ul class=\"list-disc list-inside space-y-2 text-gray-600\"><li>100% of our cotton is organic or recycled</li><li>All packaging is plastic-free and fully recyclable</li><li>Carbon-neutral shipping on all orders</li><li>Made-to-order capsule collections to reduce waste</li><li>Partnership with textile recycling programs</li></ul></div><p class=\"text-gray-600\">We believe sustainability is a journey, not a destination. We are constantly evaluating our supply chain to identify new opportunities for improvement.</p></div>",
+      "title": "SUSTAINABILITY"
+    },
+    "terms": {
+      "content": "<div class=\"space-y-6 text-gray-600\"><p>By accessing and using the SAYAND website, you accept and agree to be bound by these terms and conditions.</p><div><h4 class=\"text-black font-bold text-sm tracking-wider mb-2\">ORDERS & PAYMENT</h4><p>All prices are listed in USD and include VAT where applicable. We reserve the right to refuse or cancel any order for any reason. Payment must be received before items are shipped.</p></div><div><h4 class=\"text-black font-bold text-sm tracking-wider mb-2\">INTELLECTUAL PROPERTY</h4><p>All content on this website, including images, text, and designs, is the property of SAYAND and is protected by copyright and trademark laws. Unauthorized use is strictly prohibited.</p></div><div><h4 class=\"text-black font-bold text-sm tracking-wider mb-2\">LIABILITY</h4><p>SAYAND is not liable for any indirect, incidental, or consequential damages arising from the use of our products or website. Our liability is limited to the purchase price of the item.</p></div></div>",
+      "title": "TERMS OF USE"
+    }
+  },
+  "newArrivals": [
+    {
+      "category": "women",
+      "colors": [
+        "MIX COLORS"
+      ],
+      "description": "AFRICAN WEAR. NIGERIAN STYLE. ONE SIZE",
+      "details": {
+        "Care": "Hand Wash",
+        "Fit": "One size",
+        "Origin": "Made in Nigeria"
+      },
+      "images": [
+        "https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/products%2F1786711982037__MG_6865.jpeg?alt=media&token=e26ea8e8-da18-4914-879f-5275d7b412a6",
+        "https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/products%2F1786711986974__MG_6863.jpeg?alt=media&token=bb6fa639-c31e-4b95-b369-abe52441d653",
+        "https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/products%2F1786711991936__MG_6862.jpeg?alt=media&token=7e1b5c03-1d50-4236-a6d5-2b51f3fdcdba",
+        "https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/products%2F1786711996040__MG_6861.jpeg?alt=media&token=ac74dc33-147b-4eeb-9867-002b5f589bbd"
+      ],
+      "isOutOfStock": false,
+      "isVipOnly": false,
+      "measurements": {
+        "M": {
+          "Chest": "100cm",
+          "Length": "72cm",
+          "Waist": "86cm"
+        },
+        "S": {
+          "Chest": "96cm",
+          "Length": "70cm",
+          "Waist": "82cm"
+        }
+      },
+      "name": "AFRICAN WEAR _BUBU",
+      "price": 40,
+      "quantity": 5,
+      "sizeQuantities": {
+        "ONE SIZE": 5
+      },
+      "sizes": [
+        "ONE SIZE"
+      ],
+      "translations": {
+        "it": {
+          "description": "",
+          "details": {
+            "Care": "",
+            "Fit": "",
+            "Material": "",
+            "Origin": ""
+          },
+          "name": ""
+        }
+      }
+    },
+    {
+      "category": "women",
+      "colors": [
+        "MIX COLOUR"
+      ],
+      "description": "AFRICAN WEAR. NIGERIAN STYLE . ONE SIZE",
+      "details": {
+        "Care": "Hand Wash",
+        "Fit": "One Size",
+        "Origin": "Made in Nigeria"
+      },
+      "images": [
+        "https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/products%2F1786712850588__MG_6859.jpeg?alt=media&token=fee75845-7336-45ea-bea9-bea28538370a",
+        "https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/products%2F1786712990129__MG_6858.jpeg?alt=media&token=a4d5a829-4326-467f-a680-374f821e0bdf",
+        "https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/products%2F1786712995137__MG_6857.jpeg?alt=media&token=5c716290-1f8e-4d4c-99e6-9f99d133a3c7"
+      ],
+      "isOutOfStock": false,
+      "isVipOnly": false,
+      "measurements": {
+        "M": {
+          "Chest": "100cm",
+          "Length": "72cm",
+          "Waist": "86cm"
+        },
+        "S": {
+          "Chest": "96cm",
+          "Length": "70cm",
+          "Waist": "82cm"
+        }
+      },
+      "name": "BUBU GOWN",
+      "price": 40,
+      "quantity": 5,
+      "sizeQuantities": {
+        "ONE SIZE": 5
+      },
+      "sizes": [
+        "ONE SIZE"
+      ]
+    },
+    {
+      "category": "women",
+      "colors": [
+        "MIX COLOUR"
+      ],
+      "description": "AFRICAN WEAR. NIGERIAN STYLE . ONE SIZE",
+      "details": {
+        "Care": "Hand Wash",
+        "Fit": "One Size",
+        "Origin": "Made in Nigeria"
+      },
+      "images": [
+        "https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/products%2F1786713767486__MG_6856.jpeg?alt=media&token=65debd2a-583d-4719-8302-2d8cb3207145",
+        "https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/products%2F1786713775351__MG_6854.jpeg?alt=media&token=ced6c194-666d-488c-af50-9bb7aa37f486"
+      ],
+      "isOutOfStock": false,
+      "isVipOnly": false,
+      "measurements": {
+        "M": {
+          "Chest": "100cm",
+          "Length": "72cm",
+          "Waist": "86cm"
+        },
+        "S": {
+          "Chest": "96cm",
+          "Length": "70cm",
+          "Waist": "82cm"
+        }
+      },
+      "name": "BUBU GOWN 2",
+      "price": 40,
+      "quantity": 4,
+      "sizeQuantities": {
+        "ONE SIZE": 4
+      },
+      "sizes": [
+        "ONE SIZE"
+      ]
+    },
+    {
+      "category": "women",
+      "colors": [
+        "MIX COLOUR"
+      ],
+      "description": "AFRICAN WEAR. NIGERIAN STYLE . ONE SIZE",
+      "details": {
+        "Care": "Hand Wash",
+        "Fit": "One Size",
+        "Origin": "Made in Nigeria"
+      },
+      "images": [
+        "https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/products%2F1786714031817__MG_6853.jpeg?alt=media&token=6e772fd7-a5de-42d3-ad0f-63a50a7012b5",
+        "https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/products%2F1786714039437__MG_6852.jpeg?alt=media&token=65a32d0f-caec-4d7f-88fb-84ceceebbec3"
+      ],
+      "isOutOfStock": false,
+      "isVipOnly": false,
+      "measurements": {
+        "M": {
+          "Chest": "100cm",
+          "Length": "72cm",
+          "Waist": "86cm"
+        },
+        "S": {
+          "Chest": "96cm",
+          "Length": "70cm",
+          "Waist": "82cm"
+        }
+      },
+      "name": "BUBU GOWN 3",
+      "price": 40,
+      "quantity": 5,
+      "sizeQuantities": {
+        "ONE SIZE": 5
+      },
+      "sizes": [
+        "ONE SIZE"
+      ]
+    },
+    {
+      "category": "women",
+      "colors": [
+        "CREEM/BLACK"
+      ],
+      "description": "ELEGANT WEAR FOR OCCATIONS.",
+      "details": {
+        "Care": "Dry Clean/Hand Wash",
+        "Fit": "One Size",
+        "Origin": "Made in Nigeria"
+      },
+      "images": [
+        "https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/products%2F1786715851558_BDCA4CA4_3553_4B67_AEAD_9C926EAA412C.jpeg?alt=media&token=47feab09-3683-41c1-9491-462953e9caaa",
+        "https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/products%2F1786715855289_7A8CA1BC_55ED_49FF_A87F_6D088E56524E.jpeg?alt=media&token=c6d4feff-0d46-4520-b510-0464f34c5d29"
+      ],
+      "isOutOfStock": false,
+      "isVipOnly": false,
+      "measurements": {
+        "M": {
+          "Chest": "100cm",
+          "Length": "72cm",
+          "Waist": "86cm"
+        },
+        "S": {
+          "Chest": "96cm",
+          "Length": "70cm",
+          "Waist": "82cm"
+        }
+      },
+      "name": "GOWN",
+      "price": 40,
+      "quantity": 5,
+      "sizeQuantities": {
+        "ONE SIZE": 5
+      },
+      "sizes": [
+        "ONE SIZE"
+      ]
+    }
+  ],
+  "siteContent": {
+    "accImg": "https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/design%2F1785505420034_IMG_1276.jpeg?alt=media&token=25f73681-7f07-48b1-89d5-a758829c525c",
+    "editDesc": "Our design philosophy centers on precision cutting and premium materials. Each piece is crafted to transcend seasons, not chase them.",
+    "editImg": "https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/design%2F1785787682931_82203373_5CB9_48A9_9CB6_669FDF82A1DE.mp4?alt=media&token=9d105ab7-ce27-4868-a532-1b410dc0c17a, https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/design%2F1785787688378_04F25DF1_FD45_47D2_800A_FA0AA5F7BFE6.mp4?alt=media&token=1fb8b06b-d329-43bf-981a-470727725578, https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/design%2F1785787692869_B5F64FCD_5C9C_46EA_B1FB_01CADFB02E8C.mov?alt=media&token=d82c8153-581b-4366-9d30-9b8dee7634cc, https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/design%2F1785787701643_6F4FB095_14E0_4AA3_A1F4_9C84E9AB30BA.mp4?alt=media&token=248d3333-d674-4671-9a90-5e758acce956",
+    "editSubtitle": "THE EDIT",
+    "editTitle": "LESS IS<br>ALWAYS<br>MORE",
+    "heroImg": "https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/design%2F1782236474067_IMG_5009.jpeg?alt=media&token=e1d090de-abe9-4117-a7d6-d7ea8035ef33",
+    "heroSubtitle": "SPRING / SUMMER 2026",
+    "heroTitle": "ESSENTIAL<br>MODERNITY",
+    "hotspots": "",
+    "lbAccImg": "https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/design%2F1784656835829_3bec1bb2-9b5c-4e90-bc6f-9fadcea5d7c0.jpeg?alt=media&token=83db005f-c644-4092-b477-6cb275311d8a",
+    "lbEditCardImg": "https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/design%2F1784656879618_IMG_2085.png?alt=media&token=999bf9ec-b72f-4b6b-8d09-042bf14015ad",
+    "lbHeroImg": "",
+    "lbMenImg": "https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/design%2F1784656771625__MG_4586.jpeg?alt=media&token=b90f0912-b9b5-484a-a64b-eff2dbc6edc6",
+    "lbSaleImg": "https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/design%2F1784658188598_summer15.png?alt=media&token=e6028c92-83d0-4add-887b-55faf621228e",
+    "lbWomenImg": "https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/design%2F1784656740693__MG_5479.jpeg?alt=media&token=79b540f1-d0c7-45ee-a9ba-f0e9a841244a",
+    "mediaDescriptions": "",
+    "menImg": "https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/design%2F1785505304490_Untitled_design.png?alt=media&token=3b4d1897-ef3c-4573-9f8c-cf515a62af46",
+    "womenImg": "https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/design%2F1785753803371_BDCA4CA4_3553_4B67_AEAD_9C926EAA412C.jpeg?alt=media&token=3c36552b-596f-4ca8-ad53-4e9158bfe084"
+  },
+  "trending": [
+    {
+      "category": "accessories",
+      "colors": [
+        "BURGUNDY"
+      ],
+      "description": "",
+      "images": [
+        "https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/products%2F1786714592608_IMG_1276.jpeg?alt=media&token=fbc35276-805d-4bb5-810c-b1f5630333cf",
+        "https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/products%2F1786714594740_IMG_1280.jpeg?alt=media&token=09dceca6-1f59-4018-b120-201655c83c2a",
+        "https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/products%2F1786714597310__MG_4921.jpeg?alt=media&token=03bcbf36-6049-46e1-99ec-cb9c9b1cbbb6",
+        "https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/products%2F1786714605299__MG_4898.jpeg?alt=media&token=2d5f97f9-200e-4e56-af58-5e534505c3f3"
+      ],
+      "isOutOfStock": false,
+      "isVipOnly": false,
+      "measurements": {
+        "M": {
+          "Chest": "100cm",
+          "Length": "72cm",
+          "Waist": "86cm"
+        },
+        "S": {
+          "Chest": "96cm",
+          "Length": "70cm",
+          "Waist": "82cm"
+        }
+      },
+      "name": "HAT",
+      "price": 40,
+      "quantity": 4,
+      "sizeQuantities": {
+        "55-58CM": 4
+      },
+      "sizes": [
+        "55-58CM"
+      ]
+    },
+    {
+      "category": "accessories",
+      "colors": [
+        "WHITE"
+      ],
+      "description": "",
+      "images": [
+        "https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/products%2F1786714903283_IMG_1277.jpeg?alt=media&token=355209cb-6c04-4b66-aa2f-111a98b509f8",
+        "https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/products%2F1786714905139__MG_3701.jpeg?alt=media&token=72412244-f82a-4748-a69a-0db7ce60554e",
+        "https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/products%2F1786714911282__MG_3745.jpeg?alt=media&token=99f94385-b93a-4c2b-8d06-ea11f9d848a6",
+        "https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/products%2F1786714917733__MG_3693.jpeg?alt=media&token=44d8d857-562f-464b-bcf6-913e4bf7932c"
+      ],
+      "isOutOfStock": false,
+      "isVipOnly": false,
+      "measurements": {
+        "M": {
+          "Chest": "100cm",
+          "Length": "72cm",
+          "Waist": "86cm"
+        },
+        "S": {
+          "Chest": "96cm",
+          "Length": "70cm",
+          "Waist": "82cm"
+        }
+      },
+      "name": "HAT 2",
+      "price": 40,
+      "quantity": 5,
+      "sizeQuantities": {
+        "55 - 58CM": 5
+      },
+      "sizes": [
+        "55 - 58CM"
+      ]
+    },
+    {
+      "category": "accessories",
+      "colors": [
+        "BLACK"
+      ],
+      "description": "",
+      "images": [
+        "https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/products%2F1786715116326_9da20f45_8002_4e12_80d0_c4eab2073eda.jpeg?alt=media&token=23ba05b0-c57d-465b-8683-68cefce8785a",
+        "https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/products%2F1786715117761_b693ae13_c40a_4a14_9620_deefec7ead51.jpeg?alt=media&token=98676cd2-530f-4f49-b6a6-1c8657d7d688"
+      ],
+      "isOutOfStock": false,
+      "isVipOnly": false,
+      "measurements": {
+        "M": {
+          "Chest": "100cm",
+          "Length": "72cm",
+          "Waist": "86cm"
+        },
+        "S": {
+          "Chest": "96cm",
+          "Length": "70cm",
+          "Waist": "82cm"
+        }
+      },
+      "name": "HAT 3",
+      "price": 40,
+      "quantity": 5,
+      "sizeQuantities": {
+        "55 - 58CM": 5
+      },
+      "sizes": [
+        "55 - 58CM"
+      ]
+    },
+    {
+      "category": "accessories",
+      "colors": [
+        "RED"
+      ],
+      "description": "",
+      "images": [
+        "https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/products%2F1786715250936_3ebba4fe_b4b7_4deb_a5f4_86f899af1725.jpeg?alt=media&token=b31836ee-b1c6-4268-aef5-436a55006f05",
+        "https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/products%2F1786715253198_b50609d3_3cdd_4f10_a0a7_757d7029403b.jpeg?alt=media&token=4c0a7a0f-c9c8-4ae7-8532-f52751b3bb7c"
+      ],
+      "isOutOfStock": false,
+      "isVipOnly": false,
+      "measurements": {
+        "M": {
+          "Chest": "100cm",
+          "Length": "72cm",
+          "Waist": "86cm"
+        },
+        "S": {
+          "Chest": "96cm",
+          "Length": "70cm",
+          "Waist": "82cm"
+        }
+      },
+      "name": "PAPA'S CAP",
+      "price": 40,
+      "quantity": 1,
+      "sizeQuantities": {
+        "55 - 58CM": 1
+      },
+      "sizes": [
+        "55 - 58CM"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,126 @@
+{
+  "rules": {
+    "mainStore": {
+      ".read": true,
+      ".write": "auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2'"
+    },
+    "orders": {
+      ".read": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || (auth != null && query.orderByChild === 'userId' && query.equalTo === auth.uid)",
+      ".indexOn": [
+        "userId"
+      ],
+      "$orderId": {
+        ".read": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || (auth != null && data.child('userId').val() === auth.uid)",
+        ".write": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || (auth != null && $orderId.matches(/^[-A-Za-z0-9_]{20}$/) && !data.exists() && newData.child('userId').val() === auth.uid && newData.child('status').val() === 'Pending')",
+        ".validate": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || newData.hasChildren(['userId','status','timestamp','totalAmount','shippingInfo','items'])",
+        "userId": {
+          ".validate": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || newData.isString()"
+        },
+        "date": {
+          ".validate": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || newData.isString()"
+        },
+        "paymentMethod": {
+          ".validate": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || newData.isString()"
+        },
+        "giftNote": {
+          ".validate": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || newData.isString()"
+        },
+        "status": {
+          ".write": "auth != null && data.parent().child('userId').val() === auth.uid && newData.isString() && ((newData.val() === 'Canceled (By User)' && (data.val() === 'Pending' || data.val() === 'Verifying' || data.val() === 'Processing' || data.val() === 'Paid')) || (newData.val() === 'Return Requested' && (data.val() === 'Shipped' || data.val() === 'Delivered')))",
+          ".validate": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || newData.isString()"
+        },
+        "timestamp": {
+          ".validate": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || (newData.isNumber() && newData.val() >= 0)"
+        },
+        "totalAmount": {
+          ".validate": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || (newData.isNumber() && newData.val() >= 0)"
+        },
+        "discountAmount": {
+          ".validate": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || (newData.isNumber() && newData.val() >= 0)"
+        },
+        "vipDiscountPercent": {
+          ".validate": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || (newData.isNumber() && newData.val() >= 0)"
+        },
+        "announcementDiscount": {
+          ".validate": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || (newData.isNumber() && newData.val() >= 0)"
+        },
+        "announcementPromoPercent": {
+          ".validate": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || (newData.isNumber() && newData.val() >= 0)"
+        },
+        "shippingCost": {
+          ".validate": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || (newData.isNumber() && newData.val() >= 0)"
+        },
+        "paymentUrl": {
+          ".validate": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || newData.isString()"
+        },
+        "promoCodeUsed": {
+          ".validate": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || newData.isString()"
+        },
+        "isGift": {
+          ".validate": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || newData.isBoolean()"
+        },
+        "shippingInfo": {
+          ".validate": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || (newData.hasChildren(['email']) && newData.child('email').isString())"
+        },
+        "items": {
+          ".validate": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || newData.hasChildren()"
+        },
+        "$other": {
+          ".validate": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || data.exists()"
+        }
+      }
+    },
+    "adminOrderIndex": {
+      ".read": "auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2'",
+      ".write": "auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2'"
+    },
+    "publicOrderIndex": {
+      ".read": "auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2'",
+      ".write": "auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2'"
+    },
+    "users": {
+      ".read": "auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2'",
+      "$userId": {
+        ".read": "auth != null && auth.uid === $userId",
+        ".write": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || (auth != null && auth.uid === $userId && !data.exists() && !newData.child('orders').exists())",
+        "$field": {
+          ".write": "auth != null && auth.uid === $userId && $field !== 'orders'"
+        },
+        "orders": {
+          ".write": "auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2'"
+        }
+      }
+    },
+    "subscribers": {
+      ".read": true,
+      ".write": true,
+      ".indexOn": [
+        "email"
+      ]
+    },
+    "preorders": {
+      ".read": "auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2'",
+      ".write": true
+    },
+    "reviews": {
+      ".read": true,
+      ".write": true
+    },
+    "stockNotifications": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "uniqueVisitors": {
+      ".read": "auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2'",
+      ".write": true
+    },
+    "checkoutQuotes": {
+      ".read": false,
+      ".write": false
+    },
+    "paymentFulfillments": {
+      ".read": "auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2'",
+      ".write": false
+    }
+  }
+}

@@ -78,26 +78,83 @@
         .resend-btn { background: none !important; border: none !important; color: #1a2e15 !important; text-decoration: underline; font-size: 10px !important; padding: 0 !important; width: auto !important; font-weight: 800 !important; margin-top: 10px !important; box-shadow: none !important; letter-spacing: 0.1em;}
         .resend-btn:hover { color: #d4af37 !important;}
     </style>
+    <link rel="stylesheet" href="css/i18n.css?v=site-4">
+    <script src="js/translations.js?v=reset-message-1"></script>
+    <script src="js/i18n.js?v=site-4"></script>
+    <link rel="stylesheet" href="css/site-updates.css?v=site-4">
+    <script src="js/consent.js?v=site-4"></script>
+
+    <meta name="description" content="Access your SAYAND account and shopping services securely.">
+    <link rel="canonical" href="https://thesayand.com/login">
+    <meta name="robots" content="noindex, follow">
+    <script src="js/site-updates.js?v=site-4"></script>
+
+    <style>
+        /* Keep account forms and injected preference controls in one column. */
+        body { flex-direction: column; gap: 16px; }
+        body > .auth-container, body > .box {
+            flex: 0 0 auto;
+            min-width: 0;
+            overflow-wrap: anywhere;
+        }
+        body > .sayand-language-control {
+            box-sizing: border-box;
+            width: 100%;
+            max-width: 400px;
+        }
+        body > .sayand-cookie-settings {
+            box-sizing: border-box;
+            width: auto;
+            max-width: 100%;
+            margin: 0;
+        }
+        .modal-overlay {
+            inset: 0;
+            width: auto;
+            height: 100%;
+            height: 100dvh;
+            padding: 16px;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+        .modal-box {
+            box-sizing: border-box;
+            flex: 0 1 400px;
+            min-width: 0;
+            max-height: 100%;
+            overflow-y: auto;
+            overflow-wrap: anywhere;
+        }
+        @media (max-width: 480px) {
+            body { padding: 20px 16px; }
+            .auth-container, .box { padding: 28px 20px; }
+            .modal-box { padding: 32px 20px; }
+            .otp-container { gap: 6px; }
+            .otp-input { flex: 1 1 0; min-width: 0; max-width: 45px; }
+            .auth-container input, .box input { font-size: 16px; }
+        }
+    </style>
 </head>
 <body>
     
     <div id="announcement-bar" class="hidden bg-[#1a2e15] text-[#d4af37] text-center py-2 px-8 text-[10px] font-black tracking-[0.2em] uppercase border-b border-[#d4af37]/30 relative z-[60]">
-    <span id="announcement-text"></span>
-    <button onclick="document.getElementById('announcement-bar').classList.add('hidden')" class="absolute right-4 top-1/2 -translate-y-1/2 text-[#d4af37] hover:text-white text-lg leading-none">&times;</button>
-</div>
+        <span id="announcement-text"></span>
+        <button onclick="document.getElementById('announcement-bar').classList.add('hidden')" class="absolute right-4 top-1/2 -translate-y-1/2 text-[#d4af37] hover:text-white text-lg leading-none">&times;</button>
+    </div>
 
     <div class="auth-container">
-        <h1>SAYAND</h1>
+        <!-- 🟢 ADDED NOTRANSLATE HERE -->
+        <h1 class="notranslate">SAYAND</h1>
         <div id="error-message"></div>
         
         <form id="auth-form">
           <div id="name-fields" class="name-fields hidden">
-    <input type="text" id="firstName" placeholder="First Name">
-    <input type="text" id="lastName" placeholder="Last Name">
-    <label for="dob" style="display:block;text-align:left;font-size:10px;font-weight:800;color:#6a7c64;letter-spacing:0.1em;margin-bottom:4px;margin-top:4px;">DATE OF BIRTH</label>
-    <input type="date" id="dob">
-    <input type="text" id="referralCode" placeholder="Referral Code (Optional)" style="text-transform: uppercase;">
-</div>
+            <input type="text" id="firstName" placeholder="First Name">
+            <input type="text" id="lastName" placeholder="Last Name">
+            <label for="dob" style="display:block;text-align:left;font-size:10px;font-weight:800;color:#6a7c64;letter-spacing:0.1em;margin-bottom:4px;margin-top:4px;">DATE OF BIRTH</label>
+            <input type="date" id="dob">
+            <input type="text" id="referralCode" placeholder="Referral Code (Optional)" style="text-transform: uppercase;">
+        </div>
             
             <input type="email" id="email" placeholder="Email Address" required>
             
@@ -171,16 +228,13 @@
         </div>
     </div>
 
-    <!-- FIREBASE SCRIPTS (Logic Unchanged) -->
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-functions-compat.js"></script>
-    
     <script src="js/firebase-config.js"></script>
 
     <script>
-        // Exact logic from Source 18 retained here. No changes made.
         let isLoginMode = true;
         let currentVerificationUid = null;
         let currentVerificationEmail = null;
@@ -189,25 +243,20 @@
         const errorBox = document.getElementById('error-message');
         const authBtn = document.getElementById('auth-button');
 
-        // --- AUTO-FILL REFERRAL CODE FROM URL ---
         window.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             const refCode = urlParams.get('ref');
             
             if (refCode) {
-                // Automatically flip the page from "Sign In" to "Create Account"
                 if (isLoginMode) {
                     document.getElementById('toggle-mode').click();
                 }
-                
-                // Paste the code into the box and make it visually clear it worked
                 const refInput = document.getElementById('referralCode');
                 refInput.value = refCode;
                 refInput.style.borderColor = '#d4af37';
                 refInput.style.backgroundColor = '#f9f6f0';
             }
         });
-        // ----------------------------------------
 
         window.toggleVisibility = function(inputId, btn) {
             const input = document.getElementById(inputId);
@@ -223,7 +272,7 @@
         document.getElementById('toggle-mode').addEventListener('click', () => {
             isLoginMode = !isLoginMode;
             errorBox.innerText = '';
-document.getElementById('referralCode').value = '';
+            document.getElementById('referralCode').value = '';
             
             if (isLoginMode) {
                 document.getElementById('name-fields').classList.add('hidden');
@@ -267,66 +316,64 @@ document.getElementById('referralCode').value = '';
             });
         });
 
-  async function handleSocialLogin(provider) {
-    try {
-        // Request Google birthday scope
-        if (provider.providerId === 'google.com') {
-            provider.addScope('https://www.googleapis.com/auth/user.birthday.read');
-            provider.addScope('profile');
-            provider.addScope('email');
-        }
-
-        const result = await firebase.auth().signInWithPopup(provider);
-        const user = result.user;
-        const credential = result.credential;
-
-        let dob = null;
-
-        // Try to pull birthday from Google People API
-        if (credential && credential.accessToken && provider.providerId === 'google.com') {
+        async function handleSocialLogin(provider) {
             try {
-                const res = await fetch(
-                    `https://people.googleapis.com/v1/people/me?personFields=birthdays&access_token=${credential.accessToken}`
-                );
-                const peopleData = await res.json();
-                if (peopleData.birthdays && peopleData.birthdays.length > 0) {
-                    const bday = peopleData.birthdays.find(b => b.date) || peopleData.birthdays[0];
-                    if (bday && bday.date) {
-                        const { year, month, day } = bday.date;
-                        if (year && month && day) {
-                            dob = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                if (provider.providerId === 'google.com') {
+                    provider.addScope('https://www.googleapis.com/auth/user.birthday.read');
+                    provider.addScope('profile');
+                    provider.addScope('email');
+                }
+
+                const result = await firebase.auth().signInWithPopup(provider);
+                const user = result.user;
+                const credential = result.credential;
+
+                let dob = null;
+                if (credential && credential.accessToken && provider.providerId === 'google.com') {
+                    try {
+                        const res = await fetch(`https://people.googleapis.com/v1/people/me?personFields=birthdays&access_token=${credential.accessToken}`);
+                        const peopleData = await res.json();
+                        if (peopleData.birthdays && peopleData.birthdays.length > 0) {
+                            const bday = peopleData.birthdays.find(b => b.date) || peopleData.birthdays[0];
+                            if (bday && bday.date) {
+                                const { year, month, day } = bday.date;
+                                if (year && month && day) {
+                                    dob = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                                }
+                            }
                         }
+                    } catch (e) {
+                        console.log('[SAYAND] Could not fetch Google birthday:', e);
                     }
                 }
-            } catch (e) {
-                console.log('[SAYAND] Could not fetch Google birthday:', e);
-            }
-        }
 
-        const snap = await firebase.database().ref(`users/${user.uid}`).once('value');
-        if (!snap.exists()) {
-            const userData = {
-                firstName: user.displayName ? user.displayName.split(' ')[0] : 'Member',
-                lastName: user.displayName ? user.displayName.split(' ').slice(1).join(' ') : '',
-                email: user.email,
-                createdAt: firebase.database.ServerValue.TIMESTAMP,
-                accountVerified: true,
-                welcomeEmailSent: false
-            };
-            if (dob) userData.dateOfBirth = dob;
-            await firebase.database().ref(`users/${user.uid}`).set(userData);
-        } else {
-            // If we got a DOB from Google and user doesn't have one yet, backfill it
-            const existing = snap.val();
-            if (dob && !existing.dateOfBirth) {
-                await firebase.database().ref(`users/${user.uid}`).update({ dateOfBirth: dob });
+                const snap = await firebase.database().ref(`users/${user.uid}`).once('value');
+                if (!snap.exists()) {
+                    const userData = {
+                        firstName: user.displayName ? user.displayName.split(' ')[0] : 'Member',
+                        lastName: user.displayName ? user.displayName.split(' ').slice(1).join(' ') : '',
+                        email: user.email,
+                        createdAt: firebase.database.ServerValue.TIMESTAMP,
+                        accountVerified: true,
+                        welcomeEmailSent: false
+                    };
+                    if (dob) userData.dateOfBirth = dob;
+                    await firebase.database().ref(`users/${user.uid}`).set(userData);
+                } else {
+                    const existing = snap.val();
+                    if (dob && !existing.dateOfBirth) {
+                        await firebase.database().ref(`users/${user.uid}`).update({ dateOfBirth: dob });
+                    }
+                }
+                window.location.href = "dashboard.html";
+            } catch (error) {
+                if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
+                    errorBox.innerText = '';
+                } else {
+                    errorBox.innerText = "Login failed. Please try again.";
+                }
             }
         }
-        window.location.href = "dashboard.html";
-    } catch (error) {
-        errorBox.innerText = error.message;
-    }
-}
 
         document.getElementById('auth-form').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -373,7 +420,6 @@ document.getElementById('referralCode').value = '';
 
            } else {
                 const confirmPassword = document.getElementById('confirmPassword').value;
-                
                 if (password !== confirmPassword) {
                     errorBox.innerText = "Passwords do not match. Please try again.";
                     return; 
@@ -401,13 +447,12 @@ document.getElementById('referralCode').value = '';
                 const lastName = document.getElementById('lastName').value.trim();
                 const enteredRefCode = document.getElementById('referralCode').value.trim().toUpperCase();
 
-                // ─── 1. VALIDATE REFERRAL CODE (IF ENTERED) ───
                 let referrerUid = null;
                 if (enteredRefCode) {
                     try {
                         const refSnap = await firebase.database().ref('users').orderByChild('referralCode').equalTo(enteredRefCode).once('value');
                         if (refSnap.exists()) {
-                            referrerUid = Object.keys(refSnap.val())[0]; // Get the ID of the person who referred them
+                            referrerUid = Object.keys(refSnap.val())[0]; 
                         } else {
                             errorBox.innerText = "Invalid referral code. Leave blank or try a valid one.";
                             authBtn.innerText = 'CREATE ACCOUNT';
@@ -427,7 +472,6 @@ document.getElementById('referralCode').value = '';
                     currentVerificationEmail = email;
                     currentVerificationName = firstName;
 
-                    // ─── 2. GENERATE A UNIQUE REFERRAL CODE FOR THIS NEW USER ───
                     const myReferralCode = 'SAYAND' + Math.random().toString(36).substring(2, 6).toUpperCase();
 
                     await firebase.database().ref(`users/${user.uid}`).set({
@@ -435,24 +479,19 @@ document.getElementById('referralCode').value = '';
                         lastName: lastName,
                         email: email,
                         dateOfBirth: dob,
-                        referralCode: myReferralCode, // Save their code so they can share it
+                        referralCode: myReferralCode, 
                         createdAt: firebase.database.ServerValue.TIMESTAMP,
                         accountVerified: false,
                         welcomeEmailSent: false
                     });
 
-                    // ─── 3. DISTRIBUTE 10% REWARDS IF REFERRED ───
                     if (referrerUid) {
                         const newUserPromo = 'WELCOME10-' + Math.random().toString(36).substring(2, 6).toUpperCase();
                         const referrerPromo = 'THANKS10-' + Math.random().toString(36).substring(2, 6).toUpperCase();
 
                         const updates = {};
-                        
-                        // Push 10% codes directly to mainStore so the cart can validate them immediately
                         updates[`mainStore/discountCodes/${newUserPromo}`] = { value: 10, maxUses: 1, uses: 0 };
                         updates[`mainStore/discountCodes/${referrerPromo}`] = { value: 10, maxUses: 1, uses: 0 };
-                        
-                        // Save the codes to their profiles so they can view them in the dashboard later
                         updates[`users/${user.uid}/rewards/${newUserPromo}`] = { amount: "10% OFF", type: "Welcome Bonus", code: newUserPromo };
                         updates[`users/${referrerUid}/rewards/${referrerPromo}`] = { amount: "10% OFF", type: "Referral Bonus", code: referrerPromo };
 
@@ -535,24 +574,37 @@ document.getElementById('referralCode').value = '';
                 return;
             }
             
+            const emailInput = document.getElementById('email');
+            emailInput.value = email;
+            if (!emailInput.checkValidity()) {
+                errorBox.innerText = "Please enter a valid email address, for example name@example.com.";
+                emailInput.focus();
+                return;
+            }
+
             const forgotBtn = document.getElementById('forgot-password');
+            if (forgotBtn.getAttribute('aria-disabled') === 'true') return;
+            forgotBtn.setAttribute('aria-disabled', 'true');
             const originalText = forgotBtn.innerText;
             forgotBtn.innerText = "SENDING LINK...";
             errorBox.innerText = "";
 
-       try {
+            try {
                 const sendResetFn = firebase.functions().httpsCallable('requestPasswordReset');
                 const result = await sendResetFn({ email: email });
 
                 if (result.data && result.data.success) {
                     alert("A password reset link has been securely sent to " + email);
                 } else {
-                    // Prevent ugly JSON/Brevo errors from showing to the customer
-                    const errorMsg = result.data ? result.data.message : "";
-                    if (errorMsg.includes("Brevo") || errorMsg.includes("Server error") || errorMsg.includes("IP")) {
-                         errorBox.innerText = "Email service temporarily unavailable. Please try again later.";
+                    const errorMsg = String((result.data && result.data.message) || "");
+                    if (errorMsg.includes("No account found") ||
+                        errorMsg.includes("auth/user-not-found") ||
+                        errorMsg.includes("Unable to create the email action link")) {
+                        errorBox.innerText = "We couldn't create a reset link. Check your email address and use the one you registered with. If you haven't registered, choose Sign up below.";
+                    } else if (errorMsg.includes("Brevo")) {
+                        errorBox.innerText = "Email service temporarily unavailable. Please try again later.";
                     } else {
-                         errorBox.innerText = "Unable to send reset link. Please check your email and try again.";
+                        errorBox.innerText = "Unable to send reset link. Please check your email and try again.";
                     }
                 }
             } catch (error) {
@@ -560,38 +612,9 @@ document.getElementById('referralCode').value = '';
                 errorBox.innerText = "Unable to connect to the server. Please try again.";
             } finally {
                 forgotBtn.innerText = originalText;
+                forgotBtn.removeAttribute('aria-disabled');
             }
         });
-        
-        async function handleSocialLogin(provider) {
-            try {
-                const result = await firebase.auth().signInWithPopup(provider);
-                const user = result.user;
-                
-                const snap = await firebase.database().ref(`users/${user.uid}`).once('value');
-                if (!snap.exists()) {
-                    await firebase.database().ref(`users/${user.uid}`).set({
-                        firstName: user.displayName ? user.displayName.split(' ')[0] : 'Member',
-                        lastName: user.displayName ? user.displayName.split(' ').slice(1).join(' ') : '',
-                        email: user.email,
-                        createdAt: firebase.database.ServerValue.TIMESTAMP,
-                        accountVerified: true,
-                        welcomeEmailSent: false 
-                    });
-                }
-                window.location.href = "dashboard.html";
-          } catch (error) {
-            // If the user just closed the window, ignore it and clear the error box
-            if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
-                errorBox.innerText = '';
-                console.log("Login window closed by user.");
-            } else {
-                // For real errors, show a clean message without the technical Firebase code
-                errorBox.innerText = "Login failed. Please try again.";
-                console.error(error);
-            }
-        }
-    }
 
         document.getElementById('google-login').addEventListener('click', () => {
             handleSocialLogin(new firebase.auth.GoogleAuthProvider());
@@ -629,30 +652,19 @@ document.getElementById('referralCode').value = '';
             }
         });
 
-       // ─── GENERATE & SEND OTP VERIFICATION CODE ───
         window.generateAndSendVerificationCode = async function(uid, email, firstName) {
             try {
-                // 1. Generate the 6-digit code
                 const code = Math.floor(100000 + Math.random() * 900000).toString();
-                
-                // 2. Save it to Firebase Database (Required for the verify button to work)
                 await firebase.database().ref(`users/${uid}`).update({
                     verificationCode: code
                 });
-                
-                // 3. Send email via Brevo
                 const sendEmailFn = firebase.functions().httpsCallable('sendStoreEmail');
                 await sendEmailFn({
                     type: 'signup_verification',
                     payload: { email: email, firstName: firstName || 'there', verificationCode: code }
                 });
-                
-                console.log("Verification email triggered successfully.");
-                
-                // 4. Open the OTP Modal on the screen
                 document.getElementById('verify-email-display').innerText = email;
                 document.getElementById('verification-modal').classList.add('active');
-                
                 return code;
             } catch (error) {
                 console.error("Error sending verification email:", error);
@@ -663,7 +675,7 @@ document.getElementById('referralCode').value = '';
                 throw error;
             }
         };
-
     </script>
+    
 </body>
 </html>

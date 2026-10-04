@@ -16,7 +16,7 @@
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=site-4">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f5f0e8; color: #0f1f0f; }
         .toast { position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%); background: #c9a227; color: #0f1f0f; padding: 14px 32px; font-size: 10px; font-weight: 900; letter-spacing: 0.25em; transition: bottom 0.4s cubic-bezier(0.16, 1, 0.3, 1); z-index: 1000; box-shadow: 0 8px 30px rgba(15,31,15,0.25); text-transform: uppercase; border-radius: 0; }
@@ -39,6 +39,20 @@
         #whatsapp-float { box-shadow: 0 4px 20px rgba(15,31,15,0.4); }
         #cookie-banner { backdrop-filter: blur(8px); }
     </style>
+    <link rel="stylesheet" href="css/i18n.css?v=site-4">
+    <script src="js/translations.js?v=shipping-admin-1"></script>
+    <script src="js/i18n.js?v=site-4"></script>
+    <link rel="stylesheet" href="css/site-updates.css?v=site-4">
+    <script src="js/consent.js?v=site-4"></script>
+
+    <meta name="description" content="Shop SAYAND clothing and accessories for women and men. Discover our collections, new arrivals and editorial looks.">
+    <link rel="canonical" href="https://thesayand.com/">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="SAYAND | Modern Essentials">
+    <meta property="og:description" content="Shop SAYAND clothing and accessories for women and men. Discover our collections, new arrivals and editorial looks.">
+    <meta property="og:url" content="https://thesayand.com/">
+    <meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/SAYAND%20Intertwined%20S%26A%20Monogram.png?alt=media&token=4a0c7abb-0150-4d22-94fc-d58f901a45f6">
+    <script src="js/site-updates.js?v=site-4"></script>
 </head>
 <body class="bg-[#f5f0e8] text-[#0f1f0f] antialiased overflow-x-hidden">
 
@@ -74,7 +88,7 @@
                     </div>
                 </div>
                 <div class="absolute left-1/2 transform -translate-x-1/2 z-50 pointer-events-none">
-                    <a href="index.html" target="_self" class="text-2xl md:text-3xl lg:text-4xl font-black tracking-tighter leading-none pointer-events-auto text-[#c9a227] hover:opacity-80 transition-opacity" onclick="handleLogoClick(event)">SAYAND</a>
+                    <a href="index.html" target="_self" class="notranslate text-2xl md:text-3xl lg:text-4xl font-black tracking-tighter leading-none pointer-events-auto text-[#c9a227] hover:opacity-80 transition-opacity" onclick="handleLogoClick(event)">SAYAND</a>
                 </div>
                 <div class="flex items-center justify-end space-x-4 md:space-x-6 flex-1">
                      <div class="relative group hidden md:block">
@@ -85,6 +99,18 @@
                             <button onclick="setCurrency('GBP')" class="block w-full text-left px-3 py-2 text-[10px] font-black text-[#e8d5a3] hover:bg-[#c9a227] hover:text-[#0f1f0f] transition-colors tracking-widest">GBP</button>
                         </div>
                     </div>
+
+                    <!-- LANGUAGE SELECTOR -->
+                    <div class="relative group hidden md:block">
+                        <button id="lang-toggle" class="text-[10px] tracking-[0.2em] font-black text-[#e8d5a3] hover:text-[#c9a227] transition-colors border border-[#c9a227]/30 px-2 py-1 uppercase">EN</button>
+                        <div class="absolute right-0 mt-1 w-20 bg-[#0f1f0f] border border-[#c9a227]/30 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                            <button onclick="changeSiteLanguage('en')" class="block w-full text-left px-3 py-2 text-[10px] font-black text-[#e8d5a3] hover:bg-[#c9a227] hover:text-[#0f1f0f] transition-colors tracking-widest">EN</button>
+                            <button onclick="changeSiteLanguage('it')" class="block w-full text-left px-3 py-2 text-[10px] font-black text-[#e8d5a3] hover:bg-[#c9a227] hover:text-[#0f1f0f] transition-colors tracking-widest">IT</button>
+                            <button onclick="changeSiteLanguage('fr')" class="block w-full text-left px-3 py-2 text-[10px] font-black text-[#e8d5a3] hover:bg-[#c9a227] hover:text-[#0f1f0f] transition-colors tracking-widest">FR</button>
+                            <button onclick="changeSiteLanguage('de')" class="block w-full text-left px-3 py-2 text-[10px] font-black text-[#e8d5a3] hover:bg-[#c9a227] hover:text-[#0f1f0f] transition-colors tracking-widest">DE</button>
+                        </div>
+                    </div>
+
                     <button onclick="openSearch()" class="flex items-center justify-center text-[#e8d5a3] hover:text-[#c9a227] transition-colors">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="11" cy="11" r="8"></circle>
@@ -117,6 +143,16 @@
                 <button onclick="setCurrency('EUR'); toggleMenu();" class="text-[10px] tracking-widest font-black px-4 py-2 border border-[#c9a227]/30 text-[#e8d5a3] hover:bg-[#c9a227] hover:text-[#0f1f0f] transition-colors">EUR</button>
                 <button onclick="setCurrency('USD'); toggleMenu();" class="text-[10px] tracking-widest font-black px-4 py-2 border border-[#c9a227]/30 text-[#e8d5a3] hover:bg-[#c9a227] hover:text-[#0f1f0f] transition-colors">USD</button>
                 <button onclick="setCurrency('GBP'); toggleMenu();" class="text-[10px] tracking-widest font-black px-4 py-2 border border-[#c9a227]/30 text-[#e8d5a3] hover:bg-[#c9a227] hover:text-[#0f1f0f] transition-colors">GBP</button>
+            </div>
+        </div>
+        <div class="w-48 h-px bg-[#c9a227]/30 my-2"></div>
+        <div class="flex flex-col items-center space-y-3">
+            <span class="text-[10px] tracking-[0.3em] font-black text-[#e8d5a3]/60 uppercase">Language</span>
+            <div class="flex space-x-2">
+                <button onclick="changeSiteLanguage('en'); toggleMenu();" class="text-[10px] tracking-widest font-black px-3 py-1.5 border border-[#c9a227]/30 text-[#e8d5a3] hover:bg-[#c9a227] hover:text-[#0f1f0f] transition-colors">EN</button>
+                <button onclick="changeSiteLanguage('it'); toggleMenu();" class="text-[10px] tracking-widest font-black px-3 py-1.5 border border-[#c9a227]/30 text-[#e8d5a3] hover:bg-[#c9a227] hover:text-[#0f1f0f] transition-colors">IT</button>
+                <button onclick="changeSiteLanguage('fr'); toggleMenu();" class="text-[10px] tracking-widest font-black px-3 py-1.5 border border-[#c9a227]/30 text-[#e8d5a3] hover:bg-[#c9a227] hover:text-[#0f1f0f] transition-colors">FR</button>
+                <button onclick="changeSiteLanguage('de'); toggleMenu();" class="text-[10px] tracking-widest font-black px-3 py-1.5 border border-[#c9a227]/30 text-[#e8d5a3] hover:bg-[#c9a227] hover:text-[#0f1f0f] transition-colors">DE</button>
             </div>
         </div>
         <div class="w-48 h-px bg-[#c9a227]/30 my-2"></div>
@@ -176,9 +212,6 @@
             <button id="whatsapp-checkout-btn" class="w-full bg-[#0f1f0f] text-[#c9a227] border border-[#c9a227] py-4 text-[10px] tracking-widest font-black hover:bg-[#1a2e15] transition-colors shadow-lg">PROCEED TO CHECKOUT</button>
         </div>
     </div>
-
-    <!-- EDITORIAL -->
-    
 
     <!-- PRODUCT DETAIL OVERLAY -->
     <div id="product-detail" class="fixed inset-0 bg-[#0f1f0f] z-[80] transform translate-y-full transition-transform duration-500 overflow-hidden">
@@ -278,7 +311,7 @@
                             <span class="accordion-icon text-[#c9a227]">+</span>
                         </div>
                         <div class="accordion-body">
-                            <p class="text-sm text-[#7a8a6e] leading-relaxed">Standard delivery within 3-5 business days. Express delivery available for select locations. Free returns within 30 days of purchase. Items must be in original condition with tags attached.</p>
+                            <p class="text-sm text-[#7a8a6e] leading-relaxed">Delivery within Italy: 3–7 working days. International delivery: 5–14 working days. Free returns within 30 days of purchase. Items must be in original condition with tags attached.</p>
                         </div>
                     </div>
                     <div class="accordion-item">
@@ -335,7 +368,7 @@
             <div class="max-w-4xl text-white">
                 <p id="heroSubtitle" class="text-[10px] tracking-[0.3em] font-black mb-4 fade-in text-[#c9a227]">SPRING / SUMMER 2026</p>
                 <h2 id="heroTitle" class="text-5xl md:text-7xl lg:text-8xl font-black leading-[0.9] tracking-tighter mb-6 fade-in stagger-1 text-[#f5f0e8]">ESSENTIAL<br>MODERNITY</h2>
-                <div class="flex space-x-4 fade-in stagger-2">
+                <div class="flex flex-wrap gap-4 fade-in stagger-2">
                     <button onclick="window.location.href='collection.html?category=women'" class="bg-[#c9a227] text-[#0f1f0f] px-8 py-4 text-[10px] tracking-[0.2em] font-black hover:bg-[#e8d5a3] transition-all duration-300 shadow-lg">SHOP WOMEN</button>
                     <button onclick="window.location.href='collection.html?category=men'" class="border border-[#c9a227] text-[#c9a227] px-8 py-4 text-[10px] tracking-[0.2em] font-black hover:bg-[#c9a227] hover:text-[#0f1f0f] transition-all duration-300">SHOP MEN</button>
                 </div>
@@ -429,24 +462,25 @@
         <div class="max-w-4xl mx-auto text-center">
             <h2 class="text-3xl md:text-5xl lg:text-6xl font-black tracking-widest mb-4 text-[#c9a227] uppercase">JOIN SAYAND</h2>
             <p class="text-[#e8d5a3] text-sm md:text-base mb-8 tracking-wide font-medium">Subscribe for early access to new arrivals and exclusive offers.</p>
-            <form id="subscribe-form" class="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto" onsubmit="handleSubscribe(event)">
+            <form id="subscribe-form" class="flex flex-col sm:flex-row flex-wrap gap-4 max-w-lg mx-auto" onsubmit="handleSubscribe(event)">
                 <input type="email" id="subscribe-email" placeholder="Enter your email" class="flex-1 bg-transparent border-b-2 border-[#c9a227]/30 py-3 text-white placeholder-[#7a8a6e] font-bold focus:outline-none focus:border-[#c9a227] transition-colors text-xs tracking-widest uppercase" required>
                 <button type="submit" class="bg-[#c9a227] text-[#0f1f0f] px-8 py-3 text-[10px] tracking-widest font-black hover:bg-[#e8d5a3] transition-colors shadow-lg">SUBSCRIBE</button>
+                <label class="w-full flex items-start gap-3 text-xs text-[#f5f0e8] leading-relaxed"><input id="subscribe-consent" type="checkbox" required class="mt-1"><span>I agree to receive SAYAND newsletters and offers.</span></label>
+                <a href="privacy.html" class="w-full text-xs text-[#f5f0e8] underline">Privacy Policy</a>
             </form>
         </div>
     </section>
 
-    <!-- FOOTER -->
-    <footer class="w-full bg-white border-t border-[#d4c9a8] pt-16 pb-8 px-4 sm:px-6 lg:px-8 xl:px-12">
+   <!-- FOOTER -->
+    <footer class="w-full bg-white border-t border-[#d4c9a8] pt-16 pb-8 px-4 sm:px-6 lg:px-8 xl:px-12 mt-auto shadow-inner">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
             <div>
                 <h4 class="text-[10px] tracking-[0.2em] font-black mb-6 text-[#0f1f0f]">HELP</h4>
                 <ul class="space-y-3 text-xs text-[#7a8a6e] font-bold">
                     <li><a href="#" onclick="showContact();return false;" class="hover:text-[#c9a227] transition-colors">Contact Us</a></li>
+                    <li><a href="shipping.html" class="hover:underline">Shipping Info</a></li>
+                    <li><a href="returns.html" class="hover:underline">Returns &amp; Exchanges</a></li>
                     <li><a href="track-order.html" class="hover:text-[#c9a227] transition-colors">Track Order</a></li>
-                    <li><a href="privacy.html" class="hover:text-[#c9a227] transition-colors">Privacy Policy</a></li>
-                    <li><a href="terms.html" class="hover:text-[#c9a227] transition-colors">Terms of Use</a></li>
-                    <li><a href="cookie.html" class="hover:text-[#c9a227] transition-colors">Cookie Policy</a></li>
                 </ul>
             </div>
             <div>
@@ -455,6 +489,7 @@
                     <li><a href="#" onclick="openInfoPage('about');return false;" class="hover:text-[#c9a227] transition-colors">About Us</a></li>
                     <li><a href="#" onclick="openInfoPage('careers');return false;" class="hover:text-[#c9a227] transition-colors">Careers</a></li>
                     <li><a href="#" onclick="openInfoPage('sustainability');return false;" class="hover:text-[#c9a227] transition-colors">Sustainability</a></li>
+                    <!-- 🟢 Added notranslate so it doesn't say "Premere" -->
                     <li><a href="#" onclick="openInfoPage('press');return false;" class="hover:text-[#c9a227] transition-colors">Press</a></li>
                 </ul>
             </div>
@@ -523,6 +558,42 @@
         </div>
     </div>
 
+    <!-- LUXURY WELCOME MODAL -->
+    <div id="welcome-modal" class="fixed inset-0 bg-[#0f1f0f]/95 z-[1000] hidden flex items-center justify-center backdrop-blur-md transition-opacity duration-500 opacity-0">
+        <div class="bg-[#f5f0e8] p-10 md:p-14 max-w-sm w-full mx-4 relative border-t-4 border-[#c9a227] shadow-2xl text-center flex flex-col items-center">
+            <h2 class="text-3xl font-black tracking-tighter mb-2 text-[#0f1f0f] notranslate">SAYAND</h2>
+            <p class="text-[10px] tracking-[0.2em] font-bold text-[#7a8a6e] mb-8 uppercase">Shipping Destination</p>
+            
+            <div class="w-full space-y-5 text-left">
+                <div>
+                    <label class="block text-[9px] font-black tracking-widest text-[#0f1f0f] mb-2 uppercase">Location</label>
+                    <div class="w-full border border-[#c2c9c0] p-3 text-xs font-bold text-[#6a7c64] bg-white" id="welcome-location">Detecting...</div>
+                </div>
+                <div>
+                    <label class="block text-[9px] font-black tracking-widest text-[#0f1f0f] mb-2 uppercase">Language</label>
+                    <select id="welcome-language" class="w-full border border-[#c2c9c0] p-3 text-xs font-bold focus:border-[#c9a227] focus:outline-none bg-white text-[#1a2e15] uppercase tracking-wider">
+                        <option value="en">English</option>
+                        <option value="it">Italiano</option>
+                        <option value="fr">Français</option>
+                        <option value="de">Deutsch</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[9px] font-black tracking-widest text-[#0f1f0f] mb-2 uppercase">Currency</label>
+                    <select id="welcome-currency" class="w-full border border-[#c2c9c0] p-3 text-xs font-bold focus:border-[#c9a227] focus:outline-none bg-white text-[#1a2e15] uppercase tracking-wider">
+                        <option value="EUR">EUR (€)</option>
+                        <option value="USD">USD ($)</option>
+                        <option value="GBP">GBP (£)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button onclick="saveWelcomePreferences()" class="w-full bg-[#0f1f0f] text-[#c9a227] py-4 mt-8 text-[10px] tracking-[0.2em] font-black hover:bg-[#1a2e15] transition-colors shadow-lg border border-[#c9a227]">
+                ENTER STORE
+            </button>
+        </div>
+    </div>
+
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
@@ -530,7 +601,7 @@
 
     <script src="js/firebase-config.js"></script>
     <script>if(typeof firebase!=="undefined"&&firebase.database){window.db=firebase.database();}</script>
-    <script src="js/main.js"></script>
+    <script src="js/main.js?v=shipping-admin-1"></script>
 
     <script>
     firebase.auth().onAuthStateChanged((user) => {
@@ -595,10 +666,10 @@ function handleLogoClick(e) {
         <p class="text-[10px] text-[#e8d5a3] font-bold tracking-widest uppercase text-center sm:text-left">We use cookies to enhance your experience.</p>
         <button onclick="acceptCookies()" class="bg-[#c9a227] text-[#0f1f0f] px-6 py-2 text-[10px] font-black tracking-widest uppercase hover:bg-[#e8d5a3] transition-colors">Accept</button>
     </div>
+    
 
-    <!-- HERO PARALLAX — matches your reference behavior -->
+    <!-- HERO PARALLAX -->
     <script>
-    // Parallax Effect on Hero
     window.addEventListener('scroll', () => {
         const scrolled = window.pageYOffset;
         const heroImage = document.getElementById('heroImage');

@@ -1,0 +1,10 @@
+/* Language control uses the existing SAYAND palette and normal page flow. */
+.sayand-language-control { padding: 18px 16px; text-align: center; font: 600 11px/1.5 'Inter', sans-serif; letter-spacing: .06em; background: #f5f0e8; color: #0f1f0f; }
+.sayand-language-control label { display: inline-flex; align-items: center; gap: 12px; }
+.sayand-language-control select { border: 1px solid #c2c9c0; background: #fff; color: #0f1f0f; padding: 8px 12px; font: inherit; border-radius: 0; }
+.sayand-language-control select:focus-visible { outline: 2px solid #c9a227; outline-offset: 2px; }
+
+/* Longer French/German headings remain readable on narrow screens. */
+@media (max-width: 767px) {
+  html:lang(fr) #heroTitle, html:lang(de) #heroTitle { font-size: clamp(1.9rem, 9vw, 3rem); }
+}

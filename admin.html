@@ -18,6 +18,11 @@
         .tab-btn:hover { color: #1a2e15; }
         .tab-btn.active { color: #1a2e15; border-bottom-color: #d4af37; }
     </style>
+
+    <meta name="description" content="Access your SAYAND account and shopping services securely.">
+    <link rel="canonical" href="https://thesayand.com/admin">
+    <meta name="robots" content="noindex, follow">
+    <meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/SAYAND%20Intertwined%20S%26A%20Monogram.png?alt=media&token=4a0c7abb-0150-4d22-94fc-d58f901a45f6">
 </head>
 <body class="antialiased min-h-screen flex flex-col overflow-x-hidden">
 
@@ -111,6 +116,37 @@
                         </div>
                         <textarea id="prodDesc" placeholder="Full product description for the description tab..." class="input-field p-2.5 text-xs h-20 font-medium"></textarea>
                     </div>
+
+                    <details class="border border-[#c2c9c0] p-3 space-y-3">
+                        <summary class="text-xs font-black cursor-pointer">ITALIAN PRODUCT TEXT</summary>
+                        <p class="text-xs text-[#6a7c64]">Optional: saved Italian wording for the storefront. Leave a field empty to keep its original text. The original product name remains the product identifier.</p>
+                        <label class="block text-xs font-bold">Italian product name<input id="prodNameIt" class="input-field p-2.5 text-xs" type="text"></label>
+                        <label class="block text-xs font-bold">Italian description<textarea id="prodDescIt" class="input-field p-2.5 text-xs h-24"></textarea></label>
+                        <label class="block text-xs font-bold">Materiale<input id="detailMaterialIt" class="input-field p-2.5 text-xs" type="text"></label>
+                        <label class="block text-xs font-bold">Vestibilità<input id="detailFitIt" class="input-field p-2.5 text-xs" type="text"></label>
+                        <label class="block text-xs font-bold">Cura<input id="detailCareIt" class="input-field p-2.5 text-xs" type="text"></label>
+                        <label class="block text-xs font-bold">Origine<input id="detailOriginIt" class="input-field p-2.5 text-xs" type="text"></label>
+                    </details>
+                    <details class="border border-[#c2c9c0] p-3 space-y-3">
+                        <summary class="text-xs font-black cursor-pointer">GERMAN PRODUCT TEXT</summary>
+                        <p class="text-xs text-[#6a7c64]">Optional: saved German wording for the storefront. Leave a field empty to keep its original text. The original product name remains the product identifier.</p>
+                        <label class="block text-xs font-bold">German product name<input id="prodNameDe" class="input-field p-2.5 text-xs" type="text"></label>
+                        <label class="block text-xs font-bold">German description<textarea id="prodDescDe" class="input-field p-2.5 text-xs h-24"></textarea></label>
+                        <label class="block text-xs font-bold">Material<input id="detailMaterialDe" class="input-field p-2.5 text-xs" type="text"></label>
+                        <label class="block text-xs font-bold">Fit<input id="detailFitDe" class="input-field p-2.5 text-xs" type="text"></label>
+                        <label class="block text-xs font-bold">Care<input id="detailCareDe" class="input-field p-2.5 text-xs" type="text"></label>
+                        <label class="block text-xs font-bold">Origin<input id="detailOriginDe" class="input-field p-2.5 text-xs" type="text"></label>
+                    </details>
+                    <details class="border border-[#c2c9c0] p-3 space-y-3">
+                        <summary class="text-xs font-black cursor-pointer">FRENCH PRODUCT TEXT</summary>
+                        <p class="text-xs text-[#6a7c64]">Optional: saved French wording for the storefront. Leave a field empty to keep its original text. The original product name remains the product identifier.</p>
+                        <label class="block text-xs font-bold">French product name<input id="prodNameFr" class="input-field p-2.5 text-xs" type="text"></label>
+                        <label class="block text-xs font-bold">French description<textarea id="prodDescFr" class="input-field p-2.5 text-xs h-24"></textarea></label>
+                        <label class="block text-xs font-bold">Material<input id="detailMaterialFr" class="input-field p-2.5 text-xs" type="text"></label>
+                        <label class="block text-xs font-bold">Fit<input id="detailFitFr" class="input-field p-2.5 text-xs" type="text"></label>
+                        <label class="block text-xs font-bold">Care<input id="detailCareFr" class="input-field p-2.5 text-xs" type="text"></label>
+                        <label class="block text-xs font-bold">Origin<input id="detailOriginFr" class="input-field p-2.5 text-xs" type="text"></label>
+                    </details>
 
                     <div class="border-t border-[#c2c9c0]/50 pt-3">
                         <button type="button" class="flex justify-between items-center w-full py-2 text-[10px] font-black tracking-widest text-[#1a2e15] hover:text-[#d4af37] transition-colors uppercase" onclick="toggleCollapsible('details-collapsible', this)">
@@ -325,7 +361,13 @@
                     <div class="space-y-3 bg-white p-5 border border-[#c2c9c0]/50 shadow-sm">
                         <h3 class="text-[10px] font-black tracking-widest mb-2 text-[#1a2e15] uppercase">HERO SECTION</h3>
                         <input type="text" id="heroSubtitle" placeholder="Subtitle" class="input-field p-2.5 text-xs font-bold" oninput="updateDesign()">
+<label class="block text-xs mt-2">Hero subtitle — Italian (optional)<textarea id="heroSubtitleIt" class="input-field p-2.5 text-xs" oninput="updateDesign()"></textarea></label>
+<label class="block text-xs mt-2">Hero subtitle — French (optional)<textarea id="heroSubtitleFr" class="input-field p-2.5 text-xs" oninput="updateDesign()"></textarea></label>
+<label class="block text-xs mt-2">Hero subtitle — German (optional)<textarea id="heroSubtitleDe" class="input-field p-2.5 text-xs" oninput="updateDesign()"></textarea></label>
                         <textarea id="heroTitle" placeholder="Main Title (Use <br> for new line)" class="input-field p-2.5 text-xs h-16 font-bold uppercase" oninput="updateDesign()"></textarea>
+<label class="block text-xs mt-2">Hero title — Italian (optional)<textarea id="heroTitleIt" class="input-field p-2.5 text-xs" oninput="updateDesign()"></textarea></label>
+<label class="block text-xs mt-2">Hero title — French (optional)<textarea id="heroTitleFr" class="input-field p-2.5 text-xs" oninput="updateDesign()"></textarea></label>
+<label class="block text-xs mt-2">Hero title — German (optional)<textarea id="heroTitleDe" class="input-field p-2.5 text-xs" oninput="updateDesign()"></textarea></label>
                         <label class="block text-[10px] text-[#6a7c64] font-bold tracking-wider mt-3">HERO IMAGE</label>
                         <div id="heroImgPreviewContainer" class="mt-2 mb-3 hidden"></div>
                         <input type="file" accept="image/*" multiple class="w-full text-[10px] text-[#6a7c64] file:mr-3 file:py-2 file:px-3 file:border border-[#c2c9c0] file:text-[10px] file:font-black file:tracking-widest file:bg-[#eef2ec] file:text-[#1a2e15] hover:file:bg-[#c2c9c0]/30 transition-all cursor-pointer mb-2" onchange="handleDesignImageUpload(event, 'heroImg')">
@@ -356,8 +398,17 @@
                         <p class="text-[9px] text-[#6a7c64] font-medium mb-2">These control the Lookbook overlay text and navigation mood cards.</p>
                         
                         <input type="text" id="editSubtitle" placeholder="Lookbook Subtitle" class="input-field p-2.5 text-xs font-bold uppercase mb-2" oninput="updateDesign()">
+<label class="block text-xs mt-2">Editorial subtitle — Italian (optional)<textarea id="editSubtitleIt" class="input-field p-2.5 text-xs" oninput="updateDesign()"></textarea></label>
+<label class="block text-xs mt-2">Editorial subtitle — French (optional)<textarea id="editSubtitleFr" class="input-field p-2.5 text-xs" oninput="updateDesign()"></textarea></label>
+<label class="block text-xs mt-2">Editorial subtitle — German (optional)<textarea id="editSubtitleDe" class="input-field p-2.5 text-xs" oninput="updateDesign()"></textarea></label>
                         <textarea id="editTitle" placeholder="Lookbook Title" class="input-field p-2.5 text-xs h-16 font-black uppercase mb-2" oninput="updateDesign()"></textarea>
+<label class="block text-xs mt-2">Editorial title — Italian (optional)<textarea id="editTitleIt" class="input-field p-2.5 text-xs" oninput="updateDesign()"></textarea></label>
+<label class="block text-xs mt-2">Editorial title — French (optional)<textarea id="editTitleFr" class="input-field p-2.5 text-xs" oninput="updateDesign()"></textarea></label>
+<label class="block text-xs mt-2">Editorial title — German (optional)<textarea id="editTitleDe" class="input-field p-2.5 text-xs" oninput="updateDesign()"></textarea></label>
                         <textarea id="editDesc" placeholder="Lookbook Description" class="input-field p-2.5 text-xs h-20 font-medium mb-4" oninput="updateDesign()"></textarea>
+<label class="block text-xs mt-2">Editorial description — Italian (optional)<textarea id="editDescIt" class="input-field p-2.5 text-xs" oninput="updateDesign()"></textarea></label>
+<label class="block text-xs mt-2">Editorial description — French (optional)<textarea id="editDescFr" class="input-field p-2.5 text-xs" oninput="updateDesign()"></textarea></label>
+<label class="block text-xs mt-2">Editorial description — German (optional)<textarea id="editDescDe" class="input-field p-2.5 text-xs" oninput="updateDesign()"></textarea></label>
 
                           <!-- HOMEPAGE CAROUSEL MANAGER -->
                         <div class="border-t border-[#c2c9c0]/30 pt-6 mt-6">
@@ -444,16 +495,25 @@
                                 <div>
                                     <label class="block text-[9px] text-[#6a7c64] font-bold tracking-wider uppercase mb-1">ARTICLE TITLE</label>
                                     <input type="text" id="lbTitle" placeholder="e.g. Granny Takes A Trip" class="input-field p-2.5 text-xs font-bold w-full">
+<label class="block text-xs mt-2">Article title — Italian (optional)<textarea id="lbTitleIt" class="input-field p-2.5 text-xs w-full"></textarea></label>
+<label class="block text-xs mt-2">Article title — French (optional)<textarea id="lbTitleFr" class="input-field p-2.5 text-xs w-full"></textarea></label>
+<label class="block text-xs mt-2">Article title — German (optional)<textarea id="lbTitleDe" class="input-field p-2.5 text-xs w-full"></textarea></label>
                                 </div>
                                 <div>
                                     <label class="block text-[9px] text-[#6a7c64] font-bold tracking-wider uppercase mb-1">SUBHEADING / CATEGORY</label>
                                     <input type="text" id="lbSubtitle" placeholder="e.g. NEWS or CAMPAIGN" class="input-field p-2.5 text-xs font-bold w-full uppercase">
+<label class="block text-xs mt-2">Article subtitle — Italian (optional)<textarea id="lbSubtitleIt" class="input-field p-2.5 text-xs w-full"></textarea></label>
+<label class="block text-xs mt-2">Article subtitle — French (optional)<textarea id="lbSubtitleFr" class="input-field p-2.5 text-xs w-full"></textarea></label>
+<label class="block text-xs mt-2">Article subtitle — German (optional)<textarea id="lbSubtitleDe" class="input-field p-2.5 text-xs w-full"></textarea></label>
                                 </div>
                             </div>
 
                             <div>
                                 <label class="block text-[9px] text-[#6a7c64] font-bold tracking-wider uppercase mb-1">ARTICLE DESCRIPTION</label>
                                 <textarea id="lbDesc" placeholder="Write the editorial text..." class="input-field p-2.5 text-xs h-20 font-medium w-full"></textarea>
+<label class="block text-xs mt-2">Article description — Italian (optional)<textarea id="lbDescIt" class="input-field p-2.5 text-xs w-full"></textarea></label>
+<label class="block text-xs mt-2">Article description — French (optional)<textarea id="lbDescFr" class="input-field p-2.5 text-xs w-full"></textarea></label>
+<label class="block text-xs mt-2">Article description — German (optional)<textarea id="lbDescDe" class="input-field p-2.5 text-xs w-full"></textarea></label>
                             </div>
 
                             <div class="border-t border-[#c2c9c0]/30 pt-4">
@@ -510,6 +570,14 @@
                     <div>
                         <label class="block text-[10px] font-bold tracking-wider text-[#6a7c64] mb-1">PINTEREST URL</label>
                         <input type="url" id="contactPinterest" class="input-field p-2.5 text-xs font-medium" oninput="updateContact()">
+                    </div>
+
+                    <div class="border-t border-[#c2c9c0]/50 pt-5">
+                        <label for="returnAddress" class="block text-[10px] font-bold tracking-wider text-[#6a7c64] mb-2">RETURN ADDRESS</label>
+                        <textarea id="returnAddress" rows="5" maxlength="1000" class="input-field w-full p-3 text-sm" placeholder="Recipient, street, postcode, city, country"></textarea>
+                        <p class="text-xs text-[#6a7c64] my-2">Published on the Returns page. Edit this field when your return location changes. This does not change labels already issued or text in external email templates.</p>
+                        <button id="saveReturnAddress" type="button" onclick="saveReturnAddress()" disabled class="bg-[#1a2e15] text-white px-4 py-3 text-xs font-bold">SAVE RETURN ADDRESS</button>
+                        <p id="returnAddressStatus" role="status" aria-live="polite" class="text-sm mt-2"></p>
                     </div>
 
                     <h3 class="text-[10px] tracking-widest font-black text-[#1a2e15] mt-8 mb-4 pt-6 border-t border-[#c2c9c0]/50 uppercase">PAYMENT LINKS</h3>
@@ -645,8 +713,7 @@
             }
 
             const allowedAdmins = [
-                "MS15g8h5ELPmMcuBijhEC7loGws2", 
-                "PASTE_SECOND_UID_HERE"         
+                "MS15g8h5ELPmMcuBijhEC7loGws2"         
             ]; 
 
             if (!allowedAdmins.includes(user.uid)) {
@@ -668,7 +735,7 @@
             }
         });
     </script>
-    <script src="js/admin.js?v=update19"></script>
+    <script src="js/admin.js?v=order-recovery-2"></script>
 
 
 </body>

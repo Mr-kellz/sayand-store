@@ -1,0 +1,16 @@
+
+/* Visible keyboard focus and clear consent controls. */
+:where(a,button,input,select,textarea,[tabindex]):focus-visible { outline: 3px solid #c9a227 !important; outline-offset: 4px; }
+.sayand-consent { position: fixed; inset: auto 12px 12px; z-index: 10000; max-height: 75vh; overflow-y: auto; padding: 20px; background: #f5f0e8; color: #0f1f0f; border: 1px solid #6a7c64; box-shadow: 0 8px 30px #0004; font: 400 14px/1.55 Inter, sans-serif; }
+.sayand-consent[hidden], .sayand-consent [hidden] { display: none !important; }
+.sayand-consent h2 { font-size: 18px; font-weight: 800; margin-bottom: 8px; }
+.sayand-consent p { margin: 8px 0; }
+.sayand-consent a { text-decoration: underline; }
+.sayand-consent-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:12px; }
+.sayand-consent button { padding: 10px 16px; border: 1px solid #0f1f0f; background:#0f1f0f; color:#f5f0e8; font:600 14px/1.5 Inter,sans-serif; cursor:pointer; }
+.sayand-consent label { display:flex; align-items:center; gap:10px; margin:14px 0; }
+.sayand-consent input { width:20px; height:20px; accent-color:#0f1f0f; }
+.sayand-cookie-settings { display:block; margin:12px auto; padding:10px 14px; font-size:12px; text-decoration:underline; background:#f5f0e8; color:#0f1f0f; }
+.sayand-skip-link { position:fixed; left:12px; top:-100px; z-index:10001; background:#f5f0e8; color:#0f1f0f; padding:12px; }
+.sayand-skip-link:focus { top:12px; }
+@media(prefers-reduced-motion:reduce) { html { scroll-behavior:auto !important; } *, *::before, *::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; } }

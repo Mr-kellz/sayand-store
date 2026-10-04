@@ -8,8 +8,35 @@
     "ignore": [
       "firebase.json",
       "**/.*",
-      "**/node_modules/**"
+      "**/node_modules/**",
+      "functions/**",
+      "tools/**",
+      "**/*.zip",
+      "**/*.MP4",
+      "**/*.mp4",
+      "**/*.md",
+      "*-Install.txt",
+      "START-HERE.txt",
+      "package.json",
+      "package-lock.json",
+      "index.js",
+      "firebase-debug.log*",
+      "database.rules.json",
+      "INSTALL-ORDER-SECURITY.txt",
+      "INSTALL-CHECKOUT-SECURITY.txt",
+      "**/*export*.json",
+      "**/*snapshot*.json",
+      "**/*backup*.json",
+      "**/*.log",
+      "INSTALL.txt",
+      "tests/**",
+      "**/*.cjs",
+      "VALIDATION.txt",
+      "**/functions/**"
     ],
     "cleanUrls": true
+  },
+  "database": {
+    "rules": "database.rules.json"
   }
 }

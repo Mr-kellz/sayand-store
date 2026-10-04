@@ -67,19 +67,22 @@ window.setCurrency = function(curr) {
 };
 
 // ==================== COOKIE CONSENT ====================
-window.acceptCookies = function() {
-    localStorage.setItem('sayand_cookies_accepted', '1');
-    const banner = document.getElementById('cookie-banner');
-    if (banner) banner.classList.add('translate-y-full');
-};
-
-function initCookieBanner() {
-    if (localStorage.getItem('sayand_cookies_accepted')) return;
-    setTimeout(() => {
-        const banner = document.getElementById('cookie-banner');
-        if (banner) banner.classList.remove('translate-y-full');
-    }, 1500);
+window.acceptCookies = function() { if(window.SayandConsent) window.SayandConsent.open(); };
+function initCookieBanner() { /* Shared consent.js owns the controls on every page. */ }
+let visitorTrackingInFlight = false;
+async function trackConsentingVisitor() {
+    if (!window.SayandConsent || !window.SayandConsent.allowed('analytics') || visitorTrackingInFlight) return;
+    if (typeof firebase === 'undefined' || !firebase.database) return;
+    try {
+        if (localStorage.getItem('sayand_visitor_id')) return;
+        visitorTrackingInFlight = true;
+        const visitorId = 'v_' + Date.now() + '_' + Math.random().toString(36).slice(2,11);
+        await firebase.database().ref('uniqueVisitors/' + visitorId).set({firstVisit:firebase.database.ServerValue.TIMESTAMP});
+        if (window.SayandConsent.allowed('analytics')) localStorage.setItem('sayand_visitor_id',visitorId);
+    } catch (error) { console.error('Visitor statistics unavailable:',error); }
+    finally { visitorTrackingInFlight=false; }
 }
+window.addEventListener('sayand:consentchange',()=>{trackConsentingVisitor();if(window.renderRecentlyViewed)window.renderRecentlyViewed();});
 
 // ==================== ANNOUNCEMENT BAR ====================
 let announcementCountdownInterval = null;
@@ -258,10 +261,12 @@ window.calculateAnnouncementDiscount = function(subtotal) {
 
 // ==================== RECENTLY VIEWED ====================
 window.saveRecentlyViewed = function(p) {
+    if (!window.SayandConsent || !window.SayandConsent.allowed('personalization')) return;
     let rv = JSON.parse(localStorage.getItem('sayand_recently_viewed') || '[]');
     rv = rv.filter(item => item.name !== p.name);
     rv.unshift({
         name: p.name,
+        translations: p.translations || {},
         price: p.price,
         img: p.images ? p.images[0] : p.img,
         category: p.category,
@@ -277,7 +282,7 @@ window.renderRecentlyViewed = function() {
     const container = document.getElementById('recently-viewed-grid');
     const section = document.getElementById('recently-viewed-section');
     if (!container || !section) return;
-    const items = JSON.parse(localStorage.getItem('sayand_recently_viewed') || '[]');
+    const items = window.SayandConsent && window.SayandConsent.allowed('personalization') ? JSON.parse(localStorage.getItem('sayand_recently_viewed') || '[]') : [];
     if (items.length === 0) { section.classList.add('hidden'); return; }
     section.classList.remove('hidden');
     
@@ -331,7 +336,7 @@ window.renderRecentlyViewed = function() {
                 ${oosHTML}
             </div>
             <div class="flex flex-col items-start text-left w-full px-1">
-                <h4 class="text-[11px] font-semibold tracking-wide uppercase mb-1 truncate w-full text-[#1a2e15] group-hover:text-[#d4af37] transition-colors">${p.name}</h4>
+                <h4 class="text-[11px] font-semibold tracking-wide uppercase mb-1 truncate w-full text-[#1a2e15] group-hover:text-[#d4af37] transition-colors">${SayandI18n.productHTML(p)}</h4>
                 <div class="text-[11px] md:text-xs font-medium">
                     ${activeSale ? `<span class="text-[#6a7c64] line-through mr-2">${origDisplay}</span><span class="text-red-600 font-semibold">${priceDisplay}</span>` : `<span class="text-[#1a2e15]">${priceDisplay}</span>`}
                 </div>
@@ -405,6 +410,9 @@ firebase.database().ref("mainStore").on("value", (snapshot) => {
     const data = snapshot.val();
     if (data) {
         window.SAYAND_PRODUCTS = data;
+        
+        SayandI18n.registerCatalog(data);
+
         if (typeof updateContactInfo === 'function') updateContactInfo(data);
         if (typeof updateSiteContent === 'function') updateSiteContent(data);
         if (typeof renderAllProducts === 'function') renderAllProducts(data);
@@ -581,11 +589,11 @@ window.updateSiteContent = function(data) {
             setMediaElement('editorial-hero-img', editorialMediaList[0]);
         }
         
-        if(sc.heroSubtitle) document.getElementById('heroSubtitle').innerText = sc.heroSubtitle;
-        if(sc.heroTitle) document.getElementById('heroTitle').innerHTML = sc.heroTitle;
-        if(sc.editSubtitle) document.getElementById('editSubtitle').innerText = sc.editSubtitle;
-        if(sc.editTitle) document.getElementById('editTitle').innerHTML = sc.editTitle;
-        if(sc.editDesc) document.getElementById('editDesc').innerText = sc.editDesc;
+        for (const field of ['heroSubtitle','heroTitle','editSubtitle','editTitle','editDesc']) {
+            if (!sc[field]) continue;
+            const isHTML = field === 'heroTitle' || field === 'editTitle';
+            SayandI18n.bind(document.getElementById(field), sc[field], SayandI18n.fieldTranslations(sc, field), isHTML);
+        }
     }
 };
 
@@ -684,6 +692,12 @@ function createProductCardHTML(p, isNewArrival = false) {
     const safeName = encodeURIComponent(p.name);
     const activeSale = isSaleActive(p);
     
+    // SAFELY EXTRACT IMAGE URL OR USE TRANSPARENT PIXEL FALLBACK
+    let safeImgSrc = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+    if (imgArray.length > 0 && imgArray[0]) {
+        safeImgSrc = imgArray[0];
+    }
+    
     // VIP LOCK LOGIC
     let isLocked = p.isVipOnly && !window.userIsVip;
     let clickAction = isLocked ? `handleVipClick(event)` : `window.location.href='product.html?item=${safeName}'`;
@@ -750,14 +764,14 @@ function createProductCardHTML(p, isNewArrival = false) {
     return `
         <div class="product-card flex flex-col relative w-full group/card transition-all cursor-pointer" data-images="${imgArrayStr}" data-current-index="0" onmouseenter="${isLocked ? '' : 'hoverCard(this)'}" onmouseleave="${isLocked ? '' : 'unhoverCard(this)'}" onclick="${clickAction}">
             <div class="relative w-full aspect-[4/5] overflow-hidden mb-3 bg-[#eef2ec]">
-                <img src="${imgArray[0]}" class="main-img w-full h-full object-cover transition-transform duration-700 ${isLocked ? '' : 'group-hover/card:scale-105'}">
+                <img src="${safeImgSrc}" class="main-img w-full h-full object-cover transition-transform duration-700 ${isLocked ? '' : 'group-hover/card:scale-105'}">
                 ${oosHTML}
                 ${lockHTML}
                 ${carouselHTML}
                 ${badgeHTML}
             </div>
             <div class="flex flex-col items-start text-left w-full px-1">
-                <h4 class="text-[11px] md:text-xs font-semibold tracking-wide uppercase mb-1 truncate w-full ${isLocked ? 'text-[#6a7c64]' : 'text-[#1a2e15] group-hover/card:text-[#d4af37] transition-colors'}">${p.name}</h4>
+                <h4 class="text-[11px] md:text-xs font-semibold tracking-wide uppercase mb-1 truncate w-full ${isLocked ? 'text-[#6a7c64]' : 'text-[#1a2e15] group-hover/card:text-[#d4af37] transition-colors'}">${SayandI18n.productHTML(p)}</h4>
                 <div class="text-[11px] md:text-xs ${activeSale && !isLocked ? '' : 'text-[#1a2e15] font-medium'}">${priceHTML}</div>
             </div>
         </div>`;
@@ -909,7 +923,7 @@ window.openProductDetail = function(encodedProd) {
             document.getElementById('swipe-hint').style.display = 'none';
         }
         
-        document.getElementById('detail-name').innerText = p.name;
+        SayandI18n.bindProduct(document.getElementById('detail-name'), p, 'name');
         
         const priceEl = document.getElementById('detail-price');
         const origPriceEl = document.getElementById('detail-original-price');
@@ -1000,7 +1014,7 @@ window.openProductDetail = function(encodedProd) {
         renderDetailSizes(sizes);
         updateProductStockUI();
         
-        document.getElementById('detail-description').innerText = p.description || `Premium quality ${p.category || 'fashion'} piece from SAYAND.`;
+        SayandI18n.bindProduct(document.getElementById('detail-description'), p, 'description', 'Premium quality fashion piece from SAYAND.');
         renderDetailDetails(p);
         renderDetailMeasurements(p);
         
@@ -1113,7 +1127,7 @@ window.renderDetailDetails = function(p) {
     container.innerHTML = Object.entries(details).map(([key, value]) => `
         <div class="flex justify-between py-3 border-b border-[#c2c9c0]/50">
             <span class="text-[#2c4c23] text-[10px] font-black tracking-widest uppercase">${key}</span>
-            <span class="text-[#1a2e15] text-xs font-bold">${value}</span>
+            <span class="text-[#1a2e15] text-xs font-bold">${SayandI18n.productHTML(p, 'details.' + key, value)}</span>
         </div>`).join('');
 };
 
@@ -1182,7 +1196,7 @@ window.renderRelatedProducts = function(currentP) {
                 <img src="${img}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
             </div>
             <div class="flex flex-col items-start text-left w-full">
-                <p class="text-[11px] font-semibold tracking-wide text-[#1a2e15] truncate uppercase w-full group-hover:text-[#d4af37] transition-colors mb-1">${p.name}</p>
+                <p class="text-[11px] font-semibold tracking-wide text-[#1a2e15] truncate uppercase w-full group-hover:text-[#d4af37] transition-colors mb-1">${SayandI18n.productHTML(p)}</p>
                 <p class="text-[11px] text-[#1a2e15] font-medium">${formatPrice(isSaleActive(p) ? p.salePrice : p.price)}</p>
             </div>
         </div>`;
@@ -1222,7 +1236,7 @@ window.toggleWishlistCurrent = function() {
         }
         showToast('REMOVED FROM SAVED');
     } else {
-        wishlist.push({name: currentDetailProduct.name, price: currentDetailProduct.price, img: currentDetailProduct.images ? currentDetailProduct.images[0] : currentDetailProduct.img, category: currentDetailProduct.category});
+        wishlist.push({name: currentDetailProduct.name, translations: currentDetailProduct.translations || {}, price: currentDetailProduct.price, img: currentDetailProduct.images ? currentDetailProduct.images[0] : currentDetailProduct.img, category: currentDetailProduct.category});
         if(heartBtn) {
             heartBtn.classList.add('text-[#d4af37]');
             heartBtn.classList.remove('text-[#1a2e15]');
@@ -1263,7 +1277,7 @@ window.renderWishlist = function() {
                     <img src="${w.img}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                 </div>
                 <div class="flex flex-col items-start text-left w-full px-1">
-                    <h4 class="text-[11px] font-semibold tracking-wide text-[#1a2e15] truncate uppercase w-full group-hover:text-[#d4af37] transition-colors mb-1">${w.name}</h4>
+                    <h4 class="text-[11px] font-semibold tracking-wide text-[#1a2e15] truncate uppercase w-full group-hover:text-[#d4af37] transition-colors mb-1">${SayandI18n.productHTML(w)}</h4>
                     <p class="text-[11px] text-[#1a2e15] font-medium">${formatPrice(displayPrice)}</p>
                 </div>
                 <button onclick="removeFromWishlist('${w.name}')" class="absolute top-2 right-2 w-8 h-8 bg-[#f9f6f0]/90 rounded-full flex items-center justify-center hover:bg-red-50 transition-colors z-10 shadow-sm border border-[#c2c9c0]/50">
@@ -1405,6 +1419,7 @@ if (addBtn) {
                 }
                 itemRef.set({
                     name: productName,
+                    translations: currentDetailProduct.translations || {},
                     price: numericPrice,
                     quantity: selectedQty,
                     maxStock: sizeMaxQty, 
@@ -1541,7 +1556,8 @@ window.handleSearch = function() {
     const filtered = uniqueProducts.filter(p => 
         p.name.toLowerCase().includes(query) || 
         (p.category && p.category.toLowerCase().includes(query)) ||
-        (p.description && p.description.toLowerCase().includes(query))
+        (p.description && p.description.toLowerCase().includes(query)) ||
+        (p.translations && Object.values(p.translations).some(texts => [texts.name, texts.description].some(text => text && text.toLowerCase().includes(query))))
     );
 
     if (filtered.length === 0) {
@@ -1556,7 +1572,7 @@ window.handleSearch = function() {
     }
 };
 
-const LEGAL_PAGES = ['privacy', 'terms', 'cookie'];
+const LEGAL_PAGES = ['privacy', 'terms', 'cookie', 'shipping', 'returns'];
 
 function getFooterPage(page) {
     if (typeof SAYAND_PRODUCTS !== 'undefined' && SAYAND_PRODUCTS && SAYAND_PRODUCTS.footer && SAYAND_PRODUCTS.footer[page]) {
@@ -1571,17 +1587,18 @@ window.openInfoPage = function(page) {
         return;
     }
     
-    const data = getFooterPage(page);
-    if (!data) return;
-    
     history.pushState({page: page, overlay: true}, '', '#' + page);
     
     const title = document.getElementById('info-title');
     const content = document.getElementById('info-content');
     const pageOverlay = document.getElementById('info-page');
     
-    if(title) title.innerText = data.title;
-    if(content) content.innerHTML = data.content;
+    const data = getFooterPage(page);
+    if (!data) return;
+
+    SayandI18n.bind(title, data.title, SayandI18n.fieldTranslations(data, 'title'));
+    SayandI18n.bind(content, data.content, SayandI18n.fieldTranslations(data, 'content'), true);
+
     if(pageOverlay) {
         pageOverlay.style.transform = 'translateY(0)';
         document.body.style.overflow = 'hidden';
@@ -1609,10 +1626,12 @@ window.addEventListener('popstate', function(e) {
         overlay.style.transform = 'translateY(100%)';
         document.body.style.overflow = '';
     } else if (!LEGAL_PAGES.includes(hash)) {
-        const data = getFooterPage(hash);
-        if (data && overlay) {
-            document.getElementById('info-title').innerText = data.title;
-            document.getElementById('info-content').innerHTML = data.content;
+        const preDiv = document.getElementById('prerender-' + hash);
+        if (preDiv && overlay) {
+            const t = preDiv.querySelector('.pre-title');
+            const c = preDiv.querySelector('.pre-content');
+            if(t) document.getElementById('info-title').innerHTML = t.innerHTML;
+            if(c) document.getElementById('info-content').innerHTML = c.innerHTML;
             overlay.style.transform = 'translateY(0)';
             document.body.style.overflow = 'hidden';
         }
@@ -1767,16 +1786,20 @@ window.submitNotifyRequest = async function() {
 
 function handleHashRoute() {
     const hash = window.location.hash.replace('#', '');
+    if (hash === 'returns') { window.location.replace('returns.html'); return; }
     if (hash && !LEGAL_PAGES.includes(hash)) {
         setTimeout(() => {
-            const data = getFooterPage(hash);
-            if (data && data.content.includes('Content loading') === false) {
+            const preDiv = document.getElementById('prerender-' + hash);
+            if (preDiv) {
                 const title = document.getElementById('info-title');
                 const content = document.getElementById('info-content');
                 const pageOverlay = document.getElementById('info-page');
                 
-                if(title) title.innerText = data.title;
-                if(content) content.innerHTML = data.content;
+                const t = preDiv.querySelector('.pre-title');
+                const c = preDiv.querySelector('.pre-content');
+                if(title && t) title.innerHTML = t.innerHTML;
+                if(content && c) content.innerHTML = c.innerHTML;
+                
                 if(pageOverlay) {
                     pageOverlay.style.transform = 'translateY(0)';
                     document.body.style.overflow = 'hidden';
@@ -1791,6 +1814,8 @@ window.handleSubscribe = async function(e) {
     e.preventDefault();
     const emailInput = document.getElementById('subscribe-email');
     if (!emailInput) return;
+    const consent = document.getElementById('subscribe-consent');
+    if (!consent || !consent.checked) { showToast('Please confirm newsletter consent.'); return; }
 
     const email = emailInput.value.trim().toLowerCase();
     
@@ -1839,6 +1864,7 @@ window.handleSubscribe = async function(e) {
             email: email,
             firstName: subscriberName !== "there" ? subscriberName : null, 
             subscribedAt: firebase.database.ServerValue.TIMESTAMP,
+            consent: {purpose:'newsletter',version:1,granted:true,recordedAt:firebase.database.ServerValue.TIMESTAMP},
             source: window.location.href
         });
 
@@ -1963,7 +1989,7 @@ firebase.auth().onAuthStateChanged((user) => {
             let count200 = 0;
             if (orders) {
                 Object.values(orders).forEach(o => {
-                    if (o.status !== 'Canceled' && o.status !== 'Refunded') {
+                    if ((o.paymentDate || o.stripeSessionId) && !/cancel|refund/i.test(o.status || '')) {
                         if ((o.totalAmount || 0) >= 200) count200++;
                     }
                 });
@@ -2062,7 +2088,7 @@ firebase.auth().onAuthStateChanged((user) => {
                             
                             <div class="flex-1 ml-4 flex flex-col justify-between">
                                 <div>
-                                    <h4 class="text-[10px] tracking-widest font-black text-[#1a2e15] uppercase w-11/12 truncate ${isOOS ? 'text-red-800' : ''}">${item.name}</h4>
+                                    <h4 class="text-[10px] tracking-widest font-black text-[#1a2e15] uppercase w-11/12 truncate ${isOOS ? 'text-red-800' : ''}">${SayandI18n.productHTML(item)}</h4>
                                     <p class="text-[10px] text-[#6a7c64] font-bold mt-1 uppercase">SIZE: ${item.size} | COLOR: ${item.color}</p>
                                     
                                     ${isOOS ? `<p class="text-[10px] font-black tracking-widest text-red-600 mt-1 uppercase bg-red-100 inline-block px-2 py-0.5">SOLD OUT</p>` : ''}
@@ -2237,23 +2263,41 @@ document.addEventListener('DOMContentLoaded', () => {
     const toggle = document.getElementById('currency-toggle');
     if (toggle) toggle.innerText = window.currentCurrency;
 
-    // --- UNIQUE VISITOR TRACKING ---
-    setTimeout(() => {
-        try {
-            let visitorId = localStorage.getItem('sayand_visitor_id');
-            if (!visitorId) {
-                // Generate a unique ID for this browser
-                visitorId = 'v_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-                localStorage.setItem('sayand_visitor_id', visitorId);
-                
-                // Save to database
-                if (typeof firebase !== 'undefined' && firebase.database) {
-                    firebase.database().ref('uniqueVisitors/' + visitorId).set({
-                        firstVisit: firebase.database.ServerValue.TIMESTAMP,
-                        userAgent: navigator.userAgent
-                    });
-                }
-            }
-        } catch(e) { console.error("Visitor tracking error:", e); }
-    }, 1500); // Delayed slightly to ensure Firebase is loaded
+    trackConsentingVisitor();
 });
+// ==================== WELCOME PREFERENCES ====================
+function checkWelcomePreferences() {
+    const modal = document.getElementById('welcome-modal');
+    if (!modal || localStorage.getItem('sayand_prefs_set')) return;
+    const language = document.getElementById('welcome-language');
+    const currency = document.getElementById('welcome-currency');
+    if (language) language.value = SayandI18n.language;
+    if (currency) currency.value = window.currentCurrency || 'EUR';
+    const locationLabel = document.getElementById('welcome-location');
+    if (locationLabel) locationLabel.textContent = 'Global';
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    requestAnimationFrame(() => modal.classList.remove('opacity-0'));
+    document.body.style.overflow = 'hidden';
+}
+
+window.saveWelcomePreferences = function() {
+    const language = document.getElementById('welcome-language').value;
+    const currency = document.getElementById('welcome-currency').value;
+    localStorage.setItem('sayand_prefs_set', 'true');
+    SayandI18n.setLanguage(language);
+    window.setCurrency(currency);
+    const modal = document.getElementById('welcome-modal');
+    modal.classList.add('opacity-0');
+    setTimeout(() => {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        document.body.style.overflow = '';
+    }, 500);
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', checkWelcomePreferences, {once:true});
+} else {
+    checkWelcomePreferences();
+}

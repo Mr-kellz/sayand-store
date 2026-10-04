@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"/>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=site-4">
     
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f9f6f0; color: #1a2e15; }
@@ -31,18 +31,32 @@
         .maps-fallback-msg { font-size: 10px; color: #d4af37; font-weight: 800; letter-spacing: 0.05em; margin-top: 4px; display: none; }
     </style>
 
+    <link rel="stylesheet" href="css/i18n.css?v=site-4">
+    <script src="js/translations.js?secureCheckout=1&orderSecurity=1&v=shipping-admin-1"></script>
+    <script src="js/i18n.js?v=site-4"></script>
+    <link rel="stylesheet" href="css/site-updates.css?v=site-4">
+    <script src="js/consent.js?v=site-4"></script>
+
+    <meta name="description" content="Access your SAYAND account and shopping services securely.">
+    <link rel="canonical" href="https://thesayand.com/checkout">
+    <meta name="robots" content="noindex, follow">
+    <meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/SAYAND%20Intertwined%20S%26A%20Monogram.png?alt=media&token=2afe3106-31a8-4a27-960a-e0d09ee96d4f">
+    <script src="js/site-updates.js?v=site-4"></script>
 </head>
 <body class="antialiased" id="checkout-body">
 
     <nav class="bg-[#1a2e15] border-b border-[#d4af37]/30 px-6 py-4 flex justify-between items-center sticky top-0 z-50 shadow-md">
-<a href="index.html" onclick="event.preventDefault(); var p=window.location.pathname; if(p==='/'||p.endsWith('index.html')||p===''){location.reload();}else{window.location.href='index.html';}" class="text-xl md:text-2xl font-black tracking-tighter hover:opacity-70 transition-opacity text-[#d4af37]">SAYAND</a>        <span class="text-[10px] tracking-[0.2em] font-bold text-white">SECURE CHECKOUT</span>
+        <!-- 🟢 LOGO TRANSLATION PROTECTION -->
+        <a href="index.html" onclick="event.preventDefault(); var p=window.location.pathname; if(p==='/'||p.endsWith('index.html')||p===''){location.reload();}else{window.location.href='index.html';}" class="notranslate text-xl md:text-2xl font-black tracking-tighter hover:opacity-70 transition-opacity text-[#d4af37]">SAYAND</a>        
+        <span class="text-[10px] tracking-[0.2em] font-bold text-white">SECURE CHECKOUT</span>
     </nav>
 
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div class="flex flex-col lg:flex-row gap-12">
             
             <div class="flex-1">
-                <form id="checkout-form" class="space-y-8">
+                <p class="text-sm leading-relaxed mb-6">Delivery within Italy: 3–7 working days. International delivery: 5–14 working days.</p>
+<form id="checkout-form" class="space-y-8">
                     
                     <div>
                         <h2 class="text-sm font-black tracking-[0.1em] mb-4 uppercase text-[#2c4c23]">Contact Information</h2>
@@ -59,7 +73,6 @@
                     <div>
                         <h2 class="text-sm font-black tracking-[0.1em] mb-4 uppercase text-[#2c4c23]">Shipping Address</h2>
 
-                        <!-- ADDRESS BOOK SELECTOR -->
                         <div id="address-book-container" class="mb-4 hidden">
                             <label class="block text-[10px] font-black tracking-wider text-[#d4af37] mb-2">SAVED ADDRESSES</label>
                             <select id="address-book-select" onchange="selectSavedAddress()" class="input-field w-full p-3 text-xs font-bold">
@@ -87,70 +100,17 @@
                         </div>
                     </div>
 
-                    <div>
+               <div>
                         <h2 class="text-sm font-black tracking-[0.1em] mb-4 uppercase text-[#2c4c23]">Payment Method</h2>
-                        <div class="space-y-3">
-                            
-                            <label class="relative block cursor-pointer group">
-                                <input type="radio" name="payment" value="Revolut" checked class="peer sr-only radio-custom">
-                                <div class="border border-[#c2c9c0] p-4 transition-all flex items-center justify-between bg-white">
-                                    <div class="flex items-center gap-3">
-                                        <div class="radio-ring w-4 h-4 rounded-full border border-[#c2c9c0] flex items-center justify-center transition-all bg-white">
-                                            <div class="radio-dot w-2 h-2 rounded-full opacity-0 scale-50 transition-all"></div>
-                                        </div>
-                                        <span class="text-xs font-black tracking-wider text-[#1a2e15]">REVOLUT PAY</span>
-                                    </div>
-                                </div>
-                                <div class="overflow-hidden max-h-0 peer-checked:max-h-32 transition-all duration-300 ease-in-out px-4 bg-[#f9f6f0] border-x border-b border-[#d4af37] text-[10px] text-[#6a7c64] py-4">
-                                    <p class="text-[#2c4c23] mb-1"><strong>How this works:</strong></p>
-                                    <ul class="list-decimal list-inside space-y-1 font-medium">
-                                        <li>Click <strong>Complete Order</strong> below to securely save your order.</li>
-                                        <li>On the next page, click <strong>Complete Payment</strong> to open Revolut.</li>
-                                    </ul>
-                                </div>
-                            </label>
-
-                            <label class="relative block cursor-pointer group">
-                                <input type="radio" name="payment" value="PayPal" class="peer sr-only radio-custom">
-                                <div class="border border-[#c2c9c0] p-4 transition-all flex items-center justify-between bg-white">
-                                    <div class="flex items-center gap-3">
-                                        <div class="radio-ring w-4 h-4 rounded-full border border-[#c2c9c0] flex items-center justify-center transition-all bg-white">
-                                            <div class="radio-dot w-2 h-2 rounded-full opacity-0 scale-50 transition-all"></div>
-                                        </div>
-                                        <span class="text-xs font-black tracking-wider text-[#1a2e15]">PAYPAL</span>
-                                    </div>
-                                </div>
-                                <div class="overflow-hidden max-h-0 peer-checked:max-h-32 transition-all duration-300 ease-in-out px-4 bg-[#f9f6f0] border-x border-b border-[#d4af37] text-[10px] text-[#6a7c64] py-4">
-                                    <p class="text-[#2c4c23] mb-1"><strong>How this works:</strong></p>
-                                    <ul class="list-decimal list-inside space-y-1 font-medium">
-                                        <li>Click <strong>Complete Order</strong> below to securely save your order.</li>
-                                        <li>On the next page, click <strong>Complete Payment</strong> to open PayPal.</li>
-                                    </ul>
-                                </div>
-                            </label>
-
-                            <label class="relative block cursor-pointer group">
-                                <input type="radio" name="payment" value="WhatsApp" class="peer sr-only radio-custom">
-                                <div class="border border-[#c2c9c0] p-4 transition-all flex items-center justify-between bg-white">
-                                    <div class="flex items-center gap-3">
-                                        <div class="radio-ring w-4 h-4 rounded-full border border-[#c2c9c0] flex items-center justify-center transition-all bg-white">
-                                            <div class="radio-dot w-2 h-2 rounded-full opacity-0 scale-50 transition-all"></div>
-                                        </div>
-                                        <span class="text-xs font-black tracking-wider text-[#1a2e15]">WHATSAPP ORDER</span>
-                                    </div>
-                                </div>
-                                <div class="overflow-hidden max-h-0 peer-checked:max-h-32 transition-all duration-300 ease-in-out px-4 bg-[#f9f6f0] border-x border-b border-[#d4af37] text-[10px] text-[#6a7c64] py-4">
-                                    <p class="text-[#2c4c23] mb-1"><strong>How this works:</strong></p>
-                                    <ul class="list-decimal list-inside space-y-1 font-medium">
-                                        <li>Click <strong>Complete Order</strong> below to securely save your order.</li>
-                                        <li>On the next page, click <strong>Complete Payment</strong> to open WhatsApp.</li>
-                                    </ul>
-                                </div>
-                            </label>
-
+                        <div class="border border-[#c2c9c0] p-5 bg-white shadow-sm">
+                            <div class="flex items-center gap-3 mb-3">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2c4c23" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                <span class="text-xs font-black tracking-wider text-[#1a2e15]">CREDIT CARD / APPLE PAY</span>
+                            </div>
+                            <p class="text-[10px] text-[#6a7c64] font-medium leading-relaxed">After clicking "Complete Order", you will be securely redirected to our Stripe payment gateway to complete your purchase using Apple Pay, Google Pay, or any major Credit/Debit card.</p>
                         </div>
+                        <input type="radio" name="payment" value="Stripe" checked class="hidden">
                     </div>
-
                     <div class="border border-[#d4af37]/30 p-5 mb-6 bg-white shadow-sm">
                         <label class="flex items-center gap-3 cursor-pointer">
                             <input type="checkbox" id="is-gift-checkbox" class="w-4 h-4 text-[#2c4c23] focus:ring-[#2c4c23]" onchange="recalculateTotals()">
@@ -226,6 +186,7 @@
                         <span>TOTAL</span>
                         <span id="checkout-total">€0.00 EUR</span>
                     </div>
+                    <p id="payment-currency-note" class="text-[10px] mt-2">Payment is charged in EUR. Other currency amounts are estimates.</p>
                 </div>
             </div>
 
@@ -263,15 +224,13 @@
     let announcementPromo = null;
     let announcementDiscountAmount = 0; 
     
-       function normalizeCodeEntry(entry) {
+    function normalizeCodeEntry(entry) {
         if (entry && typeof entry === 'object' && 'value' in entry) {
             return entry.value;
         }
         return entry;
     }
 
-    // ─── LIVE STOCK VALIDATOR ───
-    // Checks cart items against current Firebase inventory before checkout
     async function validateCartStock(cartItems, storeData) {
         const errors = [];
         
@@ -281,7 +240,6 @@
             let foundSection = null;
             let foundIndex = null;
 
-            // Search for the product in all store sections
             const sections = ['newArrivals', 'trending', 'sales', 'upcomingSales'];
             for (const section of sections) {
                 if (storeData[section] && Array.isArray(storeData[section])) {
@@ -300,16 +258,13 @@
                 continue;
             }
 
-            // Skip stock check for preorders
             if (foundProduct.isPreorder) continue;
 
-            // Check forced out of stock
             if (foundProduct.isOutOfStock) {
                 errors.push(`"${cartItem.name}" is now SOLD OUT.`);
                 continue;
             }
 
-            // Check size-specific stock
             const cartSize = cartItem.size || 'OS';
             const cartQty = parseInt(cartItem.quantity || cartItem.qty || 1);
             
@@ -321,7 +276,6 @@
                     errors.push(`"${cartItem.name}" (Size ${cartSize}): Only ${available} left in stock. You have ${cartQty} in your bag.`);
                 }
             } else {
-                // Fallback to total quantity
                 const available = parseInt(foundProduct.quantity || 0);
                 if (available <= 0) {
                     errors.push(`"${cartItem.name}" is now SOLD OUT.`);
@@ -366,31 +320,29 @@
     let activeFixedCodes = {}; 
     let activeDiscountCodeExpiry = {};
 
-// ==================== CURRENCY SUPPORT ====================
-const CURRENCY_RATES = { EUR: 1, USD: 1.09, GBP: 0.84 };
-const CURRENCY_SYMBOLS = { EUR: '€', USD: '$', GBP: '£' };
-let currentCurrency = localStorage.getItem('sayand_currency') || 'EUR';
+    const CURRENCY_RATES = { EUR: 1, USD: 1.09, GBP: 0.84 };
+    const CURRENCY_SYMBOLS = { EUR: '€', USD: '$', GBP: '£' };
+    let currentCurrency = localStorage.getItem('sayand_currency') || 'EUR';
 
-async function fetchLiveRates() {
-    try {
-        const res = await fetch('https://api.exchangerate-api.com/v4/latest/EUR');
-        const data = await res.json();
-        if (data && data.rates) {
-            if (data.rates.USD) CURRENCY_RATES.USD = data.rates.USD;
-            if (data.rates.GBP) CURRENCY_RATES.GBP = data.rates.GBP;
-        }
-    } catch (e) { console.log('[CHECKOUT] Using default currency rates'); }
-}
-fetchLiveRates();
+    async function fetchLiveRates() {
+        try {
+            const res = await fetch('https://api.exchangerate-api.com/v4/latest/EUR');
+            const data = await res.json();
+            if (data && data.rates) {
+                if (data.rates.USD) CURRENCY_RATES.USD = data.rates.USD;
+                if (data.rates.GBP) CURRENCY_RATES.GBP = data.rates.GBP;
+            }
+        } catch (e) { console.log('[CHECKOUT] Using default currency rates'); }
+    }
+    fetchLiveRates();
 
-function formatPrice(priceEUR) {
-    if (!priceEUR && priceEUR !== 0) return CURRENCY_SYMBOLS[currentCurrency] + '0.00';
-    const rate = CURRENCY_RATES[currentCurrency] || 1;
-    const converted = (parseFloat(priceEUR) * rate).toFixed(2);
-    return (CURRENCY_SYMBOLS[currentCurrency] || '€') + converted;
-}
+    function formatPrice(priceEUR) {
+        if (!priceEUR && priceEUR !== 0) return CURRENCY_SYMBOLS[currentCurrency] + '0.00';
+        const rate = CURRENCY_RATES[currentCurrency] || 1;
+        const converted = (parseFloat(priceEUR) * rate).toFixed(2);
+        return (CURRENCY_SYMBOLS[currentCurrency] || '€') + converted;
+    }
 
-    // Store loaded address book for dropdown selection
     window.checkoutAddrBook = {};
 
     const phoneInputField = document.querySelector("#ship-phone");
@@ -403,7 +355,6 @@ function formatPrice(priceEUR) {
         separateDialCode: true,
     });
 
-    // ─── GOOGLE MAPS AUTOCOMPLETE ───
     window.initAddressAutocomplete = function() {
         const addressInput = document.getElementById('ship-address');
         const fallbackMsg = document.getElementById('maps-fallback');
@@ -414,7 +365,7 @@ function formatPrice(priceEUR) {
         }
 
         if (typeof google === 'undefined' || !google.maps || !google.maps.places) {
-            console.error('[CHECKOUT] Google Maps API not loaded. Check API key and Places API enablement.');
+            console.error('[CHECKOUT] Google Maps API not loaded.');
             if (fallbackMsg) fallbackMsg.style.display = 'block';
             return;
         }
@@ -425,7 +376,6 @@ function formatPrice(priceEUR) {
                 fields: ['address_components', 'name', 'formatted_address']
             });
 
-            // Prevent form submit on Enter key in autocomplete
             addressInput.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter') { 
                     e.preventDefault(); 
@@ -434,12 +384,8 @@ function formatPrice(priceEUR) {
 
             autocomplete.addListener('place_changed', function() {
                 const place = autocomplete.getPlace();
-                if (!place || !place.address_components) {
-                    console.warn('[CHECKOUT] No address_components in selected place');
-                    return;
-                }
+                if (!place || !place.address_components) return;
 
-                // Clear previous values
                 document.getElementById('ship-city').value = '';
                 document.getElementById('ship-zip').value = '';
                 document.getElementById('ship-country').value = '';
@@ -457,23 +403,18 @@ function formatPrice(priceEUR) {
                     }
                 }
                 
-                // If street address is empty after selection, use formatted_address
                 if (!addressInput.value.trim() && place.formatted_address) {
                     addressInput.value = place.formatted_address;
                 }
                 
-                console.log('[CHECKOUT] Address filled from Google Maps:', place.name || place.formatted_address);
                 setTimeout(updateShippingDisplay, 50);
             });
             
-            console.log('[CHECKOUT] Google Maps autocomplete initialized successfully');
         } catch (err) {
-            console.error('[CHECKOUT] Failed to init autocomplete:', err);
             if (fallbackMsg) fallbackMsg.style.display = 'block';
         }
     };
 
-    // Retry with max attempts
     let mapsRetryCount = 0;
     const MAX_MAPS_RETRIES = 20;
     
@@ -489,31 +430,24 @@ function formatPrice(priceEUR) {
         
         mapsRetryCount++;
         if (mapsRetryCount > MAX_MAPS_RETRIES) {
-            console.error('[CHECKOUT] Google Maps failed to load after max retries.');
             if (fallbackMsg) fallbackMsg.style.display = 'block';
             return;
         }
-        
-        console.warn('[CHECKOUT] Google Maps not ready, retrying... (' + mapsRetryCount + '/' + MAX_MAPS_RETRIES + ')');
         setTimeout(initMapsWithRetry, 500);
     };
 
-    // Timeout fallback for Google Maps API loading
     window.mapsLoadTimeout = setTimeout(() => {
         const fallbackMsg = document.getElementById('maps-fallback');
         if (typeof google === 'undefined' || !google.maps || !google.maps.places) {
-            console.error('[CHECKOUT] Google Maps API failed to load within 5 seconds.');
             if (fallbackMsg) fallbackMsg.style.display = 'block';
         }
     }, 5000);
 
     window.gm_authFailure = function() {
-        console.error('Google Maps API authentication failed. Check your API key restrictions and billing.');
         const fallbackMsg = document.getElementById('maps-fallback');
         if (fallbackMsg) fallbackMsg.style.display = 'block';
     };
 
-    // ─── ADDRESS BOOK DROPDOWN ───
     window.selectSavedAddress = function() {
         const key = document.getElementById('address-book-select').value;
         if (!key) {
@@ -542,7 +476,6 @@ function formatPrice(priceEUR) {
         setTimeout(updateShippingDisplay, 50);
     };
 
-    // ─── CART NORMALIZATION ───
     function normalizeCart(cart) {
         if (!cart) return null;
         if (Array.isArray(cart)) {
@@ -571,7 +504,6 @@ function formatPrice(priceEUR) {
     }
 
     function recalculateTotals() {
-        // Calculate announcement promo discount
         announcementDiscountAmount = 0;
         if (announcementPromo && orderSubtotal >= announcementPromo.minAmount) {
             announcementDiscountAmount = Math.round((orderSubtotal * announcementPromo.percent / 100) * 100) / 100;
@@ -596,6 +528,7 @@ function formatPrice(priceEUR) {
         finalOrderTotal = Math.max(0, orderSubtotal - totalDiscount) + shippingCost + giftCost;
 
         document.getElementById('checkout-total').textContent = formatPrice(finalOrderTotal) + ' ' + currentCurrency;
+        document.getElementById('payment-currency-note').textContent = 'Payment is charged in EUR. Other currency amounts are estimates.';
         const giftAmtEl = document.getElementById('checkout-gift-amount');
         if(giftAmtEl) giftAmtEl.textContent = '+' + formatPrice(2.00);
 
@@ -603,13 +536,13 @@ function formatPrice(priceEUR) {
         if (appliedPromo) {
             promoRow.classList.remove('hidden');
             let labelExtra = appliedPromo.type === 'fixed' ? 'GIFT CARD' : 'PROMO';
-            document.getElementById('checkout-promo-label').textContent = `${labelExtra} (${appliedPromo.code})`;
+            // 🟢 NOTRANSLATE ON CHECKOUT PROMO
+            document.getElementById('checkout-promo-label').innerHTML = `${labelExtra} (<span class="notranslate">${appliedPromo.code}</span>)`;
             document.getElementById('checkout-promo').textContent = '-' + formatPrice(promoDiscountAmount);
         } else {
             promoRow.classList.add('hidden');
         }
 
-        // Show/hide announcement promo row
         const annRow = document.getElementById('announcement-promo-row');
         if (announcementPromo && announcementDiscountAmount > 0) {
             annRow.classList.remove('hidden');
@@ -626,13 +559,13 @@ function formatPrice(priceEUR) {
         
         if (!codeInput) return;
 
-        // If promo codes haven't loaded yet, fetch them now
         if (Object.keys(activeDiscountCodes).length === 0 && Object.keys(activeFixedCodes).length === 0) {
             msgEl.textContent = "LOADING CODES...";
             msgEl.className = "text-[9px] font-bold mt-2 text-[#d4af37] block";
             try {
                 const storeSnap = await firebase.database().ref('mainStore').once('value');
                 const storeData = storeSnap.val();
+                SayandI18n.registerCatalog(storeData);
                 if (storeData) {
                     if (storeData.discountCodes) activeDiscountCodes = storeData.discountCodes;
                     if (storeData.fixedCodes) activeFixedCodes = storeData.fixedCodes;
@@ -693,7 +626,6 @@ function formatPrice(priceEUR) {
         console.log('[CHECKOUT] User authenticated:', user.uid);
         const itemsContainer = document.getElementById('checkout-items');
 
-        // ─── LOAD USER PROFILE ───
         try {
             if(user.email) document.getElementById('ship-email').value = user.email;
             const userSnap = await firebase.database().ref(`users/${user.uid}`).once('value');
@@ -710,7 +642,6 @@ function formatPrice(priceEUR) {
             }
         } catch(e) { console.error('[CHECKOUT] Profile load error:', e); }
 
-        // ─── LOAD ADDRESS BOOK ───
         try {
             const addrBookSnap = await firebase.database().ref(`users/${user.uid}/addressBook`).once('value');
             window.checkoutAddrBook = addrBookSnap.val() || {};
@@ -730,14 +661,13 @@ function formatPrice(priceEUR) {
             }
         } catch(e) { console.error('[CHECKOUT] Address book error:', e); }
 
-        // ─── LOAD VIP STATUS ───
         try {
             const ordersSnap = await firebase.database().ref('orders').orderByChild('userId').equalTo(user.uid).once('value');
             prevCount200 = 0; prevCount500 = 0; prevCount700 = 0;
             let used3 = 0, used6 = 0, used10 = 0;
             if (ordersSnap.exists()) {
                 Object.values(ordersSnap.val()).forEach(o => {
-                    if (o.status !== 'Canceled' && o.status !== 'Refunded') {
+                    if ((o.paymentDate || o.stripeSessionId) && !/cancel|refund/i.test(o.status || '')) {
                         let amt = o.totalAmount || 0;
                         if (amt >= 700) prevCount700++;
                         if (amt >= 500) prevCount500++;
@@ -754,7 +684,6 @@ function formatPrice(priceEUR) {
             else if (prevCount200 >= 3 && used3 < 1) { vipDiscountPercentApplied = 3; vipLabel = "ATELIER VIP (-3%)"; }
         } catch(e) { console.error('[CHECKOUT] VIP status error:', e); }
 
-        // ─── LOAD CART ───
         try {
             const cartSnap = await firebase.database().ref(`users/${user.uid}/cart`).once('value');
             orderCartData = normalizeCart(cartSnap.val());
@@ -799,7 +728,7 @@ function formatPrice(priceEUR) {
                             <span class="absolute -top-2 -right-2 bg-[#1a2e15] text-[#d4af37] w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black">${itemQty}</span>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <h4 class="text-[10px] font-black tracking-wider truncate uppercase text-[#1a2e15]">${item.name || 'Unknown Item'}</h4>
+                            <h4 class="text-[10px] font-black tracking-wider truncate uppercase text-[#1a2e15]">${SayandI18n.productHTML(item, 'name', 'Unknown Item')}</h4>
                             <p class="text-[9px] text-[#6a7c64] font-bold mt-1 uppercase">SIZE: ${item.size || 'N/A'} | COLOR: ${item.color || 'N/A'}</p>
                         </div>
                         <div class="text-[10px] font-black text-[#1a2e15]">${formatPrice(itemTotal)}</div>
@@ -813,10 +742,10 @@ function formatPrice(priceEUR) {
             itemsContainer.innerHTML = '<p class="text-xs text-red-600 font-bold text-center py-4">Error loading bag. Check console.</p>';
         }
 
-        // ─── LOAD STORE DATA (payment links, promo codes, announcement promo) ───
         try {
             const storeSnap = await firebase.database().ref('mainStore').once('value');
             const storeData = storeSnap.val();
+                SayandI18n.registerCatalog(storeData);
             if (storeData) {
                 if (storeData.contact) {
                     baseRevolut = storeData.contact.revolut || '';
@@ -827,7 +756,6 @@ function formatPrice(priceEUR) {
                 if (storeData.fixedCodes) activeFixedCodes = storeData.fixedCodes;
                 if (storeData.discountCodeExpiry) activeDiscountCodeExpiry = storeData.discountCodeExpiry;
 
-                // ─── LOAD ANNOUNCEMENT PROMO ───
                 if (storeData.announcement && storeData.announcement.isPromo && storeData.announcement.active) {
                     const now = new Date().getTime();
                     const endDate = storeData.announcement.promoEndDate ? new Date(storeData.announcement.promoEndDate).getTime() : 0;
@@ -847,7 +775,6 @@ function formatPrice(priceEUR) {
             }
         } catch(e) { console.error('[CHECKOUT] Store data error:', e); }
 
-        // ─── CALCULATE AND DISPLAY ALL TOTALS ONLY AFTER ALL DATA IS LOADED ───
         try {
             vipDiscountAmount = vipDiscountPercentApplied > 0 ? (orderSubtotal * (vipDiscountPercentApplied / 100)) : 0;
             if(vipDiscountPercentApplied > 0) {
@@ -923,10 +850,10 @@ function formatPrice(priceEUR) {
 
         const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
 
-        // ─── LIVE STOCK VALIDATION ───
         try {
             const storeSnap = await firebase.database().ref('mainStore').once('value');
             const storeData = storeSnap.val() || {};
+            SayandI18n.registerCatalog(storeData);
             const stockErrors = await validateCartStock(orderCartData, storeData);
             
             if (stockErrors.length > 0) {
@@ -946,238 +873,151 @@ function formatPrice(priceEUR) {
         }
 
         const currentUser = firebase.auth().currentUser;
-        if(!currentUser){
-            if(generalErrorEl)generalErrorEl.innerText='Session expired. Please sign in again.';
-            submitBtn.innerText='COMPLETE ORDER';submitBtn.disabled=false;
-            setTimeout(()=>window.location.href='login.html',2000);return;
+        if (!currentUser) {
+            if (generalErrorEl) generalErrorEl.innerText = 'Session expired. Please sign in again.';
+            submitBtn.innerText = 'COMPLETE ORDER';
+            submitBtn.disabled = false;
+            setTimeout(() => window.location.href = 'login.html', 2000);
+            return;
         }
+
         const isGiftChecked = document.getElementById('is-gift-checkbox').checked;
-        
-        const newOrderRef = firebase.database().ref('orders').push();
-        const orderId = newOrderRef.key;
-        
-        // Generate payment URL before saving
-        let paymentUrl = null;
-        if (paymentMethod === 'Revolut' && baseRevolut) {
-            paymentUrl = formatRevolutLink(baseRevolut);
-        } else if (paymentMethod === 'PayPal' && basePaypal) {
-            paymentUrl = formatPayPalLink(basePaypal, finalOrderTotal);
-        } else if (paymentMethod === 'WhatsApp' && baseWhatsapp) {
-            const formattedPhone = baseWhatsapp.replace(/[^0-9+]/g, '');
-            const giftAddon = isGiftChecked ? ' This order includes a SAYAND Signature Gift Box.' : '';
-            const orderText = `Hello SAYAND! I just placed an order (Total: €${finalOrderTotal.toFixed(2)} EUR). My order email is: ${shipping.email}.${giftAddon} I would like to arrange payment.`;
-            paymentUrl = `https://wa.me/${formattedPhone}?text=${encodeURIComponent(orderText)}`;
-        }
-
-        const newOrder = {
-            userId: currentUser.uid,
-            status: "Pending",
-            date: new Date().toISOString(),
-            timestamp: firebase.database.ServerValue.TIMESTAMP,
-            totalAmount: finalOrderTotal,
-            discountAmount: vipDiscountAmount + promoDiscountAmount + announcementDiscountAmount,
-            vipDiscountPercent: vipDiscountPercentApplied,
-            promoCodeUsed: appliedPromo ? appliedPromo.code : null,
-            announcementDiscount: announcementDiscountAmount,
-            announcementPromoPercent: announcementPromo ? announcementPromo.percent : 0,
-            shippingCost: shippingCost,    
-            paymentMethod: paymentMethod,
-            paymentUrl: paymentUrl,
-            isGift: isGiftChecked,
-            giftNote: isGiftChecked ? document.getElementById('gift-note').value.trim() : "",
-            shippingInfo: shipping,
-            items: orderCartData
-        };
-
-       const updates = {};
-updates['/orders/' + orderId] = newOrder; 
-updates['/users/' + currentUser.uid + '/orders/' + orderId] = newOrder;
-updates['/adminOrderIndex/' + orderId] = {
-    timestamp: firebase.database.ServerValue.TIMESTAMP,
-    userId: currentUser.uid
-};
-updates['/publicOrderIndex/' + orderId.slice(-6).toUpperCase()] = {
-    orderId: orderId,
-    timestamp: firebase.database.ServerValue.TIMESTAMP
-};
-
-         // Save address to address book if checked
-        const saveAddressChecked = document.getElementById('save-address-checkbox').checked;
-        if (saveAddressChecked) {
-            const addressLabel = `${shipping.address}, ${shipping.city}`;
-            const addressEntry = {
-                label: addressLabel,
-                firstName: shipping.firstName,
-                lastName: shipping.lastName,
-                street: shipping.address,
-                apt: shipping.apt,
-                city: shipping.city,
-                zip: shipping.zip,
-                country: shipping.country,
-                phone: shipping.phone,
-                preferred: true
-            };
-            
-            // Check for duplicates before saving
-            const userAddrSnap = await firebase.database().ref(`users/${currentUser.uid}/addressBook`).once('value');
-            const existingAddrs = userAddrSnap.val() || {};
-            
-            let isDuplicate = false;
-            Object.values(existingAddrs).forEach(addr => {
-                if (
-                    (addr.street || '').trim().toLowerCase() === shipping.address.toLowerCase() &&
-                    (addr.city || '').trim().toLowerCase() === shipping.city.toLowerCase() &&
-                    (addr.zip || '').trim().toLowerCase() === shipping.zip.toLowerCase() &&
-                    (addr.country || '').trim().toLowerCase() === shipping.country.toLowerCase()
-                ) {
-                    isDuplicate = true;
-                }
-            });
-            
-            if (!isDuplicate) {
-                const newAddrKey = firebase.database().ref().push().key;
-                
-                Object.keys(existingAddrs).forEach(k => {
-                    if (existingAddrs[k].preferred) {
-                        updates[`/users/${currentUser.uid}/addressBook/${k}/preferred`] = false;
-                    }
-                });
-                
-                updates[`/users/${currentUser.uid}/addressBook/${newAddrKey}`] = addressEntry;
-            }
-            
-            updates[`/users/${currentUser.uid}/address`] = addressEntry;
-        }
 
         try {
-            const storeSnap = await firebase.database().ref('mainStore').once('value');
-            const storeData = storeSnap.val();
+            const newOrderRef = firebase.database().ref('orders').push();
+            const orderId = newOrderRef.key;
 
-            if (storeData) {
-                Object.values(orderCartData).forEach(cartItem => {
-                    for (const section in storeData) {
-                        if (Array.isArray(storeData[section])) {
-                            storeData[section].forEach((prod, index) => {
-                                if (prod.name === cartItem.name) {
-                                    let path = `/mainStore/${section}/${index}`;
-                                    const cartQty = parseInt(cartItem.quantity || cartItem.qty || 1);
-                                    
-                                    if (prod.sizeQuantities && prod.sizeQuantities[cartItem.size] !== undefined) {
-                                        const currentQty = parseInt(prod.sizeQuantities[cartItem.size]);
-                                        const newQty = Math.max(0, currentQty - cartQty);
-                                        updates[`${path}/sizeQuantities/${cartItem.size}`] = newQty;
-                                    } 
-                                    
-                                    if (prod.quantity !== undefined) {
-                                        const newTotal = Math.max(0, parseInt(prod.quantity) - cartQty);
-                                        updates[`${path}/quantity`] = newTotal;
-                                        if (newTotal === 0) updates[`${path}/isOutOfStock`] = true;
-                                    }
-                                }
-                            });
-                        }
-                    }
-                });
+            let paymentUrl = null;
+            if (paymentMethod === 'Revolut' && baseRevolut) {
+                paymentUrl = formatRevolutLink(baseRevolut);
+            } else if (paymentMethod === 'PayPal' && basePaypal) {
+                paymentUrl = formatPayPalLink(basePaypal, finalOrderTotal);
+            } else if (paymentMethod === 'WhatsApp' && baseWhatsapp) {
+                const formattedPhone = baseWhatsapp.replace(/[^0-9+]/g, '');
+                const giftAddon = isGiftChecked ? ' This order includes a SAYAND Signature Gift Box.' : '';
+                const orderText = `Hello SAYAND! I just placed an order (Total: €${finalOrderTotal.toFixed(2)} EUR). My order email is: ${shipping.email}.${giftAddon} I would like to arrange payment.`;
+                paymentUrl = `https://wa.me/${formattedPhone}?text=${encodeURIComponent(orderText)}`;
             }
 
-            // ─── SINGLE-USE PROMO CODE SELF-DESTRUCT ───
-            if (appliedPromo && appliedPromo.code) {
-                const usedCode = appliedPromo.code.toUpperCase();
-                
-                // SAFETY LOCK: Only delete codes that start with "BDAY" or "REF"
-                if (usedCode.startsWith('BDAY') || usedCode.startsWith('REF')) {
-                    
-                    // Add the deletion commands directly to your main Firebase updates payload
-                    updates[`mainStore/discountCodes/${usedCode}`] = null;
-                    updates[`mainStore/discountCodeExpiry/${usedCode}`] = null;
-                    
-                    console.log(`Unique VIP code ${usedCode} set for permanent destruction.`);
-                } else {
-                    console.log(`General store code ${usedCode} was used and remains active.`);
-                }
-            }
-            // ───────────────────────────────────────────
+            const newOrder = {
+                userId: currentUser.uid,
+                status: "Pending",
+                date: new Date().toISOString(),
+                timestamp: firebase.database.ServerValue.TIMESTAMP,
+                totalAmount: finalOrderTotal,
+                discountAmount: vipDiscountAmount + promoDiscountAmount + announcementDiscountAmount,
+                vipDiscountPercent: vipDiscountPercentApplied,
+                promoCodeUsed: appliedPromo ? appliedPromo.code : null,
+                announcementDiscount: announcementDiscountAmount,
+                announcementPromoPercent: announcementPromo ? announcementPromo.percent : 0,
+                shippingCost: shippingCost,
+                paymentMethod: paymentMethod,
+                paymentUrl: paymentUrl,
+                isGift: isGiftChecked,
+                giftNote: isGiftChecked ? document.getElementById('gift-note').value.trim() : "",
+                shippingInfo: shipping,
+                items: orderCartData
+            };
 
-            await firebase.database().ref().update(updates);
-            await firebase.database().ref(`users/${currentUser.uid}/cart`).remove();
+            const updates = {};
+            updates['/orders/' + orderId] = newOrder;
+            const saveAddressChecked = document.getElementById('save-address-checkbox').checked;
+            if (saveAddressChecked) {
+                const addressLabel = `${shipping.address}, ${shipping.city}`;
+                const addressEntry = {
+                    label: addressLabel,
+                    firstName: shipping.firstName,
+                    lastName: shipping.lastName,
+                    street: shipping.address,
+                    apt: shipping.apt,
+                    city: shipping.city,
+                    zip: shipping.zip,
+                    country: shipping.country,
+                    phone: shipping.phone,
+                    preferred: true
+                };
 
-            // Clear all possible localStorage cart keys
-            ['sayand_cart', 'cart', 'sayandCart', 'shoppingCart', 'bag', 'sayand_bag'].forEach(k => localStorage.removeItem(k));
+                const userAddrSnap = await firebase.database().ref(`users/${currentUser.uid}/addressBook`).once('value');
+                const existingAddrs = userAddrSnap.val() || {};
 
-            try {
-                const cartItemsList = Object.values(orderCartData);
-                const firstItem = cartItemsList.length > 0 ? cartItemsList[0] : {};
-
-                const sendEmailFn = firebase.functions().httpsCallable('sendStoreEmail');
-                
-                sendEmailFn({
-                    type: 'order_confirmed',
-                    payload: {
-                        email: shipping.email,
-                        firstName: shipping.firstName,
-                        orderId: orderId.slice(-6).toUpperCase(),
-                        totalAmount: finalOrderTotal.toFixed(2),
-                        itemPrice: Number(firstItem.price || 0).toFixed(2),
-                        subtotal: orderSubtotal.toFixed(2),
-                        shippingCost: Number(shippingCost).toFixed(2),
-                        shippingAddress: `${shipping.address}, ${shipping.city}, ${shipping.country}`,
-                        productImage: firstItem.image || '', 
-                        productName: firstItem.name || ''     
+                let isDuplicate = false;
+                Object.values(existingAddrs).forEach(addr => {
+                    if (
+                        (addr.street || '').trim().toLowerCase() === shipping.address.toLowerCase() &&
+                        (addr.city || '').trim().toLowerCase() === shipping.city.toLowerCase() &&
+                        (addr.zip || '').trim().toLowerCase() === shipping.zip.toLowerCase() &&
+                        (addr.country || '').trim().toLowerCase() === shipping.country.toLowerCase()
+                    ) {
+                        isDuplicate = true;
                     }
                 });
 
-                let newlyUnlockedTier = null;
-                let discountPercent = null;
+                if (!isDuplicate) {
+                    const newAddrKey = firebase.database().ref().push().key;
 
-                if (finalOrderTotal >= 700 && prevCount700 === 9) { 
-                    newlyUnlockedTier = "ATELIER ELITE"; 
-                    discountPercent = "10%"; 
-                } else if (finalOrderTotal >= 500 && prevCount500 === 5) { 
-                    newlyUnlockedTier = "ATELIER PRESTIGE"; 
-                    discountPercent = "6%"; 
-                } else if (finalOrderTotal >= 200 && prevCount200 === 2) { 
-                    newlyUnlockedTier = "ATELIER VIP"; 
-                    discountPercent = "3%"; 
-                }
-
-                if (newlyUnlockedTier) {
-                    sendEmailFn({
-                        type: 'vip_unlocked',
-                        payload: {
-                            email: shipping.email,
-                            firstName: shipping.firstName,
-                            vipTier: newlyUnlockedTier,
-                            discountPercent: discountPercent,
-                            shopUrl: "https://thesayand.com/"
+                    Object.keys(existingAddrs).forEach(k => {
+                        if (existingAddrs[k].preferred) {
+                            updates[`/users/${currentUser.uid}/addressBook/${k}/preferred`] = false;
                         }
                     });
+
+                    updates[`/users/${currentUser.uid}/addressBook/${newAddrKey}`] = addressEntry;
                 }
 
-            } catch (emailErr) {
-                console.error("Email trigger failed:", emailErr);
+                updates[`/users/${currentUser.uid}/address`] = addressEntry;
             }
 
-            // ─── REDIRECT TO PAYMENT PAGE ───
-            if (paymentMethod === 'WhatsApp' && paymentUrl) {
-                window.open(paymentUrl, '_blank');
-            }
-            window.location.href = `payment.html?orderId=${orderId}`;
+            await firebase.database().ref().update(updates);
 
+            submitBtn.innerText = "CONNECTING TO STRIPE...";
+
+            try {
+                const createCheckout = firebase.functions().httpsCallable('createStripeCheckout');
+                const response = await createCheckout({
+                    cart: Object.values(orderCartData),
+                    currency: 'eur',
+                    orderId: orderId
+                });
+
+                if (response.data && response.data.url) {
+                    const verifiedTotal = Number(response.data.totalAmount);
+                    if (!Number.isFinite(verifiedTotal)) throw new Error('Payment total could not be verified.');
+                    if (Math.round(verifiedTotal * 100) !== Math.round(finalOrderTotal * 100)) {
+                        if (!confirm(`The store has verified your total as €${verifiedTotal.toFixed(2)} EUR, including discounts and delivery. Continue to Stripe?`)) {
+                            submitBtn.innerText = 'COMPLETE ORDER';
+                            submitBtn.disabled = false;
+                            return;
+                        }
+                    }
+                    window.location.href = response.data.url;
+                } else {
+                    throw new Error("Invalid response from payment server.");
+                }
+            } catch (stripeErr) {
+                console.error("Stripe Error:", stripeErr);
+                alert("STRIPE ERROR: " + (stripeErr && stripeErr.message ? stripeErr.message : 'Unknown Stripe error'));
+                submitBtn.innerText = "COMPLETE ORDER";
+                submitBtn.disabled = false;
+            }
         } catch (error) {
             console.error("Order error:", error);
             const generalErrorEl = document.getElementById('checkout-error');
-            let msg="There was an error submitting your order. Please try again.";
-            if(error&&error.message){if(error.message.includes('PERMISSION'))msg="Permission denied. Contact support.";else if(error.message.includes('network')||error.message.includes('offline'))msg="Network error. Check connection.";}
-            if(generalErrorEl) generalErrorEl.innerText = msg;
+            let msg = "There was an error submitting your order. Please try again.";
+            if (error && error.message) {
+                if (error.message.includes('PERMISSION')) {
+                    msg = "Permission denied. Contact support.";
+                } else if (error.message.includes('network') || error.message.includes('offline')) {
+                    msg = "Network error. Check connection.";
+                }
+            }
+            if (generalErrorEl) generalErrorEl.innerText = msg;
             submitBtn.innerText = "COMPLETE ORDER";
             submitBtn.disabled = false;
         }
     });
 
-    // Dynamic shipping listeners
     document.getElementById('ship-country').addEventListener('input', updateShippingDisplay);
-    document.getElementById('ship-country').addEventListener('change', updateShippingDisplay);
-</script>
+    document.getElementById('ship-country').addEventListener('change', updateShippingDisplay);</script>
 
     <!-- Google Maps API -->
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD8RHTg2bBV_mclB6RKb_nz_Cdk8C48pls&libraries=places&callback=initMapsWithRetry"></script>

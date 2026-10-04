@@ -1,3 +1,38 @@
+// Optimistic store save: preserve payment receipts and reject stale inventory edits.
+let storeBaseline = null;
+let storeSaveInProgress = false;
+function comparableStore(value) {
+    const clean = JSON.parse(JSON.stringify(value || {}));
+    delete clean._paymentReceipts;
+    function stable(v) {
+        if (Array.isArray(v)) return v.map(stable);
+        if (v && typeof v === 'object') return Object.fromEntries(Object.keys(v).sort().map(k=>[k,stable(v[k])]));
+        return v;
+    }
+    return JSON.stringify(stable(clean));
+}
+async function saveStoreSafely() {
+    if (!storeBaseline) throw new Error('Store has not loaded. Refresh before saving.');
+    if (storeSaveInProgress) throw new Error('A save is already in progress.');
+    storeSaveInProgress = true;
+    const ref=db.ref('mainStore');
+    let listener;
+    try {
+        const proposed=JSON.parse(JSON.stringify(database));
+        delete proposed._paymentReceipts;
+        await new Promise((resolve,reject)=>{ listener=ref.on('value',resolve,reject); });
+        const result=await ref.transaction(current=>{
+            if (!current || comparableStore(current) !== comparableStore(storeBaseline)) return;
+            return {...current,...proposed};
+        },undefined,false);
+        if (!result.committed) throw new Error('The store changed since you opened admin. Refresh and reapply your edits to protect current stock.');
+        storeBaseline=JSON.parse(JSON.stringify(result.snapshot.val()));
+    } finally {
+        if (listener) ref.off('value',listener);
+        storeSaveInProgress=false;
+    }
+}
+
 let database = { 
     lookbook: [], 
     siteContent: {}, 
@@ -36,6 +71,10 @@ function showAdminToast(message) {
     }
 }
 
+function escapeAdminTranslation(value) {
+    return String(value || '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+}
+
 const GEMINI_API_KEY = 'YOUR_NEW_API_KEY_HERE'; 
 
 console.log("[ADMIN] Connecting to Firebase Database...");
@@ -44,6 +83,7 @@ db.ref("mainStore").once("value").then((snapshot) => {
     if(snapshot.exists()) {
         console.log("[ADMIN] Database Snapshot Found. Loading data...");
         const data = snapshot.val();
+        storeBaseline = JSON.parse(JSON.stringify(data));
         
         // Load Arrays Safely
         if(data.lookbook) database.lookbook = Array.isArray(data.lookbook) ? data.lookbook : Object.values(data.lookbook);
@@ -97,21 +137,30 @@ db.ref("stockNotifications").on("value", (snapshot) => {
     renderLists();
 });
 
-db.ref("adminOrderIndex").on("value", async (snapshot) => {
-    const index = snapshot.val();
-    if (!index) {
-        if (typeof renderOrders === "function") renderOrders(null);
+// Listen to the same authoritative orders that Stripe and admin actions update.
+let adminOrdersRef = null;
+let adminOrdersCallback = null;
+firebase.auth().onAuthStateChanged((user) => {
+    if (adminOrdersRef && adminOrdersCallback) {
+        adminOrdersRef.off('value', adminOrdersCallback);
+    }
+    adminOrdersRef = null;
+    adminOrdersCallback = null;
+    const allowedAdmins = ['MS15g8h5ELPmMcuBijhEC7loGws2'];
+    if (!user || !allowedAdmins.includes(user.uid)) {
+        const container = document.getElementById('orders-list');
+        if (container) container.textContent = '';
         return;
     }
-    const orderIds = Object.keys(index).sort((a, b) => {
-        return (index[b].timestamp || 0) - (index[a].timestamp || 0);
+    adminOrdersRef = db.ref('orders');
+    adminOrdersCallback = (snapshot) => {
+        if (typeof renderOrders === 'function') renderOrders(snapshot.val());
+    };
+    adminOrdersRef.on('value', adminOrdersCallback, (error) => {
+        console.error('[ADMIN] Orders read failed:', error);
+        const container = document.getElementById('orders-list');
+        if (container) container.textContent = 'Unable to load orders. Please refresh and try again.';
     });
-    const orders = {};
-    for (const id of orderIds) {
-        const snap = await db.ref('orders/' + id).once('value');
-        if (snap.exists()) orders[id] = snap.val();
-    }
-    if (typeof renderOrders === "function") renderOrders(orders);
 });
 
 db.ref("users").on("value", (snapshot) => {
@@ -384,7 +433,7 @@ window.updateOrderTracking = async function(id) {
                     trackingNumber: trackingVal,
                     carrier: carrierName,
                     trackingUrl: trackingLink,
-                    estimatedDelivery: "3-5 Business Days"
+                    estimatedDelivery: ['it','ita','italy','italia','italie','italien'].includes(String(orderData.shippingInfo.country || '').trim().toLowerCase()) ? "3–7 working days within Italy" : "5–14 working days internationally"
                 }
             });
         }
@@ -394,32 +443,75 @@ window.updateOrderTracking = async function(id) {
     }
 }
 
-window.issueReturnCode = async function(orderId) {
-    const qrUrlInput = document.getElementById(`qr-input-${orderId}`).value.trim();
-    if (!qrUrlInput) return alert("Please paste a valid QR Code / Label URL first.");
-    if(!confirm("Are you sure? This will email the QR code directly to the customer.")) return;
+const returnUploadBusy = new Set();
+const returnSendBusy = new Set();
 
+function returnLabelURL(value) {
     try {
-        if (typeof showAdminToast === 'function') showAdminToast("APPROVING & SENDING EMAIL...");
-        await db.ref('orders/' + orderId).update({ status: 'Return Approved', returnQrUrl: qrUrlInput });
-        const snapshot = await db.ref('orders/' + orderId).once('value');
-        const orderData = snapshot.val();
+        const url = new URL(value);
+        return url.protocol === 'https:' && !url.username && !url.password ? url.href : '';
+    } catch (_) { return ''; }
+}
 
-        if (orderData && orderData.shippingInfo && orderData.shippingInfo.email) {
-            const sendEmailFn = firebase.functions().httpsCallable('sendStoreEmail');
-            await sendEmailFn({
-                type: 'return_approved',
-                payload: {
-                    email: orderData.shippingInfo.email,
-                    firstName: orderData.shippingInfo.firstName || 'there',
-                    orderId: orderId.slice(-6).toUpperCase(),
-                    qrUrl: qrUrlInput
-                }
-            });
-        }
-        if (typeof showAdminToast === 'function') showAdminToast("RETURN APPROVED & EMAILED!");
-    } catch (err) {
-        alert("Error: " + err.message);
+window.uploadReturnFile = async function(orderId, input) {
+    const file = input.files && input.files[0];
+    if (!file || returnUploadBusy.has(orderId) || returnSendBusy.has(orderId)) return;
+    const types = {'image/png':'png','image/jpeg':'jpg','application/pdf':'pdf'};
+    if (!types[file.type] || file.size <= 0 || file.size > 5 * 1024 * 1024) {
+        alert('Choose a PNG, JPG or PDF file up to 5 MB.');
+        input.value = '';
+        return;
+    }
+    const status = document.getElementById('qr-status-' + orderId);
+    const button = document.getElementById('qr-send-' + orderId);
+    returnUploadBusy.add(orderId);
+    input.disabled = true;
+    if (button) button.disabled = true;
+    status.textContent = 'Uploading courier file...';
+    try {
+        const key = db.ref('orders').push().key;
+        const path = 'return-labels/' + encodeURIComponent(orderId) + '/' + key + '.' + types[file.type];
+        const result = await firebase.storage().ref().child(path).put(file, {contentType:file.type});
+        const url = await result.ref.getDownloadURL();
+        document.getElementById('qr-input-' + orderId).value = url;
+        status.textContent = 'Uploaded. Preview the file, then approve and send.';
+        const preview = document.createElement('a');
+        preview.href = url; preview.target = '_blank'; preview.rel = 'noopener noreferrer';
+        preview.textContent = ' Open uploaded file'; preview.className = 'underline font-bold';
+        status.appendChild(preview);
+    } catch (error) {
+        status.textContent = 'Upload failed: ' + error.message;
+    } finally {
+        returnUploadBusy.delete(orderId);
+        input.disabled = false;
+        if (button) button.disabled = false;
+    }
+};
+
+window.issueReturnCode = async function(orderId) {
+    if (returnUploadBusy.has(orderId) || returnSendBusy.has(orderId)) return;
+    const url = returnLabelURL(document.getElementById('qr-input-' + orderId).value.trim());
+    if (!url) return alert('Upload the courier file or paste a valid HTTPS label link first.');
+    if (!confirm('Approve this return and email this courier QR code / label to the customer? This does not buy postage or book a collection.')) return;
+    returnSendBusy.add(orderId);
+    let approved = false;
+    try {
+        const snapshot = await db.ref('orders/' + orderId).once('value');
+        const order = snapshot.val();
+        if (!order || !['Return Requested', 'Return Approved'].includes(order.status)) throw new Error('This order does not have an active return request.');
+        if (!order.shippingInfo || !order.shippingInfo.email) throw new Error('The order has no customer email address.');
+        await db.ref('orders/' + orderId).update({status:'Return Approved', returnQrUrl:url});
+        approved = true;
+        const result = await firebase.functions().httpsCallable('sendStoreEmail')({
+            type:'return_approved',
+            payload:{email:order.shippingInfo.email,firstName:order.shippingInfo.firstName || 'there',orderId:orderId.slice(-6).toUpperCase(),qrUrl:url}
+        });
+        if (!result.data || result.data.success !== true) throw new Error((result.data && result.data.message) || 'The email service did not confirm sending.');
+        showAdminToast('RETURN APPROVED — EMAIL ACCEPTED FOR SENDING!');
+    } catch (error) {
+        alert((approved ? 'The return is approved and its file is available in the customer account, but the email was not confirmed. Use RESEND RETURN EMAIL to try again. ' : 'Return not approved. ') + error.message);
+    } finally {
+        returnSendBusy.delete(orderId);
     }
 };
 
@@ -521,7 +613,7 @@ window.renderOrders = function(data) {
         return;
     }
     
-    const ordersArray = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+    const ordersArray = Object.keys(data).filter(key => /^[-A-Za-z0-9_]{20}$/.test(key)).map(key => ({ ...data[key], id: key }));
     ordersArray.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
     
     container.innerHTML = ordersArray.map(order => {
@@ -530,7 +622,7 @@ window.renderOrders = function(data) {
         const itemsList = Object.values(order.items || {}).map(item => {
             const lineTotal = item.price * item.quantity;
             subtotal += lineTotal;
-            return `<li>${item.quantity}x ${item.name} (${item.size}/${item.color}) - €${lineTotal.toFixed(2)}</li>`
+            return `<li>${escapeAdminTranslation(item.quantity)}x ${escapeAdminTranslation(item.name)} (${escapeAdminTranslation(item.size)}/${escapeAdminTranslation(item.color)}) - €${lineTotal.toFixed(2)}</li>`
         }).join('');
         
         let statusColor = order.status === 'Pending' ? 'text-orange-500' : 
@@ -543,15 +635,26 @@ window.renderOrders = function(data) {
         let discountHTML = '';
         if (order.discountAmount) {
             let label = order.promoCodeUsed ? `PROMO (${order.promoCodeUsed})` : 'VIP DISCOUNT';
-            discountHTML = `<div class="flex justify-between text-[#d4af37] font-bold text-[9px] mb-1"><span>${label}</span> <span>-€${order.discountAmount.toFixed(2)}</span></div>`;
+            discountHTML = `<div class="flex justify-between text-[#d4af37] font-bold text-[9px] mb-1"><span>${escapeAdminTranslation(label)}</span> <span>-€${order.discountAmount.toFixed(2)}</span></div>`;
         }
 
-        let giftHTML = order.isGift ? `<div class="mt-4 mb-4 bg-[#fdfbf7] border border-[#d4af37] p-4 shadow-sm"><p class="text-[10px] font-black text-[#d4af37] tracking-[0.2em] mb-2 uppercase">🎁 Signature Gift Box Requested</p><p class="text-[12px] font-serif italic text-gray-800 border-l-2 border-[#d4af37] pl-3">" ${order.giftNote || 'No custom note provided.'} "</p></div>` : '';
+        let giftHTML = order.isGift ? `<div class="mt-4 mb-4 bg-[#fdfbf7] border border-[#d4af37] p-4 shadow-sm"><p class="text-[10px] font-black text-[#d4af37] tracking-[0.2em] mb-2 uppercase">🎁 Signature Gift Box Requested</p><p class="text-[12px] font-serif italic text-gray-800 border-l-2 border-[#d4af37] pl-3">" ${escapeAdminTranslation(order.giftNote || 'No custom note provided.')} "</p></div>` : '';
         let shipCostDisplay = order.shippingCost === 0 ? "COMPLIMENTARY" : `€${(order.shippingCost !== undefined ? order.shippingCost : 15).toFixed(2)}`;
         
         let returnAdminAction = '';
-        if (order.status === 'Return Requested') {
-            returnAdminAction = `<div class="mt-4 p-4 bg-purple-50 border border-purple-200 rounded shadow-sm"><p class="text-[10px] font-bold text-purple-700 tracking-widest uppercase mb-2">🚨 ACTION REQUIRED: ISSUE RETURN QR / LABEL</p><input type="text" id="qr-input-${order.id}" placeholder="Paste Carrier QR Image / Label URL here..." class="w-full border border-purple-300 p-2 text-xs mb-3 bg-white focus:outline-none focus:border-purple-600"><button onclick="issueReturnCode('${order.id}')" class="w-full bg-purple-600 text-white px-4 py-3 text-[10px] tracking-widest font-bold hover:bg-purple-700 transition-colors">APPROVE RETURN & SEND QR CODE</button></div>`;
+        if (order.status === 'Return Requested' || order.status === 'Return Approved') {
+            const safeReturnURL = escapeAdminTranslation(returnLabelURL(order.returnQrUrl || ''));
+            returnAdminAction = `<div class="mt-4 p-4 bg-purple-50 border border-purple-200 rounded shadow-sm">
+                <p class="text-[10px] font-bold text-purple-700 mb-2">COURIER RETURN QR / LABEL</p>
+                <p class="text-xs mb-3">Buy the return shipment from the courier first. Upload its original PNG, JPG or PDF (maximum 5 MB). Uploading does not book a pickup.</p>
+                <label for="qr-file-${order.id}" class="block text-xs font-bold mb-1">Upload courier file</label>
+                <input id="qr-file-${order.id}" type="file" accept="image/png,image/jpeg,application/pdf" onchange="uploadReturnFile('${order.id}', this)" class="w-full text-xs mb-3">
+                <p id="qr-status-${order.id}" role="status" aria-live="polite" class="text-xs mb-3"></p>
+                <label for="qr-input-${order.id}" class="block text-xs mb-1">Or paste the courier's HTTPS file link</label>
+                <input type="url" id="qr-input-${order.id}" value="${safeReturnURL}" placeholder="https://..." class="w-full border border-purple-300 p-2 text-xs mb-3 bg-white">
+                ${safeReturnURL ? `<a href="${safeReturnURL}" target="_blank" rel="noopener noreferrer" class="block underline text-xs mb-3">View current return file</a>` : ''}
+                <button id="qr-send-${order.id}" onclick="issueReturnCode('${order.id}')" class="w-full bg-purple-600 text-white px-4 py-3 text-[10px] font-bold">${order.status === 'Return Approved' ? 'RESEND RETURN EMAIL / SAVE NEW FILE' : 'APPROVE RETURN & SEND QR / LABEL'}</button>
+            </div>`;
         } else if (order.returnQrUrl) {
             returnAdminAction = `<div class="mt-4 p-3 bg-gray-50 border border-gray-200 rounded"><p class="text-[9px] font-bold text-gray-500 tracking-widest uppercase mb-1">RETURN QR / LABEL ISSUED</p><p class="text-[10px] text-gray-600 truncate"><a href="${order.returnQrUrl}" target="_blank" class="text-blue-500 underline font-bold hover:text-black">View Active Return Label</a></p></div>`;
         }
@@ -570,6 +673,8 @@ window.renderOrders = function(data) {
                     <div class="flex gap-2 items-center">
                         <select onchange="updateOrderStatus('${order.id}', this.value)" class="text-[10px] border border-gray-300 p-1 font-bold ${statusColor} bg-transparent outline-none max-w-[140px]">
                             <option value="Pending" ${order.status==='Pending'?'selected':''} class="text-black">Pending</option>
+                            <option value="Paid" ${order.status==='Paid'?'selected':''} class="text-black">Paid</option>
+                            <option value="Payment Review" ${order.status==='Payment Review'?'selected':''} class="text-black">Payment Received — Review Required</option>
                             <option value="Verifying" ${order.status==='Verifying'?'selected':''} class="text-black">Verifying Payment</option>
                             <option value="Processing" ${order.status==='Processing'?'selected':''} class="text-black">Preparing Shipment</option>
                             <option value="Shipped" ${order.status==='Shipped'?'selected':''} class="text-black">Shipped</option>
@@ -584,21 +689,22 @@ window.renderOrders = function(data) {
                     </div>
                 </div>
                 
+                ${order.paymentReviewReason ? `<p class="text-xs text-red-700 font-bold mb-3">Payment review: ${escapeAdminTranslation(order.paymentReviewReason)} Stock was not deducted. Check Stripe and inventory before fulfilling or refunding this order.</p>` : ''}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-[10px] mb-4">
                     <div>
                         <p class="font-bold text-gray-400 mb-2 tracking-widest border-b border-gray-50 pb-1">CUSTOMER INFO</p>
-                        <p class="font-semibold text-black">${order.shippingInfo?.firstName || ''} ${order.shippingInfo?.lastName || ''}</p>
+                        <p class="font-semibold text-black">${escapeAdminTranslation(order.shippingInfo?.firstName || '')} ${escapeAdminTranslation(order.shippingInfo?.lastName || '')}</p>
                         <p class="text-gray-600 flex items-center gap-2">
-                            ${order.shippingInfo?.email || ''} 
-                            <button onclick="inviteToAtelier('${order.shippingInfo?.email || ''}', '${order.shippingInfo?.firstName || ''}')" class="text-[#d4af37] border border-[#d4af37] px-1 py-0.5 hover:bg-[#f9f6ea] transition-colors text-[8px] font-bold">VIP INVITE</button>
+                            ${escapeAdminTranslation(order.shippingInfo?.email || '')} 
+                            <button data-email="${escapeAdminTranslation(order.shippingInfo?.email || '')}" data-first-name="${escapeAdminTranslation(order.shippingInfo?.firstName || '')}" onclick="inviteToAtelier(this.dataset.email, this.dataset.firstName)" class="text-[#d4af37] border border-[#d4af37] px-1 py-0.5 hover:bg-[#f9f6ea] transition-colors text-[8px] font-bold">VIP INVITE</button>
                         </p>
-                        <p class="text-gray-600">${order.shippingInfo?.phone || ''}</p>
+                        <p class="text-gray-600">${escapeAdminTranslation(order.shippingInfo?.phone || '')}</p>
                     </div>
                     <div>
                         <p class="font-bold text-gray-400 mb-2 tracking-widest border-b border-gray-50 pb-1">SHIPPING ADDRESS</p>
-                        <p class="text-gray-600">${order.shippingInfo?.address || ''} ${order.shippingInfo?.apt || ''}</p>
-                        <p class="text-gray-600">${order.shippingInfo?.city || ''}, ${order.shippingInfo?.zip || ''}</p>
-                        <p class="text-gray-600">${order.shippingInfo?.country || ''}</p>
+                        <p class="text-gray-600">${escapeAdminTranslation(order.shippingInfo?.address || '')} ${escapeAdminTranslation(order.shippingInfo?.apt || '')}</p>
+                        <p class="text-gray-600">${escapeAdminTranslation(order.shippingInfo?.city || '')}, ${escapeAdminTranslation(order.shippingInfo?.zip || '')}</p>
+                        <p class="text-gray-600">${escapeAdminTranslation(order.shippingInfo?.country || '')}</p>
                     </div>
                 </div>
                 ${giftHTML}
@@ -610,18 +716,18 @@ window.renderOrders = function(data) {
                         <div class="w-full md:w-1/2 text-[9px] text-gray-500 space-y-1">
                             <div class="flex justify-between"><span>SUBTOTAL</span> <span>€${subtotal.toFixed(2)}</span></div>
                             ${discountHTML}
-                            ${order.isGift ? `<div class="flex justify-between text-black font-bold"><span>GIFT PACKAGING</span> <span>+€15.00</span></div>` : ''}
+                            ${order.isGift ? `<div class="flex justify-between text-black font-bold"><span>GIFT PACKAGING</span> <span>+€${Number(order.giftCost === undefined ? 2 : order.giftCost).toFixed(2)}</span></div>` : ''}
                             <div class="flex justify-between"><span>SHIPPING</span> <span>${shipCostDisplay}</span></div>
                         </div>
                     </div>
                     <div class="flex justify-between items-center text-xs font-black border-t border-b border-gray-200 py-2 mb-3">
-                        <span class="text-gray-500 text-[10px]">PAID VIA: <span class="text-blue-600 uppercase">${order.paymentMethod}</span></span>
+                        <span class="text-gray-500 text-[10px]">PAID VIA: <span class="text-blue-600 uppercase">${escapeAdminTranslation(order.paymentMethod)}</span></span>
                         <span>€${(order.totalAmount || 0).toFixed(2)} EUR</span>
                     </div>
                     <div class="flex flex-col gap-1">
                         <label class="text-[9px] font-bold text-gray-400 tracking-widest uppercase">SHIPPING & TRACKING CODE</label>
                         <div class="flex gap-2">
-                            <input type="text" id="track-${order.id}" value="${order.tracking || ''}" placeholder="e.g. DHL 123456789" class="flex-1 border border-gray-300 p-1.5 text-[10px] focus:border-black outline-none bg-white font-mono">
+                            <input type="text" id="track-${order.id}" value="${escapeAdminTranslation(order.tracking || '')}" placeholder="e.g. DHL 123456789" class="flex-1 border border-gray-300 p-1.5 text-[10px] focus:border-black outline-none bg-white font-mono">
                             <button onclick="updateOrderTracking('${order.id}')" class="bg-black text-white px-3 py-1.5 text-[9px] font-bold tracking-wider hover:bg-gray-800 transition-colors">SAVE TRACKING</button>
                         </div>
                     </div>
@@ -714,6 +820,20 @@ document.getElementById('addProductForm').addEventListener('submit', function(e)
         sizeQuantities: sizeQuantities,
         colors: rawColors.length > 0 ? rawColors : ['Default']
     };
+    const previousItem = editingTarget ? database[editingTarget.section][editingTarget.index] : null;
+    const translations = { ...(previousItem && previousItem.translations || {}) };
+    for (const [code, suffix] of [['it','It'],['fr','Fr'],['de','De']]) {
+        const previous = translations[code] || {};
+        translations[code] = { ...previous,
+            name: document.getElementById('prodName' + suffix).value.trim(),
+            description: document.getElementById('prodDesc' + suffix).value.trim(),
+            details: { ...(previous.details || {}) }
+        };
+        for (const key of ['Material','Fit','Care','Origin']) {
+            translations[code].details[key] = document.getElementById('detail' + key + suffix).value.trim();
+        }
+    }
+    newItem.translations = translations;
     if (Object.keys(details).length > 0) newItem.details = details;
     if (measurements) newItem.measurements = measurements;
     if (related.length > 0) newItem.related = related;
@@ -760,6 +880,14 @@ window.startEdit = function(section, index) {
     document.getElementById('prodName').value = item.name;
     document.getElementById('prodPrice').value = item.price;
     document.getElementById('prodDesc').value = item.description || '';
+    for (const [code, suffix] of [['it','It'],['fr','Fr'],['de','De']]) {
+        const localized = item.translations && item.translations[code] || {};
+        document.getElementById('prodName' + suffix).value = localized.name || '';
+        document.getElementById('prodDesc' + suffix).value = localized.description || '';
+        for (const key of ['Material','Fit','Care','Origin']) {
+            document.getElementById('detail' + key + suffix).value = localized.details && localized.details[key] || '';
+        }
+    }
     if(document.getElementById('prodOutOfStock')) document.getElementById('prodOutOfStock').checked = !!item.isOutOfStock;
     if(document.getElementById('prodVipOnly')) document.getElementById('prodVipOnly').checked = !!item.isVipOnly;
     
@@ -1268,7 +1396,7 @@ window.launchDrop = async function(index) {
     database.newArrivals.push(newProduct);
     database.upcomingSales.splice(index, 1);
 
-    await db.ref("mainStore").set(database);
+    await saveStoreSafely();
 
     const preordersSnap = await db.ref(`preorders/${item.name}`).once('value');
     
@@ -1358,6 +1486,12 @@ window.updateAnnouncement = function() {
 
 function loadDesignForm() {
     const sc = database.siteContent;
+    for (const [code, suffix] of [['it','It'],['fr','Fr'],['de','De']]) {
+        const localized = sc.translations && sc.translations[code] || {};
+        for (const field of ['heroSubtitle','heroTitle','editSubtitle','editTitle','editDesc']) {
+            document.getElementById(field + suffix).value = localized[field] || '';
+        }
+    }
     if(document.getElementById('mediaDescriptions')) document.getElementById('mediaDescriptions').value = sc.mediaDescriptions || '';    document.getElementById('heroSubtitle').value = sc.heroSubtitle || '';
     document.getElementById('heroTitle').value = sc.heroTitle || '';
     document.getElementById('heroImg').value = sc.heroImg || '';
@@ -1378,6 +1512,16 @@ function loadDesignForm() {
 }
 
  window.updateDesign = function() {
+    database.siteContent = database.siteContent || {};
+    database.siteContent.translations = database.siteContent.translations || {};
+    for (const [code, suffix] of [['it','It'],['fr','Fr'],['de','De']]) {
+        const localized = { ...(database.siteContent.translations[code] || {}) };
+        for (const field of ['heroSubtitle','heroTitle','editSubtitle','editTitle','editDesc']) {
+            localized[field] = document.getElementById(field + suffix).value.trim();
+        }
+        database.siteContent.translations[code] = localized;
+    }
+
     if (!database.siteContent) database.siteContent = {};
     
     // Safely update properties instead of wiping the whole object
@@ -1408,6 +1552,8 @@ function loadDesignForm() {
 
 function loadContactForm() {
     const c = database.contact;
+    document.getElementById('returnAddress').value = c.returnAddress || 'SAYAND\nVia Giuseppe di Vittorio 5\n44028 Poggio Renatico (FE)\nItaly';
+    document.getElementById('saveReturnAddress').disabled = false;
     document.getElementById('contactEmail').value = c.email || '';
     document.getElementById('contactWhatsapp').value = c.whatsapp || '';
     document.getElementById('contactInstagram').value = c.instagram || '';
@@ -1419,6 +1565,7 @@ function loadContactForm() {
 
 window.updateContact = function() {
     database.contact = {
+        ...database.contact,
         email: document.getElementById('contactEmail').value,
         whatsapp: document.getElementById('contactWhatsapp').value,
         instagram: document.getElementById('contactInstagram').value,
@@ -1537,7 +1684,7 @@ function renderLists() {
 }
 
 window.generateCode = function() {
-    db.ref("mainStore").set(database)
+    saveStoreSafely()
         .then(() => {
             console.log("[ADMIN] Cloud Sync Successful! Your store is updated.");
             if(typeof showAdminToast === 'function') showAdminToast("LIVE STORE UPDATED!");
@@ -1546,7 +1693,7 @@ window.generateCode = function() {
 }
 
 const DEFAULT_FOOTER_PAGES = {
-    shipping: { title: "SHIPPING INFO", content: `<div class="space-y-6"><div><h4 class="text-black font-bold text-sm tracking-wider mb-2">STANDARD DELIVERY</h4><p class="text-gray-600">Free standard shipping on all orders over €150. Delivery within 3-5 business days.</p></div></div>` },
+    shipping: { title: "SHIPPING INFO", content: `<div class="space-y-6"><div><h4 class="text-black font-bold text-sm tracking-wider mb-2">STANDARD DELIVERY</h4><p class="text-gray-600">Free standard shipping on all orders over €150. Delivery within Italy: 3–7 working days. International delivery: 5–14 working days.</p></div></div>` },
     returns: { title: "RETURNS & EXCHANGES", content: `<div class="space-y-6"><div><h4 class="text-black font-bold text-sm tracking-wider mb-2">RETURN POLICY</h4><p class="text-gray-600">We accept returns within 30 days of purchase. Items must be in original condition.</p></div></div>` },
     size: { title: "SIZE GUIDE", content: `<div class="space-y-6"><p class="text-gray-600">Our garments are designed with a contemporary fit.</p></div>` },
     about: { title: "ABOUT US", content: `<div class="space-y-6"><p class="text-gray-600">SAYAND is a contemporary fashion label founded on the principle that less is always more.</p></div>` },
@@ -1579,6 +1726,21 @@ function loadFooterForm() {
                 <button onclick="removeFooterPage('${key}')" class="text-red-500 hover:text-red-700 text-xs font-bold px-2">&times;</button>
             </div>
             <textarea class="footer-content w-full text-[10px] border border-gray-300 p-2 focus:outline-none focus:border-black h-20" data-key="${key}" oninput="updateFooter('${key}')">${page.content}</textarea>
+            <details class="mt-3 border-t pt-2">
+                <summary class="text-xs font-bold cursor-pointer">Italian page text (optional)</summary>
+                <input type="text" class="footer-title-it w-full text-xs border p-2 mt-2" placeholder="Italian title" value="${escapeAdminTranslation(page.translations && page.translations.it && page.translations.it.title)}" data-key="${key}" oninput="updateFooter('${key}')">
+                <textarea class="footer-content-it w-full text-xs border p-2 mt-2 h-24" placeholder="Italian content (same HTML format as the original)" data-key="${key}" oninput="updateFooter('${key}')">${escapeAdminTranslation(page.translations && page.translations.it && page.translations.it.content)}</textarea>
+            </details>
+            <details class="mt-3 border-t pt-2">
+                <summary class="text-xs font-bold cursor-pointer">German page text (optional)</summary>
+                <input type="text" class="footer-title-de w-full text-xs border p-2 mt-2" placeholder="German title" value="${escapeAdminTranslation(page.translations && page.translations.de && page.translations.de.title)}" data-key="${key}" oninput="updateFooter('${key}')">
+                <textarea class="footer-content-de w-full text-xs border p-2 mt-2 h-24" placeholder="German content (same HTML format as the original)" data-key="${key}" oninput="updateFooter('${key}')">${escapeAdminTranslation(page.translations && page.translations.de && page.translations.de.content)}</textarea>
+            </details>
+            <details class="mt-3 border-t pt-2">
+                <summary class="text-xs font-bold cursor-pointer">French page text (optional)</summary>
+                <input type="text" class="footer-title-fr w-full text-xs border p-2 mt-2" placeholder="French title" value="${escapeAdminTranslation(page.translations && page.translations.fr && page.translations.fr.title)}" data-key="${key}" oninput="updateFooter('${key}')">
+                <textarea class="footer-content-fr w-full text-xs border p-2 mt-2 h-24" placeholder="French content (same HTML format as the original)" data-key="${key}" oninput="updateFooter('${key}')">${escapeAdminTranslation(page.translations && page.translations.fr && page.translations.fr.content)}</textarea>
+            </details>
             <p class="text-[9px] text-gray-400 mt-1 font-mono">KEY: ${key}</p>
         `;
         container.appendChild(div);
@@ -1589,7 +1751,16 @@ window.updateFooter = function(key) {
     const titleInput = document.querySelector(`.footer-title[data-key="${key}"]`);
     const contentInput = document.querySelector(`.footer-content[data-key="${key}"]`);
     if (titleInput && contentInput) {
-        database.footer[key] = { title: titleInput.value, content: contentInput.value };
+        const existing = database.footer[key] || {};
+        const translations = { ...(existing.translations || {}) };
+        for (const code of ['it','fr','de']) {
+            translations[code] = {
+                ...(translations[code] || {}),
+                title: document.querySelector(`.footer-title-${code}[data-key="${key}"]`).value,
+                content: document.querySelector(`.footer-content-${code}[data-key="${key}"]`).value
+            };
+        }
+        database.footer[key] = { ...existing, title: titleInput.value, content: contentInput.value, translations };
         generateCode();
     }
 };
@@ -1774,6 +1945,14 @@ window.addLookbookArticle = async function() {
     const title = document.getElementById('lbTitle').value.trim();
     const subtitle = document.getElementById('lbSubtitle').value.trim();
     const desc = document.getElementById('lbDesc').value.trim();
+    const articleTranslations = {};
+    for (const [code, suffix] of [['it','It'],['fr','Fr'],['de','De']]) {
+        articleTranslations[code] = {
+            title: document.getElementById('lbTitle' + suffix).value.trim(),
+            subtitle: document.getElementById('lbSubtitle' + suffix).value.trim(),
+            description: document.getElementById('lbDesc' + suffix).value.trim()
+        };
+    }
     const fileInput = document.getElementById('lbFile');
     const urlInput = document.getElementById('lbUrl').value.trim();
     const btn = document.getElementById('lbSubmitBtn');
@@ -1807,6 +1986,9 @@ window.addLookbookArticle = async function() {
             database.lookbook[editingLookbookIndex].title = title;
             database.lookbook[editingLookbookIndex].subtitle = subtitle;
             database.lookbook[editingLookbookIndex].description = desc;
+            database.lookbook[editingLookbookIndex].translations = {
+                ...(database.lookbook[editingLookbookIndex].translations || {}), ...articleTranslations
+            };
             if (finalUrls.length > 0) {
                 // Append new images to existing array
                 database.lookbook[editingLookbookIndex].urls = [...database.lookbook[editingLookbookIndex].urls, ...finalUrls];
@@ -1820,6 +2002,7 @@ window.addLookbookArticle = async function() {
                 title: title,
                 subtitle: subtitle,
                 description: desc,
+                translations: articleTranslations,
                 urls: finalUrls,
                 hotspots: {} // Maps image index to hotspot array: { "0": [], "1": [] }
             });
@@ -1849,6 +2032,12 @@ window.startEditLookbook = function(idx) {
     document.getElementById('lbTitle').value = article.title || '';
     document.getElementById('lbSubtitle').value = article.subtitle || '';
     document.getElementById('lbDesc').value = article.description || '';
+    for (const [code, suffix] of [['it','It'],['fr','Fr'],['de','De']]) {
+        const localized = article.translations && article.translations[code] || {};
+        document.getElementById('lbTitle' + suffix).value = localized.title || '';
+        document.getElementById('lbSubtitle' + suffix).value = localized.subtitle || '';
+        document.getElementById('lbDesc' + suffix).value = localized.description || '';
+    }
     document.getElementById('lbUrl').value = '';
     document.getElementById('lbFile').value = '';
     
@@ -1866,6 +2055,9 @@ window.cancelEditLookbook = function() {
     document.getElementById('lbTitle').value = '';
     document.getElementById('lbSubtitle').value = '';
     document.getElementById('lbDesc').value = '';
+    for (const suffix of ['It','Fr','De']) {
+        for (const field of ['lbTitle','lbSubtitle','lbDesc']) document.getElementById(field + suffix).value = '';
+    }
     document.getElementById('lbUrl').value = '';
     document.getElementById('lbFile').value = '';
 };
@@ -2112,3 +2304,27 @@ setTimeout(() => {
     console.log("[ADMIN] Triggering initial renders...");
     if (typeof renderLookbookSlides === 'function') renderLookbookSlides();
 }, 1500);
+// Save only the return address, without overwriting other store settings.
+window.saveReturnAddress = async function() {
+    const input = document.getElementById('returnAddress');
+    const button = document.getElementById('saveReturnAddress');
+    const status = document.getElementById('returnAddressStatus');
+    const address = input.value.trim();
+    if (!address || address.length > 1000) {
+        status.textContent = 'Enter a complete return address (maximum 1,000 characters).';
+        input.focus();
+        return;
+    }
+    button.disabled = true;
+    status.textContent = 'Saving...';
+    try {
+        await db.ref('mainStore/contact/returnAddress').set(address);
+        database.contact.returnAddress = address;
+        status.textContent = 'Return address saved. The Returns page now uses this address.';
+        showAdminToast('RETURN ADDRESS SAVED!');
+    } catch (error) {
+        status.textContent = 'Unable to save. Please try again. ' + error.message;
+    } finally {
+        button.disabled = false;
+    }
+};

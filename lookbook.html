@@ -6,6 +6,7 @@
     <title>SAYAND | Atelier Lookbook</title>
     <link rel="icon" type="image/png" href="https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/SAYAND%20Intertwined%20S%26A%20Monogram.png?alt=media&token=4a0c7abb-0150-4d22-94fc-d58f901a45f6">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/style.css?v=site-4">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f5f0e8; color: #0f1f0f; }
@@ -14,6 +15,20 @@
         .lookbook-card:hover .lookbook-img { transform: scale(1.05); }
         .lookbook-overlay { background: linear-gradient(to top, rgba(15,31,15,0.9) 0%, rgba(15,31,15,0.2) 60%, transparent 100%); }
     </style>
+    <link rel="stylesheet" href="css/i18n.css?v=site-4">
+    <script src="js/translations.js?v=shipping-admin-1"></script>
+    <script src="js/i18n.js?v=site-4"></script>
+    <link rel="stylesheet" href="css/site-updates.css?v=site-4">
+    <script src="js/consent.js?v=site-4"></script>
+
+    <meta name="description" content="Discover SAYAND collections, editorial stories and styling inspiration.">
+    <link rel="canonical" href="https://thesayand.com/lookbook">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="SAYAND | Atelier Lookbook">
+    <meta property="og:description" content="Discover SAYAND collections, editorial stories and styling inspiration.">
+    <meta property="og:url" content="https://thesayand.com/lookbook">
+    <meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/SAYAND%20Intertwined%20S%26A%20Monogram.png?alt=media&token=4a0c7abb-0150-4d22-94fc-d58f901a45f6">
+    <script src="js/site-updates.js?v=site-4"></script>
 </head>
 <body class="antialiased overflow-x-hidden flex flex-col min-h-screen bg-[#f5f0e8]">
 
@@ -35,7 +50,7 @@
                     </div>
                 </div>
                 <div class="absolute left-1/2 transform -translate-x-1/2 z-50 pointer-events-none">
-                    <a href="index.html" class="text-2xl md:text-3xl lg:text-4xl font-black tracking-tighter leading-none pointer-events-auto text-[#c9a227] hover:opacity-80 transition-opacity">SAYAND</a>
+                    <a href="index.html" class="notranslate text-2xl md:text-3xl lg:text-4xl font-black tracking-tighter leading-none pointer-events-auto text-[#c9a227] hover:opacity-80 transition-opacity">SAYAND</a>
                 </div>
                 <div class="flex items-center justify-end space-x-4 md:space-x-6 flex-1">
                     <a href="index.html" class="text-[10px] tracking-[0.2em] font-black text-[#e8d5a3] hover:text-[#c9a227] transition-colors uppercase">Storefront &rarr;</a>
@@ -150,13 +165,67 @@
         </div>
     </section>
 
+    <!-- INFO PAGE (For Legal Links) -->
+    <div id="info-page" class="fixed inset-0 bg-[#f5f0e8] text-[#0f1f0f] z-[110] transform translate-y-full transition-transform duration-500 overflow-hidden flex flex-col">
+        <div class="flex justify-between items-center p-6 md:p-8 border-b border-[#c9a227]/20 bg-[#0f1f0f] sticky top-0 z-10" style="padding-top: 5rem;">
+            <h3 id="info-title" class="text-xl md:text-3xl font-black tracking-widest text-[#c9a227] uppercase">TITLE</h3>
+            <button onclick="closeInfoPage()" class="text-4xl leading-none text-[#c9a227] hover:text-[#e8d5a3] transition-colors">&times;</button>
+        </div>
+        <div class="p-6 md:p-12 overflow-y-auto flex-1 hide-scrollbar max-w-4xl mx-auto w-full" style="padding-top: 1.5rem;">
+            <div id="info-content" class="text-sm md:text-base text-[#0f1f0f] font-medium leading-relaxed space-y-6"></div>
+        </div>
+    </div>
+
     <!-- FOOTER -->
-    <footer class="w-full bg-white border-t border-[#d4c9a8] pt-16 pb-8 px-4 sm:px-6 lg:px-8 xl:px-12 mt-auto">
-        <div class="border-t border-[#d4c9a8] pt-8 flex flex-col justify-center items-center">
+    <footer class="w-full bg-white border-t border-[#d4c9a8] pt-16 pb-8 px-4 sm:px-6 lg:px-8 xl:px-12 mt-auto shadow-inner">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+            <div>
+                <h4 class="text-[10px] tracking-[0.2em] font-black mb-6 text-[#0f1f0f]">HELP</h4>
+                <ul class="space-y-3 text-xs text-[#7a8a6e] font-bold">
+                    <li><a href="#" onclick="showContact();return false;" class="hover:text-[#c9a227] transition-colors">Contact Us</a></li>
+                    <li><a href="shipping.html" class="hover:underline">Shipping Info</a></li>
+                    <li><a href="returns.html" class="hover:underline">Returns &amp; Exchanges</a></li>
+                    <li><a href="track-order.html" class="hover:text-[#c9a227] transition-colors">Track Order</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-[10px] tracking-[0.2em] font-black mb-6 text-[#0f1f0f]">COMPANY</h4>
+                <ul class="space-y-3 text-xs text-[#7a8a6e] font-bold">
+                    <li><a href="#" onclick="openInfoPage('about');return false;" class="hover:text-[#c9a227] transition-colors">About Us</a></li>
+                    <li><a href="#" onclick="openInfoPage('careers');return false;" class="hover:text-[#c9a227] transition-colors">Careers</a></li>
+                    <li><a href="#" onclick="openInfoPage('sustainability');return false;" class="hover:text-[#c9a227] transition-colors">Sustainability</a></li>
+                    <li><a href="#" onclick="openInfoPage('press');return false;" class="hover:text-[#c9a227] transition-colors">Press</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-[10px] tracking-[0.2em] font-black mb-6 text-[#0f1f0f]">LEGAL</h4>
+                <ul class="space-y-3 text-xs text-[#7a8a6e] font-bold">
+                    <li><a href="#" onclick="openInfoPage('privacy');return false;" class="hover:text-[#c9a227] transition-colors">Privacy Policy</a></li>
+                    <li><a href="#" onclick="openInfoPage('terms');return false;" class="hover:text-[#c9a227] transition-colors">Terms of Use</a></li>
+                    <li><a href="#" onclick="openInfoPage('cookie');return false;" class="hover:text-[#c9a227] transition-colors">Cookie Policy</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-[10px] tracking-[0.2em] font-black mb-6 text-[#0f1f0f]">FOLLOW US</h4>
+                <div class="flex space-x-4">
+                    <a id="social-ig" href="https://instagram.com/thesayand_" target="_blank" class="w-10 h-10 border border-[#d4c9a8] flex items-center justify-center text-[#0f1f0f] font-black text-[10px] hover:bg-[#0f1f0f] hover:border-[#0f1f0f] hover:text-[#c9a227] transition-all duration-300">IG</a>
+                    <a id="social-tk" href="https://tiktok.com/@thesayand_" target="_blank" class="w-10 h-10 border border-[#d4c9a8] flex items-center justify-center text-[#0f1f0f] font-black text-[10px] hover:bg-[#0f1f0f] hover:border-[#0f1f0f] hover:text-[#c9a227] transition-all duration-300">TK</a>
+                    <a id="social-pt" href="https://pinterest.com/thesayand_" target="_blank" class="w-10 h-10 border border-[#d4c9a8] flex items-center justify-center text-[#0f1f0f] font-black text-[10px] hover:bg-[#0f1f0f] hover:border-[#0f1f0f] hover:text-[#c9a227] transition-all duration-300">PT</a>
+                </div>
+                <p id="social-handle" class="text-[10px] font-bold text-[#7a8a6e] mt-4 uppercase">@thesayand_</p>
+            </div>
+        </div>
+        <div class="border-t border-[#d4c9a8] pt-8 flex flex-col md:flex-row justify-between items-center">
             <p class="text-[9px] font-black tracking-[0.2em] text-[#7a8a6e] uppercase">&copy; 2026 SAYAND. ALL RIGHTS RESERVED.</p>
+            <div class="flex space-x-6 mt-4 md:mt-0">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" class="h-4 opacity-50 grayscale">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" class="h-4 opacity-50 grayscale">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" class="h-4 opacity-50 grayscale">
+            </div>
         </div>
     </footer>
 
+    <!-- JS SCRIPTS -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script src="js/firebase-config.js"></script>
@@ -167,10 +236,89 @@
             menu.classList.toggle('translate-x-full');
         }
 
+        // Add pop-up functionality for the footer links
+        const LEGAL_PAGES = ['privacy', 'terms', 'cookie'];
+
+        function getFooterPage(page) {
+            if (typeof SAYAND_PRODUCTS !== 'undefined' && SAYAND_PRODUCTS && SAYAND_PRODUCTS.footer && SAYAND_PRODUCTS.footer[page]) {
+                return SAYAND_PRODUCTS.footer[page];
+            }
+            return null;
+        }
+
+        window.openInfoPage = function(page) {
+            if (LEGAL_PAGES.includes(page)) {
+                window.location.href = page + '.html';
+                return;
+            }
+            
+            history.pushState({page: page, overlay: true}, '', '#' + page);
+            
+            const title = document.getElementById('info-title');
+            const content = document.getElementById('info-content');
+            const pageOverlay = document.getElementById('info-page');
+            
+            // Check for pre-rendered translation block first
+            const preDiv = document.getElementById('prerender-' + page);
+            if (preDiv) {
+                const t = preDiv.querySelector('.pre-title');
+                const c = preDiv.querySelector('.pre-content');
+                if (title && t) title.innerHTML = t.innerHTML; 
+                if (content && c) content.innerHTML = c.innerHTML;
+            } else {
+                // Fallback to raw English data
+                const data = getFooterPage(page);
+                if (!data) return;
+                if (title) title.innerText = data.title;
+                if (content) content.innerHTML = data.content;
+            }
+            
+            if(pageOverlay) {
+                pageOverlay.style.transform = 'translateY(0)';
+                document.body.style.overflow = 'hidden';
+            }
+        };
+
+        window.closeInfoPage = function() {
+            const pageOverlay = document.getElementById('info-page');
+            if(pageOverlay) pageOverlay.style.transform = 'translateY(100%)';
+            document.body.style.overflow = '';
+            
+            if (window.location.hash) {
+                history.replaceState(null, document.title, window.location.pathname + window.location.search);
+            }
+        };
+
         if (typeof firebase !== 'undefined' && firebase.database) {
             firebase.database().ref("mainStore").once("value").then(snap => {
                 const data = snap.val();
+                SayandI18n.registerCatalog(data);
                 if (!data) return;
+                
+                // Store globally so footer pop-ups can access it
+                window.SAYAND_PRODUCTS = data;
+                
+                // INJECT INVISIBLE FOOTER TRANSLATIONS
+                if (data.footer) {
+                    let hiddenContainer = document.getElementById('translation-prerender');
+                    if (!hiddenContainer) {
+                        hiddenContainer = document.createElement('div');
+                        hiddenContainer.id = 'translation-prerender';
+                        hiddenContainer.style.position = 'fixed';
+                        hiddenContainer.style.opacity = '0.001';
+                        hiddenContainer.style.pointerEvents = 'none';
+                        hiddenContainer.style.zIndex = '-9999';
+                        document.body.appendChild(hiddenContainer);
+                    }
+                    let html = '';
+                    Object.keys(data.footer).forEach(key => {
+                        html += `<div id="prerender-${key}">
+                                    <h1 class="pre-title">${data.footer[key].title}</h1>
+                                    <div class="pre-content">${data.footer[key].content}</div>
+                                 </div>`;
+                    });
+                    hiddenContainer.innerHTML = html;
+                }
 
                 // 1. Populate Hero & Mood Cards
                 const sc = data.siteContent || {};
@@ -179,7 +327,6 @@
                 if (sc.editTitle) document.getElementById('lb-hero-title').innerHTML = sc.editTitle;
                 if (sc.editDesc) document.getElementById('lb-hero-desc').innerText = sc.editDesc;
                 
-                // Ultra-Robust Dynamic Engine
                 const renderDynamicMedia = (url, containerId, extraClasses) => {
                     const container = document.getElementById(containerId);
                     if (!container || !url || url === '') return;
@@ -187,10 +334,7 @@
                     const isVideo = url.toLowerCase().match(/\.(mp4|mov|webm)(\?.*)?$/) || url.includes('video');
                     
                     if (isVideo) {
-                        // 🟢 Injects video with Tap-to-Unmute
                         container.innerHTML = `<video src="${url}" class="${extraClasses} cursor-pointer" autoplay loop muted playsinline onclick="event.stopPropagation(); this.muted = !this.muted;"></video>`;
-                        
-                        // 🟢 Forces iOS Safari to kickstart the video if it gets stuck
                         setTimeout(() => {
                             const v = container.querySelector('video');
                             if(v) { v.muted = true; v.play().catch(e => console.log('Autoplay blocked:', e)); }
@@ -200,14 +344,12 @@
                     }
                 };
 
-                // 🟢 BULLETPROOF LOGIC: Filter out any text, and ONLY grab the first pure HTTPS link from the carousel
                 let heroMediaUrl = '';
                 if (sc.editImg && sc.editImg.includes('http')) {
                     const validUrls = sc.editImg.split(',').map(s => s.trim()).filter(s => s.startsWith('http'));
                     if (validUrls.length > 0) heroMediaUrl = validUrls[0];
                 } 
                 
-                // Fallback: If storefront is empty, grab from Lookbook Hero upload box
                 if (!heroMediaUrl && sc.lbHeroImg && sc.lbHeroImg.includes('http')) {
                     heroMediaUrl = sc.lbHeroImg.trim(); 
                 }
@@ -241,8 +383,8 @@
                                 </div>
                                 <div class="px-2 max-w-2xl mx-auto text-center md:text-left">
                                     <p class="text-[10px] tracking-[0.3em] font-black text-[#c9a227] mb-3 uppercase">${article.subtitle || 'EDITORIAL'}</p>
-                                    <h2 class="text-3xl md:text-5xl font-black tracking-tighter leading-tight text-[#f5f0e8] mb-4 group-hover:text-[#c9a227] transition-colors">${article.title}</h2>
-                                    <p class="text-xs md:text-sm text-[#e8d5a3] font-medium leading-relaxed line-clamp-3">${article.description}</p>
+                                    <h2 class="text-3xl md:text-5xl font-black tracking-tighter leading-tight text-[#f5f0e8] mb-4 group-hover:text-[#c9a227] transition-colors">${SayandI18n.contentHTML(article.title, SayandI18n.fieldTranslations(article, 'title'))}</h2>
+                                    <p class="text-xs md:text-sm text-[#e8d5a3] font-medium leading-relaxed line-clamp-3">${SayandI18n.contentHTML(article.description, SayandI18n.fieldTranslations(article, 'description'))}</p>
                                 </div>
                             </article>
                         `;
@@ -253,5 +395,6 @@
             });
         }
     </script>
+    
 </body>
 </html>
