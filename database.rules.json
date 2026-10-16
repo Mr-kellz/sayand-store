@@ -1,17 +1,64 @@
 {
   "rules": {
+    ".read": false,
+    ".write": false,
     "mainStore": {
-      ".read": true,
-      ".write": "auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2'"
+      ".read": "auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2'",
+      ".write": "auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2'",
+      "newArrivals": {
+        ".read": true
+      },
+      "trending": {
+        ".read": true
+      },
+      "sales": {
+        ".read": true
+      },
+      "announcement": {
+        ".read": true
+      },
+      "contact": {
+        ".read": true
+      },
+      "siteContent": {
+        ".read": true
+      },
+      "footer": {
+        "shipping": {
+          ".read": true
+        },
+        "returns": {
+          ".read": true
+        },
+        "size": {
+          ".read": true
+        },
+        "privacy": {
+          ".read": true
+        },
+        "terms": {
+          ".read": true
+        },
+        "cookie": {
+          ".read": true
+        },
+        "contact": {
+          ".read": true
+        },
+        "faq": {
+          ".read": true
+        }
+      }
     },
     "orders": {
       ".read": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || (auth != null && query.orderByChild === 'userId' && query.equalTo === auth.uid)",
+      ".write": "auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2'",
       ".indexOn": [
         "userId"
       ],
       "$orderId": {
         ".read": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || (auth != null && data.child('userId').val() === auth.uid)",
-        ".write": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || (auth != null && $orderId.matches(/^[-A-Za-z0-9_]{20}$/) && !data.exists() && newData.child('userId').val() === auth.uid && newData.child('status').val() === 'Pending')",
+        ".write": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || (auth != null && $orderId.matches(/^[-A-Za-z0-9_]{20}$/) && !data.exists() && newData.exists() && newData.child('userId').val() === auth.uid && newData.child('status').val() === 'Pending' && newData.child('totalAmount').isNumber() && newData.child('totalAmount').val() >= 0)",
         ".validate": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || newData.hasChildren(['userId','status','timestamp','totalAmount','shippingInfo','items'])",
         "userId": {
           ".validate": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || newData.isString()"
@@ -25,12 +72,18 @@
         "giftNote": {
           ".validate": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || newData.isString()"
         },
+        "paymentUrl": {
+          ".validate": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || newData.isString()"
+        },
+        "promoCodeUsed": {
+          ".validate": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || newData.isString()"
+        },
         "status": {
-          ".write": "auth != null && data.parent().child('userId').val() === auth.uid && newData.isString() && ((newData.val() === 'Canceled (By User)' && (data.val() === 'Pending' || data.val() === 'Verifying' || data.val() === 'Processing' || data.val() === 'Paid')) || (newData.val() === 'Return Requested' && (data.val() === 'Shipped' || data.val() === 'Delivered')))",
+          ".write": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || (auth != null && data.parent().child('userId').val() === auth.uid && (data.val() === 'Pending' || data.val() === 'Verifying' || data.val() === 'Preparing' || data.val() === 'Processing' || data.val() === 'Paid') && newData.val() === 'Canceled (By User)')",
           ".validate": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || newData.isString()"
         },
         "timestamp": {
-          ".validate": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || (newData.isNumber() && newData.val() >= 0)"
+          ".validate": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || (newData.isNumber() && newData.val() >= 0 && newData.val() <= now + 86400000)"
         },
         "totalAmount": {
           ".validate": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || (newData.isNumber() && newData.val() >= 0)"
@@ -49,12 +102,6 @@
         },
         "shippingCost": {
           ".validate": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || (newData.isNumber() && newData.val() >= 0)"
-        },
-        "paymentUrl": {
-          ".validate": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || newData.isString()"
-        },
-        "promoCodeUsed": {
-          ".validate": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || newData.isString()"
         },
         "isGift": {
           ".validate": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || newData.isBoolean()"
@@ -80,39 +127,128 @@
     },
     "users": {
       ".read": "auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2'",
-      "$userId": {
-        ".read": "auth != null && auth.uid === $userId",
-        ".write": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || (auth != null && auth.uid === $userId && !data.exists() && !newData.child('orders').exists())",
-        "$field": {
-          ".write": "auth != null && auth.uid === $userId && $field !== 'orders'"
+      ".write": "auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2'",
+      ".indexOn": [
+        "referralCode"
+      ],
+      "$uid": {
+        ".read": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || (auth != null && auth.uid === $uid)",
+        ".write": "auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2'",
+        ".validate": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || (newData.hasChildren(['firstName','lastName','email','createdAt','accountVerified','welcomeEmailSent']) && newData.child('email').val() === auth.token.email)",
+        "firstName": {
+          ".write": "auth != null && auth.uid === $uid",
+          ".validate": "newData.isString() && newData.val().length <= 100"
         },
-        "orders": {
-          ".write": "auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2'"
+        "lastName": {
+          ".write": "auth != null && auth.uid === $uid",
+          ".validate": "newData.isString() && newData.val().length <= 100"
+        },
+        "dateOfBirth": {
+          ".write": "auth != null && auth.uid === $uid",
+          ".validate": "newData.isString() && newData.val().length <= 10"
+        },
+        "cart": {
+          ".write": "auth != null && auth.uid === $uid"
+        },
+        "address": {
+          ".write": "auth != null && auth.uid === $uid"
+        },
+        "addressBook": {
+          ".write": "auth != null && auth.uid === $uid"
+        },
+        "sizing": {
+          ".write": "auth != null && auth.uid === $uid"
+        },
+        "email": {
+          ".validate": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || (newData.isString() && newData.val() === auth.token.email)"
+        },
+        "createdAt": {
+          ".validate": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || (newData.isNumber() && newData.val() >= 0 && newData.val() <= now + 86400000)"
+        },
+        "accountVerified": {
+          ".validate": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || (newData.isBoolean() && (newData.val() === false || auth.token.email_verified === true))"
+        },
+        "welcomeEmailSent": {
+          ".validate": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || (newData.isBoolean() && newData.val() === false)"
+        },
+        "referralCode": {
+          ".validate": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || (newData.isString() && newData.val().length <= 40)"
+        },
+        "$other": {
+          ".validate": "auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2'"
+        },
+        "wishlist": {
+          ".write": "auth != null && auth.uid === $uid"
+        },
+        "fitProfile": {
+          ".write": "auth != null && auth.uid === $uid"
         }
       }
     },
     "subscribers": {
-      ".read": true,
-      ".write": true,
+      ".read": "auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2'",
+      ".write": "auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2'",
       ".indexOn": [
         "email"
       ]
     },
+    "stockNotifications": {
+      ".read": "auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2'",
+      ".write": "auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2'",
+      "$productId": {
+        ".read": "auth != null && query.orderByChild === 'uid' && query.equalTo === auth.uid",
+        ".indexOn": [
+          "uid"
+        ],
+        "$notificationId": {
+          ".read": "(auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2') || (auth != null && data.child('uid').val() === auth.uid)",
+          ".write": "auth != null && !data.exists() && newData.exists() && $notificationId.matches(/^[-A-Za-z0-9_]{20}$/) && newData.child('uid').val() === auth.uid && newData.child('email').val() === auth.token.email",
+          ".validate": "newData.hasChildren(['uid','email','size','productName','timestamp'])",
+          "uid": {
+            ".validate": "newData.isString() && newData.val() === auth.uid"
+          },
+          "email": {
+            ".validate": "newData.isString() && newData.val() === auth.token.email"
+          },
+          "size": {
+            ".validate": "newData.isString() && newData.val().length <= 50"
+          },
+          "productName": {
+            ".validate": "newData.isString() && newData.val().length <= 150"
+          },
+          "timestamp": {
+            ".validate": "newData.isNumber() && newData.val() >= now - 600000 && newData.val() <= now + 600000"
+          },
+          "$other": {
+            ".validate": false
+          }
+        }
+      }
+    },
     "preorders": {
       ".read": "auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2'",
-      ".write": true
+      ".write": "auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2'"
     },
     "reviews": {
       ".read": true,
-      ".write": true
-    },
-    "stockNotifications": {
-      ".read": "auth != null",
-      ".write": "auth != null"
+      ".write": "auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2'"
     },
     "uniqueVisitors": {
       ".read": "auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2'",
-      ".write": true
+      ".write": "auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2'",
+      "$visitorId": {
+        ".write": "!data.exists() && newData.exists() && $visitorId.matches(/^v_[A-Za-z0-9_]{8,40}$/)",
+        ".validate": "newData.hasChildren(['firstVisit','userAgent'])",
+        "firstVisit": {
+          ".validate": "newData.isNumber() && newData.val() >= now - 600000 && newData.val() <= now + 600000"
+        },
+        "userAgent": {
+          ".validate": "newData.isString() && newData.val().length <= 1000"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
     },
     "checkoutQuotes": {
       ".read": false,
@@ -121,6 +257,34 @@
     "paymentFulfillments": {
       ".read": "auth != null && auth.uid === 'MS15g8h5ELPmMcuBijhEC7loGws2'",
       ".write": false
+    },
+    "_serviceLimits": {
+      ".read": false,
+      ".write": false,
+      ".indexOn": [
+        "until"
+      ]
+    },
+    "_emailVerification": {
+      ".read": false,
+      ".write": false,
+      ".indexOn": [
+        "expires"
+      ]
+    },
+    "_newsletterConfirm": {
+      ".read": false,
+      ".write": false,
+      ".indexOn": [
+        "expires"
+      ]
+    },
+    "_eliaConversations": {
+      ".read": false,
+      ".write": false,
+      ".indexOn": [
+        "expires"
+      ]
     }
   }
 }

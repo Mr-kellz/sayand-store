@@ -1,0 +1,11 @@
+'use strict';
+const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+const source=fs.readFileSync(path.join(__dirname,'../js/elia.js'),'utf8');
+assert.match(source,/getElementById\('whatsapp-float'\).*elia-with-whatsapp/);
+assert.match(source,/#sayand-elia\.elia-with-whatsapp\{bottom:calc\(96px/);
+assert.match(source,/#sayand-elia\.elia-with-whatsapp \.elia-panel\{height:min\(630px,calc\(100dvh - 190px\)\)/);
+assert(source.includes("SayandServices.call('eliaChat',{message:m.text,conversationToken:state.token"));
+assert.match(source,/result\.catalogueVerified===true\?verifiedCards\(result\.products\):\[\]/);
+assert.doesNotMatch(source,/function matchingProducts|negativeProductAnswer/);
+console.log('PASS WhatsApp vertical separation and smaller panel retained');
+console.log('PASS catalogue cards come only from backend-verified reply, not model name matching');

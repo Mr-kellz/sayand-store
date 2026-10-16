@@ -1,0 +1,33 @@
+'use strict';
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const vm = require('node:vm');
+const file = fs.readFileSync(__dirname+'/../js/shopping-analytics.js','utf8');
+function setup(configured=true) {
+ const values={}, events={}, scripts=[];let consent=false;
+ const context={window:null,localStorage:{getItem:k=>values[k]||null,setItem:(k,v)=>values[k]=v,removeItem:k=>delete values[k]},location:{origin:'https://thesayand.com',pathname:'/success',hostname:'thesayand.com'},document:{readyState:'complete',cookie:'',referrer:'https://example.org/?email=private@example.org',title:'SAYAND',head:{appendChild:s=>scripts.push(s)},createElement:()=>({})},Set,Number,Date,URL};
+ context.window=context;context.SayandConsent={allowed:()=>consent};context.addEventListener=(n,fn)=>(events[n]??=[]).push(fn);
+ vm.runInNewContext(configured ? file.replace("const measurementId = '';","const measurementId = 'G-TEST123';") : file,context);
+ return {c:context,scripts,choose:value=>{consent=value;for(const fn of events['sayand:consentchange']||[])fn();},calls:()=>Array.from(context.dataLayer||[],a=>Array.from(a)).filter(a=>a[0]==='event')};
+}
+const id='-abcdefghijklmnopqrs',uid='customer';
+const order={userId:uid,stripeMode:'live',stripeSessionId:'cs_live_fixture',paymentDate:'2026-10-05',status:'Paid',items:[{name:'Gown A',price:40,quantity:1},{name:'Gown B',price:40,quantity:1}],totalAmount:5,discountAmount:80,shippingCost:5,giftCost:0};
+let env=setup();
+assert.equal(env.c.SayandAnalytics.shopping('add_to_cart',[{name:'Gown',price:40,quantity:1}]),false);
+assert.equal(env.c.SayandAnalytics.purchase(id,order,uid),false);assert.equal(env.scripts.length,0);
+env.choose(true);assert.equal(env.scripts.length,1);
+assert.equal(env.c.SayandAnalytics.purchase(id,{...order,status:'Pending'},uid),false);
+assert.equal(env.c.SayandAnalytics.purchase(id,{...order,stripeMode:'test'},uid),false);
+assert.equal(env.c.SayandAnalytics.purchase(id,order,'someone-else'),false);
+assert.equal(env.c.SayandAnalytics.purchase(id,{...order,totalAmount:85},uid),false);
+assert.equal(env.c.SayandAnalytics.purchase(id,order,uid),true);
+assert.equal(env.c.SayandAnalytics.purchase(id,order,uid),false);
+let purchase=env.calls().find(c=>c[1]==='purchase')[2];assert.equal(purchase.value,0);assert.equal(purchase.shipping,5);assert.equal(purchase.items.length,2);assert(purchase.items.every(i=>i.price===0));
+assert(!JSON.stringify(env.calls()).includes('private@example.org'));
+const fractional={...order,items:[{name:'A',quantity:3,price:1.11},{name:'B',quantity:2,price:2.01}],discountAmount:1.01,giftCost:2,shippingCost:5,totalAmount:13.34};
+assert.equal(env.c.SayandAnalytics.purchase('-bcdefghijklmnopqrst',fractional,uid),true);
+purchase=env.calls().filter(c=>c[1]==='purchase').at(-1)[2];assert.equal(Math.round(purchase.items.reduce((n,i)=>n+i.price*i.quantity,0)*100),834);assert.equal(purchase.value,8.34);
+env.choose(false);const before=env.calls().length;assert.equal(env.c.SayandAnalytics.shopping('view_item',[{name:'A',price:1,quantity:1}]),false);assert.equal(env.calls().length,before);assert.equal(env.c['ga-disable-G-TEST123'],true);
+env.choose(true);assert.equal(env.c['ga-disable-G-TEST123'],false);assert.equal(env.scripts.length,1);
+env=setup(false);env.choose(true);assert.equal(env.scripts.length,0);
+console.log('PASS: consent gates, missing ID, pending/test/wrong-owner rejection, duplicate protection, full/partial discounts, gift wrapping, withdrawal and no personal data in events.');

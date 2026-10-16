@@ -19,7 +19,63 @@ async function scopedTransaction(db, path, change) {
         }, undefined, false);
     } finally { ref.off('value', listener); }
 }
-async function quoteOrder(db, id, uid, now, mode = 'test') {
+// The same customer's abandoned, unpaid Stripe session must be expired at Stripe
+// BEFORE its discount reservation can be released. Never reclaim another owner's
+// checkout, a completed checkout, or a checkout without a recorded session.
+function checkoutConflict(message) {
+    const error = new Error(message);
+    error.code = 'failed-precondition';
+    throw error;
+}
+async function releaseOwnAbandonedPromo(db, stripe, id, uid, now, mode) {
+    if (!/^[-A-Za-z0-9_]{20}$/.test(id || '') || !['test','live'].includes(mode)) checkoutConflict('Invalid checkout request.');
+    const current = (await db.ref('orders/'+id).once('value')).val();
+    if (!current || current.userId !== uid || current.status !== 'Pending') return;
+    const code = typeof current.promoCodeUsed === 'string' ? current.promoCodeUsed.trim().toUpperCase() : '';
+    if (!code || !/^[A-Z0-9_-]{2,80}$/.test(code)) return;
+    const quotes = (await db.ref('checkoutQuotes').once('value')).val() || {};
+    const previous = Object.entries(quotes).filter(([oldId,q]) =>
+        oldId !== id && /^[-A-Za-z0-9_]{20}$/.test(oldId) && q &&
+        q.userId === uid && q.version === 2 && q.promoCodeUsed === code &&
+        (q.stripeMode || 'test') === mode && Number(q.expiresAt) > now);
+    for (const [oldId,q] of previous) {
+        if (!q.sessionId) checkoutConflict('Your previous checkout is still being prepared. Please try again shortly.');
+        const oldOrder = (await db.ref('orders/'+oldId).once('value')).val();
+        if (!oldOrder || oldOrder.userId !== uid || oldOrder.status !== 'Pending' || oldOrder.paymentDate || oldOrder.stripeSessionId)
+            checkoutConflict('Your previous checkout may already be paid. Please check My Orders.');
+        const session = await stripe.checkout.sessions.retrieve(q.sessionId);
+        if (!session || session.id !== q.sessionId || !session.metadata ||
+            session.metadata.orderId !== oldId || session.metadata.userId !== uid ||
+            session.metadata.pricingVersion !== '2' || session.metadata.stripeMode !== mode ||
+            session.livemode !== (mode === 'live') || session.currency !== 'eur' ||
+            session.amount_total !== q.amount)
+            checkoutConflict('Your previous payment session could not be verified. Contact support.');
+        if (session.status === 'open' && session.payment_status === 'unpaid') {
+            let expired;
+            try { expired = await stripe.checkout.sessions.expire(q.sessionId); }
+            catch (error) {
+                // Stripe may have expired it concurrently. Never assume a failed
+                // expiration means unpaid; check the actual state again.
+                expired = await stripe.checkout.sessions.retrieve(q.sessionId);
+            }
+            if (!expired || expired.id !== q.sessionId || expired.status !== 'expired' || expired.payment_status !== 'unpaid')
+                checkoutConflict('Your previous checkout is not safely closed. Please check My Orders.');
+        } else if (session.status !== 'expired' || session.payment_status !== 'unpaid') {
+            checkoutConflict('Your previous checkout may have been completed. Please check My Orders.');
+        }
+        // Conditional, narrow write. All other quote fields and order records stay intact.
+        // A paid session can never be released via this path.
+        await scopedTransaction(db,'checkoutQuotes/'+oldId,held => {
+            if (!held || held.version !== 2 || held.userId !== uid ||
+                held.promoCodeUsed !== code || held.sessionId !== q.sessionId ||
+                (held.stripeMode || 'test') !== mode || held.amount !== q.amount ||
+                held.expiresAt <= now) return;
+            return {...held, expiresAt:now-1, abandonedAt:now};
+        });
+    }
+}
+
+async function quoteOrder(db, id, uid, now, mode = 'test', auth = null) {
     if (!['test','live'].includes(mode)) throw new Error('Invalid payment mode.');
     const [orderSnap,storeSnap,ordersSnap] = await Promise.all([
         db.ref('orders/'+id).once('value'), db.ref('mainStore').once('value'),
@@ -29,15 +85,18 @@ async function quoteOrder(db, id, uid, now, mode = 'test') {
     if (!order || order.userId !== uid) throw new Error('Order not found in your account.');
     if (!store) throw new Error('Store data is unavailable.');
     if (order.status !== 'Pending') throw new Error('This order is no longer awaiting payment.');
+    const welcome10Eligible = String(order.promoCodeUsed || '').trim().toUpperCase()==='WELCOME10' ? await require('./newsletter-eligibility').eligible(db,auth,uid) : false;
+    if(String(order.promoCodeUsed || '').trim().toUpperCase()==='WELCOME10'&&!welcome10Eligible)checkoutConflict('WELCOME10 is for newsletter subscribers. Confirm your subscription using your verified account email.');
     const result = await scopedTransaction(db,'checkoutQuotes',quotes => {
         quotes = quotes || {};
         if (quotes[id]) {
+            if(quotes[id].promoCodeUsed==='WELCOME10'&&!welcome10Eligible)checkoutConflict('Please confirm your newsletter subscription before using WELCOME10.');
             if ((quotes[id].stripeMode || 'test') !== mode || quotes[id].version !== 2 || quotes[id].userId !== uid || quotes[id].expiresAt <= now+60000) throw new Error('Please submit a new checkout.');
             return quotes;
         }
         const modeOrders=Object.fromEntries(Object.entries(ordersSnap.val() || {}).filter(([,o]) => (o.stripeMode || 'test') === mode));
         const modeQuotes=Object.fromEntries(Object.entries(quotes).filter(([,q]) => (q.stripeMode || 'test') === mode));
-        const quote = buildQuote({mainStore:store,orders:modeOrders,checkoutQuotes:modeQuotes},order,id,uid,now);
+        const quote = buildQuote({mainStore:store,orders:modeOrders,checkoutQuotes:modeQuotes,welcome10Eligible},order,id,uid,now);
         quote.stripeMode = mode;
         quote.version = 2;
         quotes[id] = quote;
@@ -128,4 +187,4 @@ async function claimEmail(db,id) {
     });
     return r.committed && r.snapshot.val().emailClaim === claimId;
 }
-module.exports={scopedTransaction,quoteOrder,publishQuote,recordSession,fulfill,claimEmail};
+module.exports={scopedTransaction,releaseOwnAbandonedPromo,quoteOrder,publishQuote,recordSession,fulfill,claimEmail};

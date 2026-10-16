@@ -6,7 +6,7 @@
     <title>SAYAND | Order Confirmed</title>
     <link rel="icon" type="image/png" href="https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/SAYAND%20Intertwined%20S%26A%20Monogram.png?alt=media&token=2afe3106-31a8-4a27-960a-e0d09ee96d4f">
     <link rel="apple-touch-icon" href="https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/SAYAND%20Intertwined%20S%26A%20Monogram.png?alt=media&token=2afe3106-31a8-4a27-960a-e0d09ee96d4f">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/tailwind-production.css?v=mobile-1">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <style>
@@ -20,20 +20,21 @@
     <script src="js/translations.js?v=site-4"></script>
     <script src="js/i18n.js?v=site-4"></script>
     <link rel="stylesheet" href="css/site-updates.css?v=site-4">
-    <script src="js/consent.js?v=site-4"></script>
+    <script src="js/consent.js?v=launch-1"></script>
 
     <meta name="description" content="Access your SAYAND account and shopping services securely.">
     <link rel="canonical" href="https://thesayand.com/success">
     <meta name="robots" content="noindex, follow">
     <meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/SAYAND%20Intertwined%20S%26A%20Monogram.png?alt=media&token=2afe3106-31a8-4a27-960a-e0d09ee96d4f">
-    <script src="js/site-updates.js?v=site-4"></script>
+    <script src="js/shopping-analytics.js?v=launch-1"></script>
+    <script src="js/site-updates.js?v=launch-1"></script>
 </head>
 <body class="antialiased min-h-screen flex flex-col">
 
     <nav class="bg-[#1a2e15] border-b border-[#d4af37]/30 px-6 py-4 flex justify-between items-center sticky top-0 z-50 shadow-md">
         <!-- 🟢 ADDED NOTRANSLATE HERE -->
         <a href="index.html" class="notranslate text-xl md:text-2xl font-black tracking-tighter hover:opacity-70 transition-opacity text-[#d4af37]">SAYAND</a>
-        <span class="text-[10px] tracking-[0.2em] font-bold text-white">ORDER COMPLETE</span>
+        <span class="text-[10px] tracking-[0.2em] font-bold text-white">YOUR ORDER</span>
     </nav>
 
     <main class="flex-1 flex items-center justify-center p-6">
@@ -45,13 +46,9 @@
                 </svg>
             </div>
 
-            <h1 class="text-2xl md:text-3xl font-black tracking-tighter mb-4 text-[#1a2e15] uppercase">Order Confirmed</h1>
+            <h1 id="confirmation-title" class="text-2xl md:text-3xl font-black tracking-tighter mb-4 text-[#1a2e15] uppercase">Checking your order</h1>
             
-            <p class="text-xs text-[#6a7c64] font-medium leading-relaxed mb-8">
-                Thank you for your purchase. Your payment has been processed securely. 
-                <br><br>
-                We have sent an order confirmation to your email address containing your receipt and tracking details.
-            </p>
+            <p id="confirmation-message" role="status" class="text-xs text-[#6a7c64] font-medium leading-relaxed mb-8">Please wait while we check your payment status.</p>
 
             <div class="space-y-4">
                 <a href="index.html" class="block w-full bg-[#1a2e15] text-[#d4af37] py-4 text-[10px] font-black tracking-[0.2em] hover:bg-[#2c4c23] transition-colors border border-[#d4af37] shadow-md uppercase">
@@ -66,22 +63,21 @@
 
     <footer class="bg-[#1a2e15] py-8 text-center border-t border-[#d4af37]/30">
         <p class="text-[9px] font-black tracking-[0.2em] text-[#6a7c64] uppercase">&copy; 2026 SAYAND. ALL RIGHTS RESERVED.</p>
-    </footer>
+    <p style="text-align:center;margin:16px"><a href="/faq" style="text-decoration:underline">FAQ</a></p>
+</footer>
 
-    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
     <script src="js/firebase-config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-functions-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-check-compat.js"></script>
+<script src="/js/service-config.js"></script>
+<script src="/js/store-services.js"></script>
+<script src="/js/public-store.js"></script>
     
-    <script>
-        ['sayand_cart', 'cart', 'sayandCart', 'shoppingCart', 'bag', 'sayand_bag'].forEach(k => localStorage.removeItem(k));
-        
-        firebase.auth().onAuthStateChanged((user) => {
-            if (user) {
-                firebase.database().ref(`users/${user.uid}/cart`).remove();
-            }
-        });
-    </script>
+    <script src="js/purchase-confirmation.js?v=launch-1"></script>
     
+<script src="/js/elia.js?v=20261015-expanded"></script>
 </body>
 </html>

@@ -1,6 +1,7 @@
 const functions = require('firebase-functions/v1');
 const admin = require('firebase-admin');
 const https = require('https');
+const crypto = require('crypto');
 if (!admin.apps.length) {
     admin.initializeApp();
 }
@@ -15,13 +16,16 @@ exports.createStripeCheckout = functions.https.onCall(async (data, context) => {
     if (!/^[-A-Za-z0-9_]{20}$/.test(id || '')) throw new functions.https.HttpsError('invalid-argument','Invalid order reference.');
     try {
         const settings=stripeConfig.config(), stripe=require('stripe')(settings.key), db=admin.database();
-        const q=await payments.quoteOrder(db,id,uid,Date.now(),settings.mode);
+        await payments.releaseOwnAbandonedPromo(db,stripe,id,uid,Date.now(),settings.mode);
+        const q=await payments.quoteOrder(db,id,uid,Date.now(),settings.mode,admin.auth());
         await payments.publishQuote(db,id,q);
         let session;
         if (q.sessionId) session=await stripe.checkout.sessions.retrieve(q.sessionId);
         else {
-            session=await stripe.checkout.sessions.create({mode:'payment',payment_method_types:['card'],
-                currency:'eur',adaptive_pricing:{enabled:false},
+            session=await stripe.checkout.sessions.create({
+    mode:'payment',
+    currency:'eur',
+    adaptive_pricing:{enabled:false},
                 line_items:[{price_data:{currency:'eur',product_data:{name:'SAYAND order #'+id.slice(-6).toUpperCase()},unit_amount:q.amount},quantity:1}],
                 metadata:{orderId:id,userId:uid,pricingVersion:'2',stripeMode:settings.mode},client_reference_id:id,
                 customer_email:q.shippingInfo.email,expires_at:Math.floor(q.expiresAt/1000),
@@ -34,7 +38,7 @@ exports.createStripeCheckout = functions.https.onCall(async (data, context) => {
         if (session.status !== 'open' || !session.url) throw new Error('This checkout is no longer open.');
         return {url:session.url,totalAmount:q.totalAmount,currency:'EUR'};
     } catch (error) {
-        console.error('Checkout failed:',{orderId:id,code:error.code || 'internal',message:error.message});
+        console.error('Checkout preparation failed.');
         throw new functions.https.HttpsError(error.code === 'failed-precondition' ? 'failed-precondition' : 'internal',
             error.code === 'failed-precondition' ? error.message : 'Unable to prepare checkout. Please contact support.');
     }
@@ -146,11 +150,11 @@ function chunkArray(array, size) {
 }
 
 exports.sendStoreEmail = functions.https.onCall(async (data, context) => {
-    if (['order_confirmed','order_shipped','return_approved'].includes(data && data.type) && (!context.auth || context.auth.uid !== 'MS15g8h5ELPmMcuBijhEC7loGws2')) {
-        throw new functions.https.HttpsError('permission-denied','Only the store administrator can send order emails.');
+    if (!context.auth || context.auth.uid !== 'MS15g8h5ELPmMcuBijhEC7loGws2') {
+        throw new functions.https.HttpsError('permission-denied','Only the store administrator can send store emails.');
     }
     console.log("=== SEND STORE EMAIL START ===");
-    console.log("Input:", JSON.stringify(data));
+
 
     const { type, payload } = data;
     let templateId = TEMPLATES[type];
@@ -176,8 +180,8 @@ exports.sendStoreEmail = functions.https.onCall(async (data, context) => {
         }
     }
 
-    console.log("Emails:", emails);
-    console.log("Params:", JSON.stringify(cleanParams));
+
+
 
     if (emails.length === 0) {
         return { success: false, message: 'No recipients provided.' };
@@ -190,7 +194,7 @@ exports.sendStoreEmail = functions.https.onCall(async (data, context) => {
     const sendBrevoEmailFn = (brevoPayload) => {
         return new Promise((resolve, reject) => {
             const data = JSON.stringify(brevoPayload);
-            console.log("Brevo payload:", data);
+
 
             const options = {
                 hostname: 'api.brevo.com',
@@ -209,7 +213,7 @@ exports.sendStoreEmail = functions.https.onCall(async (data, context) => {
                 res.on('data', (chunk) => { responseBody += chunk; });
                 res.on('end', () => {
                     console.log(`Brevo response status: ${res.statusCode}`);
-                    console.log(`Brevo response body: ${responseBody}`);
+
 
                     if (res.statusCode >= 200 && res.statusCode < 300) {
                         try {
@@ -225,7 +229,7 @@ exports.sendStoreEmail = functions.https.onCall(async (data, context) => {
             });
 
             req.on('error', (e) => {
-                console.error("Request error:", e);
+                console.error('Customer notification or cleanup failed; review the affected job.');
                 reject(e);
             });
 
@@ -250,7 +254,7 @@ exports.sendStoreEmail = functions.https.onCall(async (data, context) => {
             const result = await sendBrevoEmailFn(brevoPayload);
             return { success: true, method: 'template', result };
         } catch (templateErr) {
-            console.log(`Template failed for ${userEmail}: ${templateErr.message}`);
+            console.warn('Email template delivery failed; trying supported fallback.');
 
             if (type === 'subscriber_welcome') {
                 const firstName = cleanParams.firstName || cleanParams.FIRSTNAME || 'there';
@@ -319,7 +323,7 @@ exports.sendStoreEmail = functions.https.onCall(async (data, context) => {
     const successes = results.filter(r => r.success).length;
     const failures = results.filter(r => !r.success);
     console.log(`=== RESULTS: ${successes}/${emails.length} succeeded ===`);
-    console.log("Details:", JSON.stringify(results));
+    console.log('Email delivery summary:', {sent:successes,failed:emails.length-successes});
 
     // Build human-readable message for frontend
     let message = '';
@@ -382,7 +386,7 @@ exports.checkAbandonedCarts = functions.pubsub.schedule('every 12 hours').onRun(
                     });
 
                 } catch (e) {
-                    console.error("Error sending abandoned cart:", e.message);
+                    console.error('Customer notification or cleanup failed; review the affected job.');
                 }
             }
         }
@@ -412,8 +416,8 @@ exports.sendOrderAlert = functions.database.ref('/orders/{orderId}')
 
             const promises = TELEGRAM_CHAT_IDS.map(chatId =>
                 sendTelegramMessage(chatId, message)
-                    .then(() => console.log(`✅ Telegram order alert sent to ${chatId}`))
-                    .catch((err) => console.error(`❌ Failed for ${chatId}:`, err.message))
+                    .then(() => console.log('Telegram alert sent'))
+                    .catch(() => console.error('Telegram alert delivery failed'))
             );
 
             return Promise.all(promises).then(() => null);
@@ -437,8 +441,8 @@ exports.alertOnReturnRequest = functions.database.ref('/orders/{orderId}')
             // 🟢 FIX: Removed the broken '.value().split' code so it reads the Array correctly
             const promises = TELEGRAM_CHAT_IDS.map(chatId => 
                 sendTelegramMessage(chatId, message)
-                    .then(() => console.log(`✅ Telegram return alert sent to ${chatId}`))
-                    .catch((err) => console.error(`❌ Failed for ${chatId}:`, err.message))
+                    .then(() => console.log('Telegram alert sent'))
+                    .catch(() => console.error('Telegram alert delivery failed'))
             );
 
             await Promise.all(promises);
@@ -475,7 +479,7 @@ exports.checkPostPurchaseCare = functions.pubsub.schedule('every 24 hours').onRu
                     });
 
                 } catch (e) {
-                    console.error(`Error sending Care email for order ${orderId}:`, e.message);
+                    console.error('Customer notification or cleanup failed; review the affected job.');
                 }
             }
         }
@@ -495,7 +499,7 @@ exports.checkDelayedWelcome = functions.pubsub.schedule('every 5 minutes').onRun
     for (const uid of Object.keys(users)) {
         const user = users[uid];
 
-        if (user.createdAt && user.email && !user.welcomeEmailSent) {
+        if (user.createdAt && user.email && user.accountVerified === true && !user.welcomeEmailSent) {
             if (now - user.createdAt >= FIVE_MINUTES) {
                 try {
                     await sendBrevoEmail({
@@ -512,45 +516,12 @@ exports.checkDelayedWelcome = functions.pubsub.schedule('every 5 minutes').onRun
                     });
 
                 } catch (e) {
-                    console.error(`Error sending welcome email for user ${uid}:`, e.message);
+                    console.error('Customer notification or cleanup failed; review the affected job.');
                 }
             }
         }
     }
     return null;
-});
-
-exports.requestPasswordReset = functions.https.onCall(async (data, context) => {
-    const { email } = data;
-    if (!email) return { success: false, message: 'Email is required.' };
-
-    try {
-        const rawLink = await admin.auth().generatePasswordResetLink(email);
-
-        const urlObj = new URL(rawLink);
-        const oobCode = urlObj.searchParams.get('oobCode');
-
-        const customResetLink = `https://thesayand.com/reset-password.html?oobCode=${oobCode}`;
-
-        await sendBrevoEmail({
-            sender: { name: "SAYAND", email: "noreply@thesayand.com" },
-            to: [{ email: email }],
-            templateId: TEMPLATES.password_reset,
-            params: {
-                resetLink: customResetLink
-            }
-        });
-
-        return { success: true };
-    } catch (error) {
-        console.error("Reset Error:", error);
-
-        if (error.code === 'auth/user-not-found') {
-            return { success: false, message: 'No account found with this email address.' };
-        }
-
-        return { success: false, message: 'Server error: ' + error.message };
-    }
 });
 
 exports.checkBirthdays = functions.pubsub.schedule('0 9 * * *').timeZone('Europe/Rome').onRun(async (context) => {
@@ -601,9 +572,9 @@ exports.checkBirthdays = functions.pubsub.schedule('0 9 * * *').timeZone('Europe
                             birthdayEmailSentYear: currentYear
                         });
 
-                        console.log(`✅ Birthday email sent to ${user.email} | Code: ${birthdayCode} | Expires: ${expiryDate.toISOString()}`);
+                        console.log('Birthday email sent.');
                     } catch (e) {
-                        console.error(`Error sending birthday email to ${user.email}:`, e.message);
+                        console.error('Customer notification or cleanup failed; review the affected job.');
                     }
                 }
             }
@@ -618,9 +589,9 @@ exports.cleanupDeletedUser = functions.auth.user().onDelete(async (user) => {
     try {
         // Deletes the user's profile from the database
         await admin.database().ref(`users/${uid}`).remove();
-        console.log(`✅ Successfully wiped database profile for deleted user: ${uid}`);
+        console.log('Deleted-user profile cleanup completed.');
     } catch (error) {
-        console.error(`❌ Error wiping database profile for user ${uid}:`, error.message);
+        console.error('Customer notification or cleanup failed; review the affected job.');
     }
 });
 // Signed Stripe events are the only source of payment confirmation.
@@ -657,7 +628,105 @@ exports.stripeWebhook = functions.https.onRequest(async (req,res) => {
         }
         return res.json({received:true});
     } catch (error) {
-        console.error('Payment processing requires retry:',{eventId:event.id,message:error.message});
+        console.error('Payment processing requires retry:',{eventId:event.id});
         return res.status(500).send('Payment processing requires retry');
     }
 });
+// ─────────────────────────────────────────────────────────────
+// ELIJAH — SECURE LIVE PRODUCT SEARCH
+// Searches SAYAND live products and active sales
+// ─────────────────────────────────────────────────────────────
+
+function elijahToArray(value) {
+    if (!value) return [];
+
+    if (Array.isArray(value)) {
+        return value.filter(v => v !== null && v !== undefined);
+    }
+
+    if (typeof value === 'object') {
+        return Object.values(value).filter(v => v !== null && v !== undefined);
+    }
+
+    return [value];
+}
+
+function elijahSafeText(value) {
+    if (value === null || value === undefined) return '';
+
+    if (
+        typeof value === 'string' ||
+        typeof value === 'number' ||
+        typeof value === 'boolean'
+    ) {
+        return String(value);
+    }
+
+    try {
+        return JSON.stringify(value);
+    } catch (_) {
+        return '';
+    }
+}
+
+function elijahNormalizeSearch(value) {
+    return String(value ?? '')
+        .normalize('NFKD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/[_\-\/]+/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+function elijahApiKeyMatches(req) {
+    const expected = process.env.ELIJAH_API_KEY || '';
+
+    const authHeader = String(req.headers.authorization || '');
+
+    const supplied = authHeader.startsWith('Bearer ')
+        ? authHeader.slice(7).trim()
+        : '';
+
+    if (!expected || !supplied) return false;
+
+    const expectedBuffer = Buffer.from(expected);
+    const suppliedBuffer = Buffer.from(supplied);
+
+    if (expectedBuffer.length !== suppliedBuffer.length) {
+        return false;
+    }
+
+    return crypto.timingSafeEqual(
+        expectedBuffer,
+        suppliedBuffer
+    );
+}
+
+// Existing internal endpoint names and ELIJAH_API_KEY remain unchanged.
+const shopQuery = require('./shop-query');
+exports.elijahProductSearch = functions.runWith({secrets:['ELIJAH_API_KEY'],maxInstances:10}).https.onRequest(shopQuery.handler(admin.database(),elijahApiKeyMatches,true));
+exports.elijahShopQuery = functions.runWith({secrets:['ELIJAH_API_KEY'],maxInstances:10}).https.onRequest(shopQuery.handler(admin.database(),elijahApiKeyMatches));
+// Live catalogue routes: no payment or customer reads.
+exports.cataloguePages = functions.runWith({timeoutSeconds:30,maxInstances:10}).https.onRequest(require('./catalogue').handler(admin.database()));
+
+const storeServices = require('./store-services').install(functions,admin,sendBrevoEmail);
+Object.assign(exports,storeServices.exports);
+Object.assign(exports,require('./return-service').install(admin,storeServices));
+
+exports.eliaChat = require('./elia-proxy').install(functions,storeServices);
+
+exports.publicEditorial = functions.runWith({maxInstances:5}).https.onRequest(require('./public-editorial').handler(admin.database()));
+// Expire only temporary records introduced by this update. Never deletes orders or evidence.
+exports.cleanupStoreServiceTokens = functions.pubsub.schedule('every 24 hours').onRun(async()=>{
+    const expiryFields={_serviceLimits:'until',_emailVerification:'expires',_newsletterConfirm:'expires',_eliaConversations:'expires'};
+    for(const [path,field] of Object.entries(expiryFields)) {
+        const snapshot=await admin.database().ref(path).orderByChild(field).endAt(Date.now()).limitToFirst(1000).once('value');
+        const updates={};snapshot.forEach(child=>{updates[child.key]=null;});
+        if(Object.keys(updates).length)await admin.database().ref(path).update(updates);
+    }
+    return null;
+});
+
+// Marketing opt-outs only; no order or transactional-email changes.
+exports.brevoNewsletterSync = functions.runWith({secrets:['BREVO_NEWSLETTER_WEBHOOK_SECRET'],maxInstances:2,timeoutSeconds:300}).https.onRequest(require('./newsletter-sync').handler(admin.database()));

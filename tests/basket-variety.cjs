@@ -1,0 +1,10 @@
+'use strict';
+const assert=require('node:assert/strict'),{basket}=require('../functions/elia-promotions');
+const p=(name,price,quantity=9)=>({name,price,quantity,sizes:['OS'],colors:['Green'],img:'https://example.test/p.jpg'});
+const data=items=>({newArrivals:items});
+let r=basket(data([p('Gown',40),p('Hat',40),p('Shirt',40)]),15000,Date.now());assert.equal(r.cards.length,3);assert.equal(r.total,16000);assert.equal(r.lines.filter(x=>x.startsWith('1 ×')).length,2);
+r=basket(data([p('Gown',40),p('Hat',55),p('Shirt',60)]),15000,Date.now());assert.equal(r.total,15500);assert(r.lines.every(x=>x.startsWith('1 ×')));
+r=basket(data([p('Gown',40),p('Expensive',2000)]),15000,Date.now());assert.equal(r.total,16000);assert.equal(r.cards.length,1);
+r=basket(data([p('Gown',40,1),p('Hat',40,1),p('Shirt',40,1)]),15000,Date.now());assert.equal(r.total,12000);assert(r.lines.every(x=>x.startsWith('1 ×')));
+assert.equal(basket(data([]),15000,Date.now()),null);
+console.log('PASS variety, single quantities, bounded overspend, stock limits, honest insufficient-stock subtotal and empty catalogue');

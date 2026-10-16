@@ -6,7 +6,7 @@
     <title>SAYAND | Admin Dashboard</title>
     <link rel="icon" type="image/png" href="https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/SAYAND%20Intertwined%20S%26A%20Monogram.png?alt=media&token=4a0c7abb-0150-4d22-94fc-d58f901a45f6">
     <link rel="apple-touch-icon" href="https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/SAYAND%20Intertwined%20S%26A%20Monogram.png?alt=media&token=4a0c7abb-0150-4d22-94fc-d58f901a45f6">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/tailwind-production.css?v=mobile-1">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/admin.css">
     <style>
@@ -692,14 +692,18 @@
     </div>
 
    <!-- FIREBASE ENGINE & SECURE ADMIN LOCK -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script> 
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-functions.js"></script>    
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script> 
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-functions-compat.js"></script>    
 
     <!-- 1. LOAD CONFIG FIRST (Initializes Firebase) -->
     <script src="js/firebase-config.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-check-compat.js"></script>
+<script src="/js/service-config.js"></script>
+<script src="/js/store-services.js"></script>
 
     <!-- 2. SET DB SHORTCUT AFTER CONFIG LOADS -->
     <script>if(typeof firebase!=="undefined"&&firebase.database){window.db=firebase.database();}</script>
@@ -735,8 +739,9 @@
             }
         });
     </script>
-    <script src="js/admin.js?v=order-recovery-2"></script>
+    <script src="js/admin.js?v=return-messages-3"></script>
 
 
+<script src="/js/return-conversation.js?v=return-messages-3"></script>
 </body>
 </html>

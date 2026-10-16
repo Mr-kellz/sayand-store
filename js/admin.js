@@ -500,7 +500,9 @@ window.issueReturnCode = async function(orderId) {
         const order = snapshot.val();
         if (!order || !['Return Requested', 'Return Approved'].includes(order.status)) throw new Error('This order does not have an active return request.');
         if (!order.shippingInfo || !order.shippingInfo.email) throw new Error('The order has no customer email address.');
-        await db.ref('orders/' + orderId).update({status:'Return Approved', returnQrUrl:url});
+        const approvalUpdate={status:'Return Approved',returnQrUrl:url};
+        if(order.returnCase){approvalUpdate['returnCase/status']='Approved';approvalUpdate['returnCase/updatedAt']=Date.now();}
+        await db.ref('orders/' + orderId).update(approvalUpdate);
         approved = true;
         const result = await firebase.functions().httpsCallable('sendStoreEmail')({
             type:'return_approved',
@@ -605,6 +607,29 @@ window.notifyRestock = async function(productName) {
     }
 };
 
+// Orders may contain legacy string-valued prices. Keep one record from breaking the list.
+function orderMoney(value, fallback=0) {
+    const number=Number(value === undefined || value === null || value === '' ? fallback : value);
+    return Number.isFinite(number) ? number : fallback;
+}
+function renderAdminReturnConversation(order) {
+    const c=order.returnCase;
+    if(!c || typeof c!=='object') return '';
+    const messages=Object.values(c.messages || {}).filter(m=>m && typeof m.text==='string')
+        .sort((a,b)=>orderMoney(a.createdAt)-orderMoney(b.createdAt));
+    const latest=messages[messages.length-1];
+    const isClosed=!!c.closedAt || ['Approved','Declined','Refunded','Closed'].includes(c.status);
+    const needsReply=!isClosed && latest && latest.role==='customer';
+    const body=messages.map(m=>`<div class="border-t border-purple-100 py-2"><strong>${m.role==='customer'?'Customer':'SAYAND'}:</strong><p class="whitespace-pre-wrap break-words">${escapeAdminTranslation(m.text)}</p></div>`).join('');
+    return `<section class="mt-4 p-4 bg-purple-50 border border-purple-300" aria-label="Return request and messages">
+        <div class="flex justify-between gap-2"><h5 class="font-bold text-xs">RETURN REQUEST & MESSAGES</h5>${needsReply?'<span class="text-xs font-bold text-purple-800">CUSTOMER AWAITING REPLY</span>':''}</div>
+        <p class="text-xs mt-2">Status: ${escapeAdminTranslation(c.status || 'Under review')}</p>
+        <p class="text-xs">Reason: ${escapeAdminTranslation(c.reason || 'Not provided')} · Condition: ${escapeAdminTranslation(c.condition || 'Not provided')}</p>
+        <details class="text-xs mt-3"><summary style="cursor:pointer;font-weight:bold;color:#1a2e15">View conversation (${messages.length} messages)</summary><div style="max-height:16rem;overflow-y:auto;margin-top:12px">${body || '<p>No messages recorded for this request.</p>'}</div></details>
+        <button type="button" onclick="openReturnConversation('${order.id}')" class="w-full p-3 text-xs font-bold mt-3" style="background:#1a2e15;color:#f9f6f0;border:1px solid #c7a443;border-radius:8px">${isClosed?'VIEW CLOSED RETURN':'REPLY TO CUSTOMER / REVIEW RETURN'}</button>
+    </section>`;
+}
+
 window.renderOrders = function(data) {
     const container = document.getElementById('orders-list');
     if(!container) return;
@@ -617,10 +642,11 @@ window.renderOrders = function(data) {
     ordersArray.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
     
     container.innerHTML = ordersArray.map(order => {
+        if(order.status!=='Refunded'&&['Approved','Declined'].includes(order.returnCase?.status))order={...order,status:'Return '+order.returnCase.status};
         const date = new Date(order.timestamp || order.date).toLocaleString();
         let subtotal = 0;
         const itemsList = Object.values(order.items || {}).map(item => {
-            const lineTotal = item.price * item.quantity;
+            const lineTotal = orderMoney(item.price) * orderMoney(item.quantity);
             subtotal += lineTotal;
             return `<li>${escapeAdminTranslation(item.quantity)}x ${escapeAdminTranslation(item.name)} (${escapeAdminTranslation(item.size)}/${escapeAdminTranslation(item.color)}) - €${lineTotal.toFixed(2)}</li>`
         }).join('');
@@ -633,13 +659,13 @@ window.renderOrders = function(data) {
                           order.status === 'Canceled (By User)' ? 'text-red-600' : 'text-gray-500'; 
         
         let discountHTML = '';
-        if (order.discountAmount) {
+        if (orderMoney(order.discountAmount)) {
             let label = order.promoCodeUsed ? `PROMO (${order.promoCodeUsed})` : 'VIP DISCOUNT';
-            discountHTML = `<div class="flex justify-between text-[#d4af37] font-bold text-[9px] mb-1"><span>${escapeAdminTranslation(label)}</span> <span>-€${order.discountAmount.toFixed(2)}</span></div>`;
+            discountHTML = `<div class="flex justify-between text-[#d4af37] font-bold text-[9px] mb-1"><span>${escapeAdminTranslation(label)}</span> <span>-€${orderMoney(order.discountAmount).toFixed(2)}</span></div>`;
         }
 
         let giftHTML = order.isGift ? `<div class="mt-4 mb-4 bg-[#fdfbf7] border border-[#d4af37] p-4 shadow-sm"><p class="text-[10px] font-black text-[#d4af37] tracking-[0.2em] mb-2 uppercase">🎁 Signature Gift Box Requested</p><p class="text-[12px] font-serif italic text-gray-800 border-l-2 border-[#d4af37] pl-3">" ${escapeAdminTranslation(order.giftNote || 'No custom note provided.')} "</p></div>` : '';
-        let shipCostDisplay = order.shippingCost === 0 ? "COMPLIMENTARY" : `€${(order.shippingCost !== undefined ? order.shippingCost : 15).toFixed(2)}`;
+        let shipCostDisplay = orderMoney(order.shippingCost,15) === 0 ? "COMPLIMENTARY" : `€${orderMoney(order.shippingCost,15).toFixed(2)}`;
         
         let returnAdminAction = '';
         if (order.status === 'Return Requested' || order.status === 'Return Approved') {
@@ -656,7 +682,7 @@ window.renderOrders = function(data) {
                 <button id="qr-send-${order.id}" onclick="issueReturnCode('${order.id}')" class="w-full bg-purple-600 text-white px-4 py-3 text-[10px] font-bold">${order.status === 'Return Approved' ? 'RESEND RETURN EMAIL / SAVE NEW FILE' : 'APPROVE RETURN & SEND QR / LABEL'}</button>
             </div>`;
         } else if (order.returnQrUrl) {
-            returnAdminAction = `<div class="mt-4 p-3 bg-gray-50 border border-gray-200 rounded"><p class="text-[9px] font-bold text-gray-500 tracking-widest uppercase mb-1">RETURN QR / LABEL ISSUED</p><p class="text-[10px] text-gray-600 truncate"><a href="${order.returnQrUrl}" target="_blank" class="text-blue-500 underline font-bold hover:text-black">View Active Return Label</a></p></div>`;
+            returnAdminAction = `<div class="mt-4 p-3 bg-gray-50 border border-gray-200 rounded"><p class="text-[9px] font-bold text-gray-500 tracking-widest uppercase mb-1">RETURN QR / LABEL ISSUED</p><p class="text-[10px] text-gray-600 truncate"><a href="${escapeAdminTranslation(returnLabelURL(order.returnQrUrl))}" target="_blank" rel="noopener noreferrer" class="text-blue-500 underline font-bold hover:text-black">View Active Return Label</a></p></div>`;
         }
         
         if (order.status === 'Canceled (By User)') {
@@ -681,6 +707,7 @@ window.renderOrders = function(data) {
                             <option value="Delivered" ${order.status==='Delivered'?'selected':''} class="text-black">Delivered</option>
                             <option value="Return Requested" ${order.status==='Return Requested'?'selected':''} class="text-black">Return Requested</option>
                             <option value="Return Approved" ${order.status==='Return Approved'?'selected':''} class="text-black">Return Approved</option>
+                            <option value="Return Declined" ${order.status==='Return Declined'?'selected':''} disabled class="text-black">Return Declined</option>
                             <option value="Refunded" ${order.status==='Refunded'?'selected':''} class="text-black">Refunded</option>
                             <option value="Canceled" ${order.status==='Canceled'?'selected':''} class="text-black">Canceled (By Admin)</option>
                             <option value="Canceled (By User)" ${order.status==='Canceled (By User)'?'selected':''} class="text-black">Canceled (By User)</option>
@@ -716,13 +743,13 @@ window.renderOrders = function(data) {
                         <div class="w-full md:w-1/2 text-[9px] text-gray-500 space-y-1">
                             <div class="flex justify-between"><span>SUBTOTAL</span> <span>€${subtotal.toFixed(2)}</span></div>
                             ${discountHTML}
-                            ${order.isGift ? `<div class="flex justify-between text-black font-bold"><span>GIFT PACKAGING</span> <span>+€${Number(order.giftCost === undefined ? 2 : order.giftCost).toFixed(2)}</span></div>` : ''}
+                            ${order.isGift ? `<div class="flex justify-between text-black font-bold"><span>GIFT PACKAGING</span> <span>+€${orderMoney(order.giftCost,2).toFixed(2)}</span></div>` : ''}
                             <div class="flex justify-between"><span>SHIPPING</span> <span>${shipCostDisplay}</span></div>
                         </div>
                     </div>
                     <div class="flex justify-between items-center text-xs font-black border-t border-b border-gray-200 py-2 mb-3">
                         <span class="text-gray-500 text-[10px]">PAID VIA: <span class="text-blue-600 uppercase">${escapeAdminTranslation(order.paymentMethod)}</span></span>
-                        <span>€${(order.totalAmount || 0).toFixed(2)} EUR</span>
+                        <span>€${orderMoney(order.totalAmount).toFixed(2)} EUR</span>
                     </div>
                     <div class="flex flex-col gap-1">
                         <label class="text-[9px] font-bold text-gray-400 tracking-widest uppercase">SHIPPING & TRACKING CODE</label>
@@ -732,6 +759,7 @@ window.renderOrders = function(data) {
                         </div>
                     </div>
                 </div>
+                ${renderAdminReturnConversation(order)}
                 ${returnAdminAction}
             </div>
         `;
@@ -739,9 +767,12 @@ window.renderOrders = function(data) {
 }
 
 window.updateOrderStatus = function(id, status) {
-    let updates = { status: status };
-    if (status === 'Delivered') updates.deliveredAt = firebase.database.ServerValue.TIMESTAMP;
-    db.ref('orders/' + id).update(updates)
+    db.ref('orders/' + id).transaction(order => {
+        if (!order) return;
+        const updates = { ...order, status: status };
+        if (status === 'Delivered' && !order.deliveredAt) updates.deliveredAt = firebase.database.ServerValue.TIMESTAMP;
+        return updates;
+    })
     .then(() => { if (typeof showAdminToast === 'function') showAdminToast("ORDER STATUS SAVED"); })
     .catch(e => alert("Error updating order: " + e.message));
 }
@@ -1380,48 +1411,48 @@ function renderUpcomingList() {
     }).join('');
 }
 
+let dropLaunchInProgress = false;
 window.launchDrop = async function(index) {
+    if(dropLaunchInProgress) return;
     const item = database.upcomingSales[index];
-    if(!confirm(`Launch ${item.name}? This will move it to New Arrivals and auto-notify everyone who reserved it.`)) return;
-
-    const newProduct = {
-        name: item.name, price: item.price,
-        images: (item.images && item.images.length > 0) ? item.images : [item.image],
-        category: item.category,
-        sizes: item.sizes || ['OS'],
-        description: "An exclusive SAYAND release.",
-        quantity: 100,
-        isVipOnly: !!item.isVipOnly 
-    };
-    database.newArrivals.push(newProduct);
-    database.upcomingSales.splice(index, 1);
-
-    await saveStoreSafely();
-
-    const preordersSnap = await db.ref(`preorders/${item.name}`).once('value');
-    
-    if (preordersSnap.exists()) {
-        const preorders = preordersSnap.val();
-        const updates = {};
-
-        Object.keys(preorders).forEach(uid => {
-            const poData = preorders[uid];
-            const cartKey = `${item.name}_${poData.size}_Default`.replace(/[^a-zA-Z0-9]/g, '_');
-            updates[`users/${uid}/cart/${cartKey}`] = {
-                name: item.name, price: item.price, quantity: 1, maxStock: 100,
-                image: (item.images && item.images.length > 0) ? item.images[0] : item.image,
-                size: poData.size, color: 'Default',
-                addedAt: firebase.database.ServerValue.TIMESTAMP
-            };
-        });
-        await db.ref().update(updates);
-        showAdminToast(`DROP LAUNCHED! ${Object.keys(preorders).length} user carts updated.`);
-    } else {
-        showAdminToast("DROP LAUNCHED! (No pre-orders were claimed)");
+    if(!item) return alert('This drop no longer exists. Refresh the list.');
+    const existing=['newArrivals','trending','sales'].flatMap(section=>Object.values(database[section] || {}));
+    if(existing.some(p=>String(p.name || '').trim().toLowerCase()===String(item.name).trim().toLowerCase()))return alert('A product with this name already exists. Edit its stock instead of creating a duplicate.');
+    const sizes=[...new Set((Array.isArray(item.sizes)&&item.sizes.length?item.sizes:['OS']).map(String))];
+    const sizeQuantities={};
+    for(const size of sizes) {
+        const prior=item.sizeQuantities?.[size];
+        const value=prompt(`Actual stock for ${item.name} — ${size} (whole units, 0 if unavailable):`, Number.isSafeInteger(prior)&&prior>=0?String(prior):'');
+        if(value===null)return;
+        if(!/^\d+$/.test(value.trim()) || !Number.isSafeInteger(Number(value)) || Number(value)>1000000)return alert('Enter a whole stock quantity between 0 and 1,000,000. Nothing was launched.');
+        sizeQuantities[size]=Number(value);
     }
-
-    setTimeout(() => { notifySubscribers(item.name, item.price, newProduct.images[0]); }, 1000);
-    renderLists();
+    const quantity=Object.values(sizeQuantities).reduce((a,b)=>a+b,0);
+    if(!quantity)return alert('Enter available stock before launching this drop.');
+    if(!confirm(`Launch ${item.name} with ${quantity} units? This will notify subscribers and update existing reservation carts.`))return;
+    const newProduct={name:item.name,price:item.price,images:(item.images?.length?item.images:[item.image]),category:item.category,sizes,sizeQuantities,description:item.description || 'An exclusive SAYAND release.',quantity,isVipOnly:!!item.isVipOnly};
+    dropLaunchInProgress=true;
+    let saved=false;
+    const oldArrivals=[...(database.newArrivals || [])],oldUpcoming=[...database.upcomingSales];
+    try {
+        database.newArrivals=[...oldArrivals,newProduct];
+        database.upcomingSales=oldUpcoming.filter((_,i)=>i!==index);
+        await saveStoreSafely();saved=true;
+        const preorderKey=item.name.replace(/[.#$\[\]\/]/g,'_');
+        const snap=await db.ref('preorders/'+preorderKey).once('value');
+        const updates={};let count=0;
+        for(const [uid,po] of Object.entries(snap.val() || {})) {
+            if(!po || !(sizeQuantities[po.size]>0))continue;
+            const cartKey=`${item.name}_${po.size}_Default`.replace(/[^a-zA-Z0-9]/g,'_');
+            updates[`users/${uid}/cart/${cartKey}`]={name:item.name,price:item.price,quantity:1,maxStock:sizeQuantities[po.size],image:newProduct.images[0],size:po.size,color:'Default',addedAt:firebase.database.ServerValue.TIMESTAMP};count++;
+        }
+        if(count)await db.ref().update(updates);
+        showAdminToast(`DROP LAUNCHED WITH ${quantity} UNITS. ${count} reservation carts updated.`);
+        await notifySubscribers(item.name,item.price,newProduct.images[0]);
+    } catch(error) {
+        if(!saved){database.newArrivals=oldArrivals;database.upcomingSales=oldUpcoming;}
+        alert(saved?'Product launched, but reservation updates or notifications need checking. Do not launch it again.':'Drop not saved. Refresh admin and try again.');
+    } finally {dropLaunchInProgress=false;renderLists();}
 };
 
 function loadAnnouncementForm() {
@@ -1849,11 +1880,11 @@ window.loadReviews = function() {
             const row = document.createElement('tr');
             row.className = 'border-b border-gray-100 hover:bg-gray-50';
             const date = new Date(rev.timestamp).toLocaleDateString();
-            const stars = '★'.repeat(rev.rating) + '☆'.repeat(5 - rev.rating);
+            const rating=Math.max(1,Math.min(5,Number(rev.rating)||1)); const stars='★'.repeat(rating)+'☆'.repeat(5-rating);
             row.innerHTML = `
-                <td class="p-3 text-[10px] font-bold uppercase">${rev.productId.replace(/_/g, ' ')}</td>
-                <td class="p-3"><div class="text-[10px] font-bold">${rev.name}</div><div class="text-[#d4af37] text-[12px]">${stars}</div><div class="text-[9px] text-gray-400">${date}</div></td>
-                <td class="p-3 text-[11px] text-gray-600 max-w-xs italic">"${rev.text}"</td>
+                <td class="p-3 text-[10px] font-bold uppercase">${escapeAdminTranslation(rev.productId.replace(/_/g, ' '))}</td>
+                <td class="p-3"><div class="text-[10px] font-bold">${escapeAdminTranslation(rev.name || 'Customer')}</div><div class="text-[#d4af37] text-[12px]">${stars}</div><div class="text-[9px] text-gray-400">${date}</div></td>
+                <td class="p-3 text-[11px] text-gray-600 max-w-xs italic">"${escapeAdminTranslation(rev.text || '')}"</td>
                 <td class="p-3 text-right space-x-2"><button onclick="deleteReview('${rev.productId}', '${rev.reviewId}')" class="text-red-500 hover:text-red-700 text-[9px] font-bold tracking-wider px-2 py-1 border border-red-500 hover:bg-red-50">DEL</button></td>
             `;
             tbody.appendChild(row);

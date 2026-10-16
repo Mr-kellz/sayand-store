@@ -14,7 +14,7 @@
       }
     })();
     </script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/tailwind-production.css?v=mobile-1">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css?v=site-4">
     <style>
@@ -43,7 +43,7 @@
     <script src="js/translations.js?v=shipping-admin-1"></script>
     <script src="js/i18n.js?v=site-4"></script>
     <link rel="stylesheet" href="css/site-updates.css?v=site-4">
-    <script src="js/consent.js?v=site-4"></script>
+    <script src="js/consent.js?v=launch-1"></script>
 
     <meta name="description" content="Shop SAYAND clothing and accessories for women and men. Discover our collections, new arrivals and editorial looks.">
     <link rel="canonical" href="https://thesayand.com/">
@@ -52,7 +52,8 @@
     <meta property="og:description" content="Shop SAYAND clothing and accessories for women and men. Discover our collections, new arrivals and editorial looks.">
     <meta property="og:url" content="https://thesayand.com/">
     <meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/SAYAND%20Intertwined%20S%26A%20Monogram.png?alt=media&token=4a0c7abb-0150-4d22-94fc-d58f901a45f6">
-    <script src="js/site-updates.js?v=site-4"></script>
+    <script src="js/shopping-analytics.js?v=launch-1"></script>
+    <script src="js/site-updates.js?v=launch-1"></script>
 </head>
 <body class="bg-[#f5f0e8] text-[#0f1f0f] antialiased overflow-x-hidden">
 
@@ -74,9 +75,9 @@
                         <span class="w-6 h-0.5 bg-[#c9a227] transition-all duration-300"></span>
                     </button>
                     <div class="hidden md:flex space-x-8 text-[10px] tracking-[0.2em] font-black">
-                        <a href="collection.html?category=women" target="_self" class="text-[#e8d5a3] hover:text-[#c9a227] transition-colors duration-300">WOMEN</a>
-                        <a href="collection.html?category=men" target="_self" class="text-[#e8d5a3] hover:text-[#c9a227] transition-colors duration-300">MEN</a>
-                        <a href="collection.html?category=accessories" target="_self" class="text-[#e8d5a3] hover:text-[#c9a227] transition-colors duration-300">ACCESSORIES</a>
+                        <a href="/collection-women" target="_self" class="text-[#e8d5a3] hover:text-[#c9a227] transition-colors duration-300">WOMEN</a>
+                        <a href="/collection-men" target="_self" class="text-[#e8d5a3] hover:text-[#c9a227] transition-colors duration-300">MEN</a>
+                        <a href="/collection-accessories" target="_self" class="text-[#e8d5a3] hover:text-[#c9a227] transition-colors duration-300">ACCESSORIES</a>
                         <a href="collection.html" target="_self" class="text-[#e8d5a3] hover:text-[#c9a227] transition-colors duration-300">COLLECTIONS</a>
                         <a href="sales.html" target="_self" class="text-red-400 hover:text-red-300 transition-colors duration-300">SALE</a>
                         <a href="login.html" target="_self" id="desktop-account-link" class="hidden md:flex items-center justify-center text-[#e8d5a3] hover:text-[#c9a227] transition-colors">
@@ -131,9 +132,9 @@
 
     <!-- MOBILE MENU -->
     <div id="mobileMenu" class="menu-overlay fixed inset-0 bg-[#0f1f0f] text-[#c9a227] z-40 flex flex-col justify-center items-center space-y-6">
-        <a href="collection.html?category=women" target="_self" onclick="toggleMenu();" class="text-3xl font-black tracking-widest hover:text-[#e8d5a3] transition-colors uppercase">WOMEN</a>
-        <a href="collection.html?category=men" target="_self" onclick="toggleMenu();" class="text-3xl font-black tracking-widest hover:text-[#e8d5a3] transition-colors uppercase">MEN</a>
-        <a href="collection.html?category=accessories" target="_self" onclick="toggleMenu();" class="text-3xl font-black tracking-widest hover:text-[#e8d5a3] transition-colors uppercase">ACCESSORIES</a>
+        <a href="/collection-women" target="_self" onclick="toggleMenu();" class="text-3xl font-black tracking-widest hover:text-[#e8d5a3] transition-colors uppercase">WOMEN</a>
+        <a href="/collection-men" target="_self" onclick="toggleMenu();" class="text-3xl font-black tracking-widest hover:text-[#e8d5a3] transition-colors uppercase">MEN</a>
+        <a href="/collection-accessories" target="_self" onclick="toggleMenu();" class="text-3xl font-black tracking-widest hover:text-[#e8d5a3] transition-colors uppercase">ACCESSORIES</a>
         <a href="collection.html" target="_self" onclick="toggleMenu();" class="text-3xl font-black tracking-widest hover:text-[#e8d5a3] transition-colors uppercase">COLLECTIONS</a>
         <a href="sales.html" target="_self" onclick="toggleMenu();" class="text-3xl font-black tracking-widest text-red-500 hover:text-red-400 transition-colors uppercase">SALE</a>
         <div class="w-48 h-px bg-[#c9a227]/30 my-2"></div>
@@ -237,7 +238,7 @@
         <div id="detail-scroll" class="h-full overflow-y-auto hide-scrollbar bg-[#0f1f0f]">
             <div class="relative w-full bg-[#e8e4d9]">
                 <div class="w-full aspect-[3/4] md:aspect-[4/5] relative overflow-hidden" id="detail-image-container" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEnd(event)">
-                    <img id="detail-hero-img" src="" class="w-full h-full object-cover transition-transform duration-300">
+                    <img alt="Product photograph" id="detail-hero-img" src="" class="w-full h-full object-cover transition-transform duration-300">
                     <div class="swipe-hint" id="swipe-hint">SWIPE FOR MORE</div>
                     <div id="detail-dots" class="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-20"></div>
                 </div>
@@ -301,7 +302,7 @@
                 </div>
 
                 <div id="detail-model-img-container" class="mt-8 mb-4">
-                    <img id="detail-model-img" src="" class="w-full object-cover" style="display:none;">
+                    <img alt="Additional product photograph" id="detail-model-img" src="" class="w-full object-cover" style="display:none;">
                 </div>
 
                 <div class="mt-8 border-t border-[#c9a227]/10">
@@ -369,8 +370,8 @@
                 <p id="heroSubtitle" class="text-[10px] tracking-[0.3em] font-black mb-4 fade-in text-[#c9a227]">SPRING / SUMMER 2026</p>
                 <h2 id="heroTitle" class="text-5xl md:text-7xl lg:text-8xl font-black leading-[0.9] tracking-tighter mb-6 fade-in stagger-1 text-[#f5f0e8]">ESSENTIAL<br>MODERNITY</h2>
                 <div class="flex flex-wrap gap-4 fade-in stagger-2">
-                    <button onclick="window.location.href='collection.html?category=women'" class="bg-[#c9a227] text-[#0f1f0f] px-8 py-4 text-[10px] tracking-[0.2em] font-black hover:bg-[#e8d5a3] transition-all duration-300 shadow-lg">SHOP WOMEN</button>
-                    <button onclick="window.location.href='collection.html?category=men'" class="border border-[#c9a227] text-[#c9a227] px-8 py-4 text-[10px] tracking-[0.2em] font-black hover:bg-[#c9a227] hover:text-[#0f1f0f] transition-all duration-300">SHOP MEN</button>
+                    <button onclick="window.location.href='/collection-women'" class="bg-[#c9a227] text-[#0f1f0f] px-8 py-4 text-[10px] tracking-[0.2em] font-black hover:bg-[#e8d5a3] transition-all duration-300 shadow-lg">SHOP WOMEN</button>
+                    <button onclick="window.location.href='/collection-men'" class="border border-[#c9a227] text-[#c9a227] px-8 py-4 text-[10px] tracking-[0.2em] font-black hover:bg-[#c9a227] hover:text-[#0f1f0f] transition-all duration-300">SHOP MEN</button>
                 </div>
             </div>
         </div>
@@ -379,24 +380,24 @@
     <!-- CATEGORIES -->
     <section class="w-full py-2 bg-[#f5f0e8]">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-2 px-2">
-            <div class="relative aspect-[3/4] overflow-hidden group cursor-pointer border border-[#d4c9a8]/40 shadow-sm" onclick="window.location.href='collection.html?category=women'">
-                <img id="womenImg" src="" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+            <div class="relative aspect-[3/4] overflow-hidden group cursor-pointer border border-[#d4c9a8]/40 shadow-sm" onclick="window.location.href='/collection-women'">
+                <img alt="SAYAND women's collection" id="womenImg" src="" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
                 <div class="absolute inset-0 bg-[#0f1f0f]/30 md:bg-[#0f1f0f]/0 md:group-hover:bg-[#0f1f0f]/30 transition-all duration-500"></div>
                 <div class="absolute bottom-0 left-0 p-6">
                     <h3 class="text-white text-2xl font-black tracking-widest mb-2 drop-shadow-lg">WOMEN</h3>
                     <p class="text-[#c9a227] text-[10px] font-black tracking-[0.2em] drop-shadow-md">VIEW COLLECTION &rarr;</p>
                 </div>
             </div>
-            <div class="relative aspect-[3/4] overflow-hidden group cursor-pointer border border-[#d4c9a8]/40 shadow-sm" onclick="window.location.href='collection.html?category=men'">
-                <img id="menImg" src="" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+            <div class="relative aspect-[3/4] overflow-hidden group cursor-pointer border border-[#d4c9a8]/40 shadow-sm" onclick="window.location.href='/collection-men'">
+                <img alt="SAYAND men's collection" id="menImg" src="" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
                 <div class="absolute inset-0 bg-[#0f1f0f]/30 md:bg-[#0f1f0f]/0 md:group-hover:bg-[#0f1f0f]/30 transition-all duration-500"></div>
                 <div class="absolute bottom-0 left-0 p-6">
                     <h3 class="text-white text-2xl font-black tracking-widest mb-2 drop-shadow-lg">MEN</h3>
                     <p class="text-[#c9a227] text-[10px] font-black tracking-[0.2em] drop-shadow-md">VIEW COLLECTION &rarr;</p>
                 </div>
             </div>
-            <div class="relative aspect-[3/4] overflow-hidden group cursor-pointer border border-[#d4c9a8]/40 shadow-sm" onclick="window.location.href='collection.html?category=accessories'">
-                <img id="accImg" src="" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+            <div class="relative aspect-[3/4] overflow-hidden group cursor-pointer border border-[#d4c9a8]/40 shadow-sm" onclick="window.location.href='/collection-accessories'">
+                <img alt="SAYAND accessories collection" id="accImg" src="" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
                 <div class="absolute inset-0 bg-[#0f1f0f]/30 md:bg-[#0f1f0f]/0 md:group-hover:bg-[#0f1f0f]/30 transition-all duration-500"></div>
                 <div class="absolute bottom-0 left-0 p-6">
                     <h3 class="text-white text-2xl font-black tracking-widest mb-2 drop-shadow-lg">ACCESSORIES</h3>
@@ -519,7 +520,8 @@
                 <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" class="h-4 opacity-50 grayscale">
             </div>
         </div>
-    </footer>
+    <p style="text-align:center;margin:16px"><a href="/faq" style="text-decoration:underline">FAQ</a></p>
+</footer>
 
     <!-- CONTACT MODAL -->
     <div id="contact-modal" class="fixed inset-0 bg-[#0f1f0f]/90 z-[90] hidden items-center justify-center backdrop-blur-sm" onclick="if(event.target===this)closeContact()">
@@ -594,14 +596,19 @@
         </div>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-functions.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-functions-compat.js"></script>
 
     <script src="js/firebase-config.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-check-compat.js"></script>
+<script src="/js/service-config.js"></script>
+<script src="/js/store-services.js"></script>
+<script src="/js/public-store.js"></script>
     <script>if(typeof firebase!=="undefined"&&firebase.database){window.db=firebase.database();}</script>
-    <script src="js/main.js?v=shipping-admin-1"></script>
+    <script src="js/main.js?v=launch-1"></script>
 
     <script>
     firebase.auth().onAuthStateChanged((user) => {
@@ -678,5 +685,6 @@ function handleLogoClick(e) {
         }
     });
     </script>
+<script src="/js/elia.js?v=20261015-expanded"></script>
 </body>
 </html>

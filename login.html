@@ -228,11 +228,15 @@
         </div>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-functions-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-functions-compat.js"></script>
     <script src="js/firebase-config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-check-compat.js"></script>
+<script src="/js/service-config.js"></script>
+<script src="/js/store-services.js"></script>
+<script src="/js/public-store.js"></script>
 
     <script>
         let isLoginMode = true;
@@ -347,24 +351,8 @@
                     }
                 }
 
-                const snap = await firebase.database().ref(`users/${user.uid}`).once('value');
-                if (!snap.exists()) {
-                    const userData = {
-                        firstName: user.displayName ? user.displayName.split(' ')[0] : 'Member',
-                        lastName: user.displayName ? user.displayName.split(' ').slice(1).join(' ') : '',
-                        email: user.email,
-                        createdAt: firebase.database.ServerValue.TIMESTAMP,
-                        accountVerified: true,
-                        welcomeEmailSent: false
-                    };
-                    if (dob) userData.dateOfBirth = dob;
-                    await firebase.database().ref(`users/${user.uid}`).set(userData);
-                } else {
-                    const existing = snap.val();
-                    if (dob && !existing.dateOfBirth) {
-                        await firebase.database().ref(`users/${user.uid}`).update({ dateOfBirth: dob });
-                    }
-                }
+                const profile=await SayandServices.call('ensureCustomerProfile',{firstName:user.displayName?.split(' ')[0] || 'Member',lastName:user.displayName?.split(' ').slice(1).join(' ') || '',dateOfBirth:dob});
+                if(!profile.verified) {currentVerificationUid=user.uid;currentVerificationEmail=user.email;await generateAndSendVerificationCode(user.uid,user.email,'Member');return;}
                 window.location.href = "dashboard.html";
             } catch (error) {
                 if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
@@ -447,23 +435,6 @@
                 const lastName = document.getElementById('lastName').value.trim();
                 const enteredRefCode = document.getElementById('referralCode').value.trim().toUpperCase();
 
-                let referrerUid = null;
-                if (enteredRefCode) {
-                    try {
-                        const refSnap = await firebase.database().ref('users').orderByChild('referralCode').equalTo(enteredRefCode).once('value');
-                        if (refSnap.exists()) {
-                            referrerUid = Object.keys(refSnap.val())[0]; 
-                        } else {
-                            errorBox.innerText = "Invalid referral code. Leave blank or try a valid one.";
-                            authBtn.innerText = 'CREATE ACCOUNT';
-                            authBtn.disabled = false;
-                            return;
-                        }
-                    } catch (e) {
-                        console.error("Ref validation error:", e);
-                    }
-                }
-
                 try {
                     const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
                     const user = userCredential.user;
@@ -472,31 +443,7 @@
                     currentVerificationEmail = email;
                     currentVerificationName = firstName;
 
-                    const myReferralCode = 'SAYAND' + Math.random().toString(36).substring(2, 6).toUpperCase();
-
-                    await firebase.database().ref(`users/${user.uid}`).set({
-                        firstName: firstName,
-                        lastName: lastName,
-                        email: email,
-                        dateOfBirth: dob,
-                        referralCode: myReferralCode, 
-                        createdAt: firebase.database.ServerValue.TIMESTAMP,
-                        accountVerified: false,
-                        welcomeEmailSent: false
-                    });
-
-                    if (referrerUid) {
-                        const newUserPromo = 'WELCOME10-' + Math.random().toString(36).substring(2, 6).toUpperCase();
-                        const referrerPromo = 'THANKS10-' + Math.random().toString(36).substring(2, 6).toUpperCase();
-
-                        const updates = {};
-                        updates[`mainStore/discountCodes/${newUserPromo}`] = { value: 10, maxUses: 1, uses: 0 };
-                        updates[`mainStore/discountCodes/${referrerPromo}`] = { value: 10, maxUses: 1, uses: 0 };
-                        updates[`users/${user.uid}/rewards/${newUserPromo}`] = { amount: "10% OFF", type: "Welcome Bonus", code: newUserPromo };
-                        updates[`users/${referrerUid}/rewards/${referrerPromo}`] = { amount: "10% OFF", type: "Referral Bonus", code: referrerPromo };
-
-                        await firebase.database().ref().update(updates);
-                    }
+                    await SayandServices.call('ensureCustomerProfile',{firstName,lastName,dateOfBirth:dob,referralCode:enteredRefCode});
 
                     await generateAndSendVerificationCode(user.uid, email, firstName);
                     
@@ -536,15 +483,9 @@
             }
 
             try {
-                const snap = await firebase.database().ref(`users/${currentVerificationUid}/verificationCode`).once('value');
-                const dbCode = snap.val();
-
-                if (dbCode === enteredCode) {
-                    await firebase.database().ref(`users/${currentVerificationUid}`).update({
-                        accountVerified: true,
-                        verificationCode: null 
-                    });
-
+                const result=await SayandServices.call('verifyCustomerEmail',{code:enteredCode});
+                if (result.verified) {
+                    await firebase.auth().currentUser.getIdToken(true);
                     btn.innerText = 'SUCCESS!';
                     setTimeout(() => {
                         window.location.href = "dashboard.html";
@@ -654,18 +595,10 @@
 
         window.generateAndSendVerificationCode = async function(uid, email, firstName) {
             try {
-                const code = Math.floor(100000 + Math.random() * 900000).toString();
-                await firebase.database().ref(`users/${uid}`).update({
-                    verificationCode: code
-                });
-                const sendEmailFn = firebase.functions().httpsCallable('sendStoreEmail');
-                await sendEmailFn({
-                    type: 'signup_verification',
-                    payload: { email: email, firstName: firstName || 'there', verificationCode: code }
-                });
+                await SayandServices.call('requestVerification');
                 document.getElementById('verify-email-display').innerText = email;
                 document.getElementById('verification-modal').classList.add('active');
-                return code;
+                return true;
             } catch (error) {
                 console.error("Error sending verification email:", error);
                 const errorDisplay = document.getElementById('error-message');

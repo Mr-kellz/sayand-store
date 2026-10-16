@@ -1,0 +1,38 @@
+'use strict';
+const assert=require('node:assert/strict');
+const {install,eligible}=require('../functions/return-service');
+const {hash}=require('../functions/store-services');
+const id='-'+'1'.repeat(19),now=Date.now(),day=86400000;
+for(const age of [0,29*day,30*day])assert(eligible({status:'Delivered',deliveredAt:now-age},now));
+for(const deliveredAt of [now-30*day-1,now+1,null,undefined,'2026-10-01',NaN])assert(!eligible({status:'Delivered',deliveredAt},now));
+console.log('PASS 30-day boundary, expired/missing/invalid/future delivery dates');
+const store={orders:{[id]:{userId:'owner',status:'Delivered',deliveredAt:now-day}}};
+const copy=v=>v===undefined?null:structuredClone(v);
+const db={ref(path){const parts=path.split('/');const get=()=>parts.reduce((v,k)=>v?.[k],store);const set=v=>{let obj=store;for(const k of parts.slice(0,-1))obj=obj[k]??={};if(v===null)delete obj[parts.at(-1)];else obj[parts.at(-1)]=copy(v);};return {once:async()=>({val:()=>copy(get())}),child:k=>db.ref(path+'/'+k),remove:async()=>set(null),transaction:async fn=>{const v=fn(copy(get()));if(v===undefined)return {committed:false,snapshot:{val:()=>copy(get())}};set(v);return {committed:true,snapshot:{val:()=>copy(get())}};}};}};
+const fail=(code,message)=>{throw Object.assign(Error(message),{code});};
+let saves=0,deletes=0,closeDuringSave=false,failSave=false;
+const admin={storage:()=>({bucket:()=>({file:()=>({save:async()=>{saves++;if(failSave)throw Object.assign(Error('storage'),{code:403});if(closeDuringSave)store.orders[id].returnCase.status='Approved';},delete:async()=>{deletes++;},getSignedUrl:async()=>['https://example.test/private-file']})})})};
+const api=install(admin,{db,call:f=>f,uid:c=>c.auth?.uid||fail('unauthenticated','Sign in'),rate:async()=>{},fail,ADMIN:'admin'});
+const owner={auth:{uid:'owner'}},staff={auth:{uid:'admin'}},form={orderId:id,reason:'Size or fit',condition:'Unworn with tags',detail:'The dress does not fit me'};
+const jpg=Buffer.concat([Buffer.from([255,216,255]),Buffer.alloc(32)]).toString('base64');
+const file={orderId:id,base64:jpg,mime:'',name:'photo.jpg'};const old=process.env.RETURN_EVIDENCE_ENABLED;
+(async()=>{
+ store.orders[id].deliveredAt=Date.now()-31*day;await assert.rejects(api.openOrderReturn(form,owner),e=>e.code==='failed-precondition');assert(!store.orders[id].returnCase);
+ store.orders[id].deliveredAt=now-day;await api.openOrderReturn(form,owner);
+ const deadline=Date.now()+100000;store._serviceLimits={[hash('return-upload:owner')]:{count:12,until:deadline}};assert.equal((await api.getOrderReturn({orderId:id},owner)).uploadRetryAt,deadline);await assert.rejects(api.attachReturnEvidence(file,owner),e=>e.code==='resource-exhausted');assert.equal(saves,0);delete store._serviceLimits;console.log('PASS exhausted quota reported to owner and rejected before Storage');
+ process.env.RETURN_EVIDENCE_ENABLED='false';assert.equal((await api.getOrderReturn({orderId:id},owner)).uploadsEnabled,false);await assert.rejects(api.attachReturnEvidence(file,owner),e=>e.code==='unavailable');assert.equal(saves,0);
+ delete process.env.RETURN_EVIDENCE_ENABLED;assert.equal((await api.getOrderReturn({orderId:id},owner)).uploadsEnabled,true);const receipt=await api.attachReturnEvidence(file,owner);assert(receipt.success);assert(receipt.attachmentId);assert.equal(saves,1);await api.attachReturnEvidence(file,owner);assert.equal(saves,1,'Duplicate retry cannot save the file twice');for(const user of [owner,staff]){const view=await api.getOrderReturn({orderId:id},user);assert.equal(view.case.attachments[receipt.attachmentId].status,'ready');assert((await api.viewReturnEvidence({orderId:id,attachmentId:receipt.attachmentId},user)).url);}assert.equal(Object.values(store.orders[id].returnCase.attachments)[0].status,'ready');
+ console.log('PASS upload-enable switch preserved; valid image with missing browser MIME accepted by byte validation');
+ await assert.rejects(api.attachReturnEvidence({...file,base64:Buffer.from('<script>bad payload</script>').toString('base64')},owner),e=>e.code==='invalid-argument');await assert.rejects(api.attachReturnEvidence({...file,mime:'video/mp4'},owner),e=>e.code==='invalid-argument');
+ await assert.rejects(api.attachReturnEvidence(file,{auth:{uid:'stranger'}}),e=>e.code==='permission-denied');
+ await api.reviewOrderReturn({orderId:id,decision:'More information needed',message:'Please send another photograph'},staff);await api.replyOrderReturn({orderId:id,message:'Here is more information'},owner);
+ await api.reviewOrderReturn({orderId:id,decision:'Approved',message:'Your return is approved. Follow the return instructions.'},staff);
+ for(const user of [owner,staff]){await assert.rejects(api.replyOrderReturn({orderId:id,message:'Try replying'},user),e=>e.code==='failed-precondition');await assert.rejects(api.attachReturnEvidence(file,user),e=>e.code==='failed-precondition');}
+ await assert.rejects(api.reviewOrderReturn({orderId:id,decision:'More information needed',message:'Try reopening this decision'},staff),e=>e.code==='failed-precondition');assert((await api.getOrderReturn({orderId:id},owner)).isClosed);
+ const attachmentId=Object.keys(store.orders[id].returnCase.attachments)[0];assert((await api.viewReturnEvidence({orderId:id,attachmentId},owner)).url);
+ console.log('PASS final decision blocks customer/admin replies, uploads and reopening; existing files remain readable');
+ store.orders[id].returnCase={status:'Under review',messages:{}};closeDuringSave=true;await assert.rejects(api.attachReturnEvidence(file,owner),e=>e.code==='failed-precondition');assert.equal(Object.keys(store.orders[id].returnCase.attachments||{}).length,0);assert(deletes>0);
+ console.log('PASS decision during upload cannot attach a late file; reserved slot and stored file cleaned up');
+ closeDuringSave=false;store.orders[id].returnCase={status:'Under review',messages:{}};failSave=true;await assert.rejects(api.attachReturnEvidence(file,owner),e=>e.code==='unavailable');assert.equal(Object.keys(store.orders[id].returnCase.attachments||{}).length,0);
+ console.log('PASS failed storage upload gives actionable error and releases file slot');
+})().catch(e=>{console.error(e);process.exitCode=1;}).finally(()=>{if(old===undefined)delete process.env.RETURN_EVIDENCE_ENABLED;else process.env.RETURN_EVIDENCE_ENABLED=old;});

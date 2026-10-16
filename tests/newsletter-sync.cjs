@@ -1,0 +1,37 @@
+'use strict';
+const assert=require('node:assert/strict');
+const {handler,contactBlocked}=require('../functions/newsletter-sync');
+const {eligible}=require('../functions/newsletter-eligibility');
+const secret='a'.repeat(64),now=1800000000000,address='alice@example.test';let reads=0,writes=0;
+const records={a:{email:address,subscribedAt:now-10000,consent:{granted:true,recordedAt:now-10000}},b:{email:address,subscribedAt:now-10000},z:{email:'other@example.test',subscribedAt:now-10000}};
+const snap=v=>({val:()=>structuredClone(v),exists:()=>!!v});
+const db={ref(path){let field,match,after='',limit=Infinity;const key=path.split('/')[1];return {orderByChild(f){field=f;return this;},equalTo(v){match=v;return this;},orderByKey(){return this;},startAfter(k){after=k;return this;},limitToFirst(n){limit=n;return this;},on(){},off(){},once:async()=>{reads++;return snap(key?records[key]:Object.fromEntries(Object.entries(records).filter(([k,v])=>k>after&&(!field||v[field]===match)).slice(0,limit)));},transaction:async fn=>{const next=fn(structuredClone(records[key]));if(next===undefined)return {committed:false};records[key]=next;writes++;return {committed:true};}};}};
+let providerCalls=0;const fetcher=async()=>{providerCalls++;return {ok:true,status:200,json:async()=>({emailBlacklisted:true})};};
+const run=handler(db,{secret:()=>secret,apiKey:()=> 'test-only',fetcher,now:()=>now});
+async function request(body,token=secret,method='POST'){let status=200,result;await run({method,body,get:()=> 'Bearer '+token},{set(){return this;},status(s){status=s;return this;},send(x){result=x;return this;},json(x){result=x;return this;}});return {status,result};}
+(async()=>{
+const auth={getUser:async()=>({email:address,emailVerified:true})};assert(await eligible(db,auth,'a'));
+assert.equal((await request({},'wrong')).status,401);assert.equal(reads,1);assert.equal(writes,0);
+assert.equal((await request({},secret,'GET')).status,405);
+assert.equal((await request({event:'unsubscribe',email:address,ts_event:'bad'})).status,400);
+assert.equal((await request({event:'unsubscribe',email:address,ts_event:now/1000+600})).status,400);
+assert.equal((await request({event:'unsubscribe',email:address,ts_event:(now-20000)/1000})).status,200);assert.equal(writes,0,'older event cannot revoke newer consent');
+assert.equal((await request({event:'unsubscribe',email:' ALICE@EXAMPLE.TEST ',ts_event:now/1000})).status,200);
+assert.equal(writes,2);assert(!await eligible(db,auth,'a'));assert.equal(records.z.active,undefined);assert.equal(records.a.consent.granted,false);
+await request({event:'unsubscribe',email:address,ts_event:now/1000});assert.equal(writes,2,'duplicate idempotent');
+await request({event:'listAddition',email:address,ts_event:now/1000});assert(!await eligible(db,auth,'a'),'list addition cannot reactivate');
+await request({event:'unsubscribe',email:'absent@example.test',ts_event:now/1000});assert.equal(Object.keys(records).length,3);
+assert.equal((await request({action:'reconcile',cursor:'bad/path'})).status,400);
+const r=await request({action:'reconcile'});assert.equal(r.status,200);assert.equal(r.result.checked,3);assert.equal(r.result.nextCursor,null);assert.equal(records.z.active,false);assert.equal(providerCalls,3);
+assert.equal(await contactBlocked(address,'key',async()=>({status:404})),false);
+await assert.rejects(contactBlocked(address,'key',async()=>({status:429,ok:false})));await assert.rejects(contactBlocked(address,'key',async()=>({status:200,ok:true,json:async()=>({})})));
+for(let i=0;i<12;i++)records['q'+String(i).padStart(2,'0')]={email:'q'+i+'@example.test',subscribedAt:now-10000};
+const p=await request({action:'reconcile'});assert.equal(p.result.checked,10);assert(p.result.nextCursor);const p2=await request({action:'reconcile',cursor:p.result.nextCursor});assert.equal(p2.result.checked,5);assert.equal(p2.result.nextCursor,null);
+let smtpStatus,smtpBody;
+records.smtp={email:'smtp@example.test',subscribedAt:now-10000};
+const smtp=handler(db,{secret:()=>secret,apiKey:()=> 'test',now:()=>now,fetcher:async url=>{assert(url.includes('/smtp/blockedContacts?limit=100&offset=0'));return {ok:true,json:async()=>({contacts:[{email:'smtp@example.test',blockedAt:new Date(now).toISOString()}],count:1})};}});
+await smtp({method:'POST',get:()=> 'Bearer '+secret,body:{action:'reconcile-transactional'}},{set(){},status(s){smtpStatus=s;return this;},send(){},json(x){smtpBody=x;}});
+assert.equal(records.smtp.active,false);assert.equal(smtpBody.nextOffset,null);assert.equal(smtpBody.changed,1);
+const fail=handler({ref(){throw Error('db');}},{secret:()=>secret,now:()=>now});let status;await fail({method:'POST',get:()=> 'Bearer '+secret,body:{event:'unsubscribe',email:address,ts_event:now/1000}},{set(){},status(s){status=s;return this;},send(){}});assert.equal(status,503);
+console.log('PASS newsletter sync: authentication, validation, timestamps, duplicate records/events, no reactivation, WELCOME10 revocation, unrelated records, reconciliation pagination, provider/database failures. Mocked external services.');
+})().catch(e=>{console.error(e);process.exitCode=1;});

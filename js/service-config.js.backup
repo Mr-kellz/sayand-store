@@ -1,0 +1,2 @@
+/6LeGT-gtAAAAAJmkX4o_BMhmr26joUA74AoNpAAe/ Public reCAPTCHA Enterprise site key only. Never put API secrets here.
+window.SAYAND_SERVICE_CONFIG = {appCheckSiteKey:'',eliaEnabled:false};

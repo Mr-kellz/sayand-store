@@ -1,0 +1,22 @@
+'use strict';
+const assert=require('node:assert/strict'),{wrap}=require('../functions/elia-requests');
+const records=new Map();let invokes=0,reads=0,rates=0;
+const copy=v=>v?structuredClone(v):null;
+const s={fail:(code,m)=>{throw Object.assign(Error(m),{code});},rate:async()=>rates++,db:{ref:k=>{reads++;return {once:async()=>({val:()=>copy(records.get(k))}),transaction:async f=>{const v=f(copy(records.get(k)));if(v===undefined)return {committed:false};records.set(k,v);return {committed:true};},update:async v=>records.set(k,{...records.get(k),...v})};}}};
+const c={auth:{uid:'alice'},rawRequest:{ip:'test'}};let finish;
+const api=wrap(async d=>{invokes++;if(d.message==='private')return {answer:'Restricted'};return new Promise(r=>finish=r);},s,m=>m==='private');
+(async()=>{
+ const id='a'.repeat(64),q={message:'Show me hats',requestId:id};
+ assert.equal((await api({operation:'status',requestId:id},c)).requestStatus,'not_found');
+ const first=api(q,c);await new Promise(r=>setImmediate(r));
+ assert.equal((await api(q,c)).requestStatus,'pending');assert.equal(invokes,1);
+ await assert.rejects(api({...q,message:'Different'},c),e=>e.code==='permission-denied');
+ await assert.rejects(api({operation:'status',requestId:id},{...c,auth:{uid:'bob'}}),e=>e.code==='permission-denied');
+ finish({answer:'Available hats',conversationToken:'b'.repeat(64)});assert.equal((await first).requestStatus,'done');
+ assert.equal((await api(q,c)).answer,'Available hats');assert.equal(invokes,1);
+ const before=reads;assert.equal((await api({message:'private',requestId:'c'.repeat(64)},c)).answer,'Restricted');assert.equal(reads,before);
+ const fail=wrap(async()=>{invokes++;throw Error('Network timeout');},s,()=>false),d={message:'Hello',requestId:'d'.repeat(64)};
+ await assert.rejects(fail(d,c),/timeout/);const count=invokes;assert.equal((await fail(d,c)).requestStatus,'uncertain');assert.equal(invokes,count);
+ for(const v of records.values())v.expires=1;assert.equal((await api({operation:'status',requestId:id},c)).requestStatus,'uncertain');assert(rates>0);
+ console.log('PASS actual receipt wrapper: concurrent/duplicate sends, lost response reconciliation, timeout, expiry, original-text binding, owner isolation, private requests before receipt storage, rate calls');
+})().catch(e=>{console.error(e);process.exitCode=1;});

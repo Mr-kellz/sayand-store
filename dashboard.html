@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SAYAND | My Account</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/tailwind-production.css?v=mobile-1">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
    <link rel="stylesheet" href="css/style.css?v=site-4">
     <style>
@@ -245,10 +245,15 @@
     </div>
 
     <!-- Firebase Scripts -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
     <script src="js/firebase-config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-functions-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-check-compat.js"></script>
+<script src="/js/service-config.js"></script>
+<script src="/js/store-services.js"></script>
+<script src="/js/public-store.js"></script>
     <script type="text/javascript" src="//www.17track.net/externalcall.js"></script>
 
     <script>
@@ -343,16 +348,7 @@
             }
         };
 
-        window.requestRefund = function(orderId) {
-            if(confirm("Request a return and refund? Our team will review your request and provide the courier return instructions.")) {
-                const updates = {};
-                updates['orders/' + orderId + '/status'] = 'Return Requested';
-
-                firebase.database().ref().update(updates)
-                .then(() => { showDashboardToast("RETURN REQUEST SUBMITTED"); })
-                .catch(e => alert("Error: " + e.message));
-            }
-        };
+        window.requestRefund = orderId => window.openReturnConversation(orderId);
 
         // ─── ADDRESS BOOK ───
         function loadAddressBook() {
@@ -425,6 +421,7 @@
         };
 
         firebase.auth().onAuthStateChanged(async (user) => {
+            if(user) await SayandServices.call('ensureCustomerProfile').catch(e=>console.error(e.message));
             const authVersion = ++customerAuthVersion;
             if (customerOrdersRef) customerOrdersRef.off('value');
             customerOrdersRef = null;
@@ -507,11 +504,13 @@ const ordersRef = firebase.database().ref('orders').orderByChild('userId').equal
                 const ordersArray = Object.keys(ordersData).map(key => ({ id: key, ...ordersData[key] }));
                 ordersArray.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
 
-                const getSafeStatus = (rawStatus) => {
+                const getSafeStatus = (rawStatus, returnCase) => {
+                    if(String(rawStatus||'').trim().toLowerCase()!=='refunded' && ['Approved','Declined'].includes(returnCase?.status))return 'Return '+returnCase.status;
                     if (!rawStatus) return 'Pending';
                     const s = String(rawStatus).trim().toLowerCase();
                     if (s === 'paid') return 'Processing';
                     if (s === 'return approved') return 'Return Approved';
+                    if (s === 'return declined') return 'Return Declined';
                     if (s.includes('pend')) return 'Pending';
                     if (s.includes('verify')) return 'Verifying';
                     if (s.includes('process') || s.includes('prepar')) return 'Processing';
@@ -525,7 +524,7 @@ const ordersRef = firebase.database().ref('orders').orderByChild('userId').equal
 
                 let count200 = 0, count500 = 0, count700 = 0;
                 ordersArray.forEach(o => {
-                    const status = getSafeStatus(o.status);
+                    const status = getSafeStatus(o.status,o.returnCase);
                     if (status !== 'Canceled' && status !== 'Refunded') {
                         let amt = o.totalAmount || 0;
                         if (amt >= 700) count700++;
@@ -552,14 +551,14 @@ const ordersRef = firebase.database().ref('orders').orderByChild('userId').equal
                 }
 
                 const latest = ordersArray[0];
-                const latestSafeStatus = getSafeStatus(latest.status);
+                const latestSafeStatus = getSafeStatus(latest.status,latest.returnCase);
                 
                 let latestStatusColor = latestSafeStatus === 'Pending' ? 'text-orange-500' : 
                                         latestSafeStatus === 'Verifying' ? 'text-yellow-600' :
                                         latestSafeStatus === 'Processing' ? 'text-blue-500' :
                                         latestSafeStatus === 'Shipped' ? 'text-blue-700' : 
                                         latestSafeStatus === 'Delivered' ? 'text-[#2c4c23]' : 
-                                        ['Return Requested', 'Return Approved'].includes(latestSafeStatus) ? 'text-purple-600' :
+                                        ['Return Requested', 'Return Approved', 'Return Declined'].includes(latestSafeStatus) ? 'text-purple-600' :
                                         latestSafeStatus === 'Refunded' ? 'text-purple-500' : 'text-red-600';
 
                 const latestDisplayStatus = {
@@ -570,6 +569,7 @@ const ordersRef = firebase.database().ref('orders').orderByChild('userId').equal
                     'Delivered': 'DELIVERED',
                     'Return Requested': 'RETURN PENDING APPROVAL',
                         'Return Approved': 'RETURN APPROVED',
+                        'Return Declined': 'RETURN DECLINED',
                     'Refunded': 'REFUNDED',
                     'Canceled': 'CANCELED'
                 }[latestSafeStatus];
@@ -582,7 +582,7 @@ const ordersRef = firebase.database().ref('orders').orderByChild('userId').equal
 
                 container.innerHTML = ordersArray.map(order => {
                     const date = order.date ? new Date(order.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Recently';
-                    const safeStatus = getSafeStatus(order.status);
+                    const safeStatus = getSafeStatus(order.status,order.returnCase);
                     
                     const itemsList = Object.values(order.items || {}).map(item => `
                         <div class="flex items-center gap-4 mt-4 bg-white p-4 border border-[#c2c9c0]">
@@ -600,7 +600,7 @@ const ordersRef = firebase.database().ref('orders').orderByChild('userId').equal
                                       safeStatus === 'Processing' ? 'text-blue-500' :
                                       safeStatus === 'Shipped' ? 'text-blue-700' : 
                                       safeStatus === 'Delivered' ? 'text-[#2c4c23]' : 
-                                      ['Return Requested', 'Return Approved'].includes(safeStatus) ? 'text-purple-600' :
+                                      ['Return Requested', 'Return Approved', 'Return Declined'].includes(safeStatus) ? 'text-purple-600' :
                                       safeStatus === 'Refunded' ? 'text-purple-500' : 'text-red-600';
 
                     const displayStatus = {
@@ -611,13 +611,14 @@ const ordersRef = firebase.database().ref('orders').orderByChild('userId').equal
                         'Delivered': 'DELIVERED',
                         'Return Requested': 'RETURN PENDING APPROVAL',
                         'Return Approved': 'RETURN APPROVED',
+                        'Return Declined': 'RETURN DECLINED',
                         'Refunded': 'REFUNDED',
                         'Canceled': 'CANCELED'
                     }[safeStatus];
 
                     const stages = ['Pending', 'Verifying', 'Processing', 'Shipped', 'Delivered'];
                     let currentStageIndex = stages.indexOf(safeStatus);
-                    let isCanceled = ['Refunded', 'Canceled', 'Return Requested', 'Return Approved'].includes(safeStatus);
+                    let isCanceled = ['Refunded', 'Canceled', 'Return Requested', 'Return Approved', 'Return Declined'].includes(safeStatus);
 
                     let progressPercentage = 0;
                     if (currentStageIndex === 0) progressPercentage = 10;
@@ -647,10 +648,13 @@ const ordersRef = firebase.database().ref('orders').orderByChild('userId').equal
                     }
 
                     let actionButtonsHTML = '';
+                    const returnConversationHTML = order.returnCase ? `<button onclick="openReturnConversation('${order.id}')" class="mt-4 w-full border p-3 text-xs">VIEW RETURN CONVERSATION</button>` : '';
                     if (['Pending', 'Verifying', 'Processing'].includes(safeStatus)) {
                         actionButtonsHTML = `<button onclick="cancelUserOrder('${order.id}')" class="mt-6 w-full bg-white border border-red-200 text-red-600 px-4 py-3 text-[10px] tracking-widest font-black hover:bg-red-50 transition-colors shadow-sm">CANCEL ORDER</button>`;
-                    } else if (['Shipped', 'Delivered'].includes(safeStatus)) {
+                    } else if (safeStatus === 'Delivered' && !order.returnCase && typeof order.deliveredAt === 'number' && order.deliveredAt > 0 && Date.now() >= order.deliveredAt && Date.now() - order.deliveredAt <= 30*24*60*60*1000) {
                         actionButtonsHTML = `<button onclick="requestRefund('${order.id}')" class="mt-6 w-full bg-white border border-[#2c4c23] text-[#1a2e15] px-4 py-3 text-[10px] tracking-widest font-black hover:bg-[#eef2ec] transition-colors shadow-sm">REQUEST RETURN / REFUND</button>`;
+                    } else if (safeStatus === 'Delivered' && !order.returnCase) {
+                        actionButtonsHTML = '<p class="mt-4 text-xs">The online return window is closed or the delivery date needs verification. Contact support@thesayand.com for help.</p>';
                     }
 
                     let returnQrHTML = order.returnQrUrl ? `
@@ -696,7 +700,7 @@ const ordersRef = firebase.database().ref('orders').orderByChild('userId').equal
                                 ${itemsList}
                             </div>
                             
-                            ${actionButtonsHTML}
+                            ${actionButtonsHTML}${returnConversationHTML}
                             ${returnQrHTML}
                             ${trackingHTML}
                         </div>
@@ -1048,5 +1052,7 @@ const ordersRef = firebase.database().ref('orders').orderByChild('userId').equal
     <!-- Google Maps API -->
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD8RHTg2bBV_mclB6RKb_nz_Cdk8C48pls&libraries=places&callback=initMapsWithRetry"></script>
     
+<script src="/js/elia.js?v=20261015-expanded"></script>
+<script src="/js/return-conversation.js"></script>
 </body>
 </html>

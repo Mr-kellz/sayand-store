@@ -6,7 +6,7 @@
     <title>SAYAND | Checkout</title>
     <link rel="icon" type="image/png" href="https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/SAYAND%20Intertwined%20S%26A%20Monogram.png?alt=media&token=2afe3106-31a8-4a27-960a-e0d09ee96d4f">
     <link rel="apple-touch-icon" href="https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/SAYAND%20Intertwined%20S%26A%20Monogram.png?alt=media&token=2afe3106-31a8-4a27-960a-e0d09ee96d4f">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/tailwind-production.css?v=mobile-1">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"/>
@@ -35,13 +35,14 @@
     <script src="js/translations.js?secureCheckout=1&orderSecurity=1&v=shipping-admin-1"></script>
     <script src="js/i18n.js?v=site-4"></script>
     <link rel="stylesheet" href="css/site-updates.css?v=site-4">
-    <script src="js/consent.js?v=site-4"></script>
+    <script src="js/consent.js?v=launch-1"></script>
 
     <meta name="description" content="Access your SAYAND account and shopping services securely.">
     <link rel="canonical" href="https://thesayand.com/checkout">
     <meta name="robots" content="noindex, follow">
     <meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/SAYAND%20Intertwined%20S%26A%20Monogram.png?alt=media&token=2afe3106-31a8-4a27-960a-e0d09ee96d4f">
-    <script src="js/site-updates.js?v=site-4"></script>
+    <script src="js/shopping-analytics.js?v=launch-1"></script>
+    <script src="js/site-updates.js?v=launch-1"></script>
 </head>
 <body class="antialiased" id="checkout-body">
 
@@ -195,12 +196,16 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
 
     <!-- FIREBASE SCRIPTS -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-functions-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-functions-compat.js"></script>
     
     <script src="js/firebase-config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-check-compat.js"></script>
+<script src="/js/service-config.js"></script>
+<script src="/js/store-services.js"></script>
+<script src="/js/public-store.js"></script>
     <script>if(typeof firebase!=="undefined"&&firebase.database){window.db=firebase.database();}</script>
     
 <script>
@@ -509,6 +514,21 @@
             announcementDiscountAmount = Math.round((orderSubtotal * announcementPromo.percent / 100) * 100) / 100;
         }
 
+        // Recompute from the validated promo whenever cart subtotal changes.
+        // The backend independently validates the final Stripe amount.
+        if (appliedPromo) {
+            const value = Number(appliedPromo.value);
+            if (appliedPromo.type === 'percent' && Number.isFinite(value) && value > 0 && value <= 100) {
+                promoDiscountAmount = Math.min(orderSubtotal, Math.round(orderSubtotal * value) / 100);
+            } else if (appliedPromo.type === 'fixed' && Number.isFinite(value) && value > 0) {
+                promoDiscountAmount = Math.min(orderSubtotal, Math.round(value * 100) / 100);
+            } else {
+                appliedPromo = null;
+                promoDiscountAmount = 0;
+            }
+        } else {
+            promoDiscountAmount = 0;
+        }
         let totalDiscount = vipDiscountAmount + promoDiscountAmount + announcementDiscountAmount;
 
         const giftCheckbox = document.getElementById('is-gift-checkbox');
@@ -537,7 +557,12 @@
             promoRow.classList.remove('hidden');
             let labelExtra = appliedPromo.type === 'fixed' ? 'GIFT CARD' : 'PROMO';
             // 🟢 NOTRANSLATE ON CHECKOUT PROMO
-            document.getElementById('checkout-promo-label').innerHTML = `${labelExtra} (<span class="notranslate">${appliedPromo.code}</span>)`;
+            const label = document.getElementById('checkout-promo-label');
+            const safeCode = document.createElement('span');
+            safeCode.className = 'notranslate';
+            safeCode.textContent = appliedPromo.code;
+            label.replaceChildren(document.createTextNode(labelExtra + ' ('), safeCode,
+                document.createTextNode(appliedPromo.type === 'percent' ? ' — ' + appliedPromo.value + '% OFF)' : ' — FIXED AMOUNT)'));
             document.getElementById('checkout-promo').textContent = '-' + formatPrice(promoDiscountAmount);
         } else {
             promoRow.classList.add('hidden');
@@ -559,62 +584,19 @@
         
         if (!codeInput) return;
 
-        if (Object.keys(activeDiscountCodes).length === 0 && Object.keys(activeFixedCodes).length === 0) {
-            msgEl.textContent = "LOADING CODES...";
-            msgEl.className = "text-[9px] font-bold mt-2 text-[#d4af37] block";
-            try {
-                const storeSnap = await firebase.database().ref('mainStore').once('value');
-                const storeData = storeSnap.val();
-                SayandI18n.registerCatalog(storeData);
-                if (storeData) {
-                    if (storeData.discountCodes) activeDiscountCodes = storeData.discountCodes;
-                    if (storeData.fixedCodes) activeFixedCodes = storeData.fixedCodes;
-                    if (storeData.discountCodeExpiry) activeDiscountCodeExpiry = storeData.discountCodeExpiry;
-                }
-            } catch (e) {
-                console.error('Failed to fetch promo codes:', e);
-            }
-        }
-
-        if (usedPromoCodes.includes(codeInput)) {
-            msgEl.textContent = "YOU HAVE ALREADY USED THIS CODE.";
-            msgEl.className = "text-[9px] font-bold mt-2 text-red-600 block";
-            appliedPromo = null;
-            recalculateTotals();
-            return;
-        }
-
-        if (activeDiscountCodes[codeInput]) {
-            const now = Date.now();
-            const codeExpiry = activeDiscountCodeExpiry ? activeDiscountCodeExpiry[codeInput] : null;
-
-            if (codeExpiry && now > codeExpiry) {
-                msgEl.textContent = "THIS PROMO CODE HAS EXPIRED.";
-                msgEl.className = "text-[9px] font-bold mt-2 text-red-600 block";
-                appliedPromo = null;
-                recalculateTotals();
-                return;
-            }
-
-            const codeValue = normalizeCodeEntry(activeDiscountCodes[codeInput]);
-            appliedPromo = { code: codeInput, type: 'percent', value: codeValue };
-            promoDiscountAmount = orderSubtotal * (codeValue / 100);
-            msgEl.textContent = `CODE APPLIED: -${codeValue}% OFF`;
-            msgEl.className = "text-[9px] font-bold mt-2 text-green-600 block";
-            recalculateTotals();
-        } else if (activeFixedCodes[codeInput]) {
-                       const codeValue = normalizeCodeEntry(activeFixedCodes[codeInput]);
-            appliedPromo = { code: codeInput, type: 'fixed', value: codeValue };
-            promoDiscountAmount = Math.min(codeValue, orderSubtotal);
-            msgEl.textContent = `GIFT CARD APPLIED: -${formatPrice(codeValue)}`;
-            msgEl.className = "text-[9px] font-bold mt-2 text-green-600 block";
-            recalculateTotals();
-        } else {
-            msgEl.textContent = "INVALID OR EXPIRED CODE.";
-            msgEl.className = "text-[9px] font-bold mt-2 text-red-600 block";
-            appliedPromo = null;
-            recalculateTotals();
-        }
+        msgEl.textContent = 'CHECKING CODE...';
+        try {
+            const result=await SayandServices.call('validatePromo',{code:codeInput});
+            const value = Number(result?.value);
+            const validPromo = result?.valid === true && (
+                (result.type === 'percent' && Number.isFinite(value) && value > 0 && value <= 100) ||
+                (result.type === 'fixed' && Number.isFinite(value) && value > 0)
+            );
+            appliedPromo = validPromo ? {code:codeInput,type:result.type,value} : null;
+            msgEl.textContent = validPromo ? (result.type === 'percent' ? 'CODE APPLIED: ' + value + '% OFF' : 'GIFT CARD APPLIED') : (typeof result?.message === 'string' ? result.message : 'INVALID OR EXPIRED CODE');
+            msgEl.className='text-[9px] font-bold mt-2 block';
+        } catch (error) {appliedPromo=null;msgEl.textContent=error.message || 'Unable to check code. Please try again.';}
+        recalculateTotals();
     });
 
        firebase.auth().onAuthStateChanged(async (user) => {
@@ -717,6 +699,7 @@
             } else {
                 let html = '';
                 orderSubtotal = 0;
+                window.SayandAnalytics?.shopping('begin_checkout', orderCartData);
                 Object.values(orderCartData).forEach(item => {
                     const itemPrice = parseFloat(item.price || 0);
                     const itemQty = parseInt(item.quantity || item.qty || 1);
@@ -724,7 +707,7 @@
                     orderSubtotal += itemTotal;
                     html += `<div class="flex items-center gap-4 border-b border-[#c2c9c0]/50 pb-3 mb-3">
                         <div class="relative">
-                            <img src="${item.image || item.img || ''}" class="w-16 h-20 object-cover border border-[#c2c9c0]/30" onerror="this.style.display='none'">
+                            <img src="${item.image || item.img || ''}" alt="${String(item.name || 'Product').replace(/[&<>\"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]))}" class="w-16 h-20 object-cover border border-[#c2c9c0]/30" onerror="this.style.display='none'">
                             <span class="absolute -top-2 -right-2 bg-[#1a2e15] text-[#d4af37] w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black">${itemQty}</span>
                         </div>
                         <div class="flex-1 min-w-0">
@@ -743,7 +726,7 @@
         }
 
         try {
-            const storeSnap = await firebase.database().ref('mainStore').once('value');
+            const storeSnap = await window.SayandPublicStore.once('value');
             const storeData = storeSnap.val();
                 SayandI18n.registerCatalog(storeData);
             if (storeData) {
@@ -851,7 +834,7 @@
         const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
 
         try {
-            const storeSnap = await firebase.database().ref('mainStore').once('value');
+            const storeSnap = await window.SayandPublicStore.once('value');
             const storeData = storeSnap.val() || {};
             SayandI18n.registerCatalog(storeData);
             const stockErrors = await validateCartStock(orderCartData, storeData);
@@ -981,21 +964,26 @@
 
                 if (response.data && response.data.url) {
                     const verifiedTotal = Number(response.data.totalAmount);
-                    if (!Number.isFinite(verifiedTotal)) throw new Error('Payment total could not be verified.');
+                    if (!Number.isFinite(verifiedTotal) || verifiedTotal < 0) throw new Error('Payment total could not be verified.');
                     if (Math.round(verifiedTotal * 100) !== Math.round(finalOrderTotal * 100)) {
-                        if (!confirm(`The store has verified your total as €${verifiedTotal.toFixed(2)} EUR, including discounts and delivery. Continue to Stripe?`)) {
-                            submitBtn.innerText = 'COMPLETE ORDER';
-                            submitBtn.disabled = false;
-                            return;
-                        }
+                        // Fail closed: never charge a total different from the displayed checkout.
+                        if (generalErrorEl) generalErrorEl.textContent = 'Your checkout total has changed. Please refresh the page, reapply your promo and review the total before paying.';
+                        submitBtn.innerText = 'COMPLETE ORDER';
+                        submitBtn.disabled = false;
+                        return;
                     }
+                    try { sessionStorage.setItem('sayand_pending_checkout', JSON.stringify({id:orderId, uid:currentUser.uid, at:Date.now(), cart:orderCartData})); } catch (_) {}
                     window.location.href = response.data.url;
                 } else {
                     throw new Error("Invalid response from payment server.");
                 }
             } catch (stripeErr) {
                 console.error("Stripe Error:", stripeErr);
-                alert("STRIPE ERROR: " + (stripeErr && stripeErr.message ? stripeErr.message : 'Unknown Stripe error'));
+                if (generalErrorEl) {
+                    generalErrorEl.textContent = stripeErr?.code === 'functions/failed-precondition' && stripeErr?.message
+                        ? stripeErr.message : 'Unable to prepare checkout. Please try again or contact support.';
+                    generalErrorEl.scrollIntoView({block:'center',behavior:'smooth'});
+                }
                 submitBtn.innerText = "COMPLETE ORDER";
                 submitBtn.disabled = false;
             }
@@ -1021,5 +1009,6 @@
 
     <!-- Google Maps API -->
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD8RHTg2bBV_mclB6RKb_nz_Cdk8C48pls&libraries=places&callback=initMapsWithRetry"></script>
+<script src="/js/elia.js?v=20261015-expanded"></script>
 </body>
 </html>

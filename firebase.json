@@ -1,6 +1,8 @@
 {
   "functions": {
-    "predeploy": [],
+    "predeploy": [
+      "node tools/check-release.cjs"
+    ],
     "source": "functions"
   },
   "hosting": {
@@ -32,9 +34,70 @@
       "tests/**",
       "**/*.cjs",
       "VALIDATION.txt",
-      "**/functions/**"
+      "**/functions/**",
+      "product-*.html",
+      "collection-*.html",
+      "sitemap.xml",
+      "storage.rules",
+      "rollback/**",
+      "product.html",
+      "js/auth.js"
     ],
-    "cleanUrls": true
+    "cleanUrls": true,
+    "rewrites": [
+      {
+        "source": "/product{,.html}",
+        "function": {
+          "functionId": "cataloguePages",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/product-**",
+        "function": {
+          "functionId": "cataloguePages",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/collection-**",
+        "function": {
+          "functionId": "cataloguePages",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/sitemap.xml",
+        "function": {
+          "functionId": "cataloguePages",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/api/catalogue-routes",
+        "function": {
+          "functionId": "cataloguePages",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/newsletter-confirm",
+        "function": {
+          "functionId": "confirmNewsletter",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/api/public-editorial",
+        "function": {
+          "functionId": "publicEditorial",
+          "region": "us-central1"
+        }
+      }
+    ],
+    "predeploy": [
+      "node tools/check-release.cjs"
+    ]
   },
   "database": {
     "rules": "database.rules.json"

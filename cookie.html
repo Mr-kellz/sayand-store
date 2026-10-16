@@ -6,7 +6,7 @@
     <title>Cookie Policy | SAYAND</title>
     <link rel="icon" type="image/png" href="https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/SAYAND%20Intertwined%20S%26A%20Monogram.png?alt=media&token=4a0c7abb-0150-4d22-94fc-d58f901a45f6">
     <link rel="apple-touch-icon" href="https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/SAYAND%20Intertwined%20S%26A%20Monogram.png?alt=media&token=4a0c7abb-0150-4d22-94fc-d58f901a45f6">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/tailwind-production.css?v=mobile-1">
     <!-- 🟢 ADDED GLOBAL STYLESHEET LINK -->
     <link rel="stylesheet" href="css/style.css?v=site-4">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -15,7 +15,7 @@
     <script src="js/translations.js?v=site-4"></script>
     <script src="js/i18n.js?v=site-4"></script>
     <link rel="stylesheet" href="css/site-updates.css?v=site-4">
-    <script src="js/consent.js?v=site-4"></script>
+    <script src="js/consent.js?v=launch-1"></script>
 
     <meta name="description" content="Read about cookies and storage choices on the SAYAND website.">
     <link rel="canonical" href="https://thesayand.com/cookie">
@@ -24,7 +24,7 @@
     <meta property="og:description" content="Read about cookies and storage choices on the SAYAND website.">
     <meta property="og:url" content="https://thesayand.com/cookie">
     <meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/SAYAND%20Intertwined%20S%26A%20Monogram.png?alt=media&token=4a0c7abb-0150-4d22-94fc-d58f901a45f6">
-    <script src="js/site-updates.js?v=site-4"></script>
+    <script src="js/site-updates.js?v=launch-1"></script>
 </head>
 <body class="bg-[#f9f6f0] text-[#1a2e15] antialiased min-h-screen flex flex-col">
 
@@ -38,15 +38,21 @@
         <div id="legal-content" class="text-sm md:text-base text-[#1a2e15] leading-relaxed space-y-6 font-medium">
             <p class="text-[#6a7c64] font-bold text-xs tracking-widest uppercase animate-pulse">Loading content...</p>
         </div>
-    </main>
+    <section class="mt-8 border-t pt-6 space-y-4"><h2 class="font-bold text-xl">Optional shopping analytics</h2><p>With your permission, SAYAND uses Google Analytics to measure page visits, product views, additions to the bag, checkout starts and confirmed purchases. Analytics is optional: declining it does not prevent shopping. These events do not include your name, email address, shipping address, payment details or gift message.</p><p>Google Analytics cookies and browser records help measure visits and avoid counting the same purchase repeatedly. You can change your choice through Cookie settings at the bottom of any page. Google Analytics is loaded only after analytics consent and when configured for this store.</p><p><a href="https://policies.google.com/privacy" class="underline">Google’s privacy information</a></p></section></main>
 
     <footer class="border-t border-[#c2c9c0] py-8 px-6 text-center mt-auto bg-white">
         <p class="text-[10px] tracking-[0.2em] text-[#6a7c64] font-bold">© 2026 SAYAND. ALL RIGHTS RESERVED.</p>
     </footer>
 
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
     <script src="js/firebase-config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-functions-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-check-compat.js"></script>
+<script src="/js/service-config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="/js/store-services.js"></script>
+<script src="/js/public-store.js"></script>
     <script>
         if (typeof firebase !== 'undefined' && firebase.database) {
             firebase.database().ref("mainStore/footer/cookie").once("value").then(snap => {
@@ -65,5 +71,6 @@
         }
     </script>
     
+<script src="/js/elia.js?v=20261015-expanded"></script>
 </body>
 </html>

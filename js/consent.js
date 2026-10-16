@@ -2,11 +2,11 @@
 /* Optional browser storage is off until a visitor makes a choice. */
 (() => {
     'use strict';
-    const key = 'sayand_consent_v1';
+    const key = 'sayand_consent_v2';
     const read = () => {
         try {
             const value = JSON.parse(localStorage.getItem(key));
-            return value && value.version === 1 ? value : null;
+            return value && value.version === 2 ? value : null;
         } catch (_) { return null; }
     };
     let choice = read();
@@ -25,7 +25,7 @@
         if (previousFocus && previousFocus.isConnected) previousFocus.focus();
     }
     function save(analytics, personalization) {
-        choice = {version:1,analytics:!!analytics,personalization:!!personalization,updatedAt:new Date().toISOString()};
+        choice = {version:2,analytics:!!analytics,personalization:!!personalization,updatedAt:new Date().toISOString()};
         try { localStorage.setItem(key,JSON.stringify(choice)); } catch (_) {}
         cleanOptionalStorage();
         hide();
@@ -52,10 +52,10 @@
         panel.className='sayand-consent';panel.setAttribute('aria-labelledby','consent-title');
         panel.hidden=!!choice;
         panel.innerHTML=`<h2 id="consent-title" tabindex="-1">Your privacy choices</h2>
-<p>Essential storage keeps your account, shopping bag and preferences working. With your permission, we also store a visitor ID for statistics and remember recently viewed products. You can reject optional storage and still shop.</p>
+<p>Essential storage keeps your account, shopping bag and preferences working. With your permission, we also measure visits and shopping activity with Google Analytics, store a visitor ID for statistics, and remember recently viewed products. You can reject optional storage and still shop.</p>
 <p><a href="cookie.html">Cookie Policy</a> · <a href="privacy.html">Privacy Policy</a></p>
 <div class="sayand-consent-actions"><button type="button" data-consent="reject">Reject optional</button><button type="button" data-consent="accept">Accept optional</button><button type="button" data-consent="customize">Customize</button></div>
-<div data-consent-settings hidden><label><input type="checkbox" name="analytics"> <span>Visitor statistics</span></label><label><input type="checkbox" name="personalization"> <span>Remember recently viewed products</span></label><button type="button" data-consent="save">Save choices</button></div>`;
+<div data-consent-settings hidden><label><input type="checkbox" name="analytics"> <span>Visitor and shopping statistics</span></label><label><input type="checkbox" name="personalization"> <span>Remember recently viewed products</span></label><button type="button" data-consent="save">Save choices</button></div>`;
         document.body.appendChild(panel);settings=panel.querySelector('[data-consent-settings]');
         panel.querySelector('[data-consent="reject"]').addEventListener('click',()=>save(false,false));
         panel.querySelector('[data-consent="accept"]').addEventListener('click',()=>save(true,true));

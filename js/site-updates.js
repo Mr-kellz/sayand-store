@@ -1,6 +1,11 @@
 (() => {
     'use strict';
     const origin='https://thesayand.com';
+    /* SEO_CATALOG_START */let catalog = {};
+    fetch('/api/catalogue-routes').then(r=>{if(!r.ok)throw Error('Routes unavailable');return r.json();}).then(data=>{catalog=data;}).catch(()=>{});/* SEO_CATALOG_END */
+    function productUrl(name) { return catalog[String(name).toLowerCase().trim()] || '/product?item=' + encodeURIComponent(name); }
+    function categoryUrl(name) { return ['women','men','accessories'].includes(name) ? '/collection-' + name : '/collection'; }
+
     function meta(selector,attribute,value) {
         let node=document.head.querySelector(selector);
         if(node)node.setAttribute(attribute,value);
@@ -13,12 +18,14 @@
         meta('meta[property="og:title"]','content',document.title);
         if(image && /^https:\/\//.test(image))meta('meta[property="og:image"]','content',image);
     }
-    window.SayandSEO={details};
+    window.SayandSEO={details,productUrl,categoryUrl};
     const route=location.pathname.replace(/\.html$/,'').replace(/\/$/,'')||'/';
     const url=new URL(origin+(route==='/index'?'/':route));
     const current=new URL(location.href);
     const param=route==='/product'?'item':route==='/article'?'id':route==='/collection'?'category':null;
     if(param && current.searchParams.has(param))url.searchParams.set(param,current.searchParams.get(param));
+    if (route === '/product' && current.searchParams.get('item')) url.href = origin + productUrl(current.searchParams.get('item'));
+    if (route === '/collection' && current.searchParams.get('category')) url.href = origin + categoryUrl(current.searchParams.get('category'));
     meta('link[rel="canonical"]','href',url.href);meta('meta[property="og:url"]','content',url.href);
     function accessibleActions(root) {
         const nodes=[];
@@ -37,6 +44,20 @@
         }
     }
     function start(){
+        if (!window.SayandAnalytics && !document.querySelector('script[src*="shopping-analytics.js"]')) {
+            const script=document.createElement('script');script.src='/js/shopping-analytics.js?v=launch-1';document.head.appendChild(script);
+        }
+        document.querySelectorAll('a[href]').forEach(link=>{
+            try { const u=new URL(link.href);if(u.origin!==location.origin)return;
+                if (/\/collection(?:\.html)?$/.test(u.pathname) && u.searchParams.has('category')) link.href=categoryUrl(u.searchParams.get('category'));
+                if (/\/product(?:\.html)?$/.test(u.pathname) && u.searchParams.has('item')) link.href=productUrl(u.searchParams.get('item'));
+            } catch (_) {}
+        });
+        const footer=document.querySelector('footer');
+        if(footer && !footer.querySelector('a[href="/faq"]')){
+            const link=document.createElement('a');link.href='/faq';link.textContent='FAQ';link.style.cssText='display:inline-block;margin:16px;text-decoration:underline';footer.appendChild(link);
+        }
+
         // Placeholder text is not an accessible name; add names where the existing forms lack them.
         document.querySelectorAll('input:not([type="hidden"]),textarea,select').forEach(input=>{
             if(input.getAttribute('aria-label')||input.getAttribute('aria-labelledby')||input.closest('label'))return;

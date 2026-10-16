@@ -52,7 +52,7 @@ function buildQuote(root, order, orderId, uid, now) {
         const quantity = Number(item.quantity === undefined ? item.qty : item.quantity);
         if (!Number.isInteger(quantity) || quantity < 1 || quantity > 100) fail('Please choose a valid quantity.');
         const {product:p} = catalog(store, name);
-        if (p.isPreorder || p.isOutOfStock) fail(`${name} is not available for immediate checkout.`);
+        if (p.isHidden || p.isDraft || p.isPreorder || p.isOutOfStock) fail(`${name} is not available for immediate checkout.`);
         if (p.isVipOnly && !isVip) fail(`${name} requires VIP membership.`);
         const sizes = Object.keys(p.sizeQuantities || {});
         if (sizes.length ? !own(p.sizeQuantities,size) : (Array.isArray(p.sizes) && !p.sizes.includes(size))) fail(`Please choose a valid size for ${name}.`);
@@ -76,8 +76,10 @@ function buildQuote(root, order, orderId, uid, now) {
     let promo = 0, promoKind = null;
     const code = text(order.promoCodeUsed || '',80).toUpperCase();
     if (code) {
+        if (code === 'WELCOME10' && root.welcome10Eligible !== true) fail('WELCOME10 is for newsletter subscribers. Confirm your subscription using your verified account email.');
         if (/[.#$\[\]\/]/.test(code)) fail('Invalid discount code.');
-        if (past.some(o => String(o.promoCodeUsed || '').toUpperCase() === code) || ownActive.some(q=>q.promoCodeUsed === code)) fail('This discount code has already been used or is in another active checkout.');
+        if (past.some(o => String(o.promoCodeUsed || '').toUpperCase() === code)) fail('This discount code has already been redeemed with a paid order.');
+        if (ownActive.some(q=>q.promoCodeUsed === code)) fail('An earlier checkout is still reserving this code. Please try again shortly.');
         if (code.startsWith('BDAY') && code !== 'BDAY'+uid.slice(-6).toUpperCase()) fail('This birthday code belongs to another account.');
         const expiry = (store.discountCodeExpiry || {})[code];
         if (expiry && Number(expiry) <= now) fail('This discount code has expired.');
@@ -161,4 +163,4 @@ function applyPayment(root, session, now) {
     root.paymentFulfillments[id] = {sessionId:session.id,completedAt:now,stockApplied:!review.length,emailState:review.length?'needs_review':'pending'};
     return root;
 }
-module.exports = {buildQuote,applyPayment};
+module.exports = {buildQuote,applyPayment,purchased};

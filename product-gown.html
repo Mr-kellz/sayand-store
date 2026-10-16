@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="sayand-product" content="GOWN">
+<link rel="canonical" href="https://thesayand.com/product-gown">
+<meta name="description" content="ELEGANT WEAR FOR OCCATIONS.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="SAYAND | GOWN">
+<meta property="og:description" content="ELEGANT WEAR FOR OCCATIONS.">
+<meta property="og:url" content="https://thesayand.com/product-gown">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="SAYAND | GOWN">
+<meta name="twitter:description" content="ELEGANT WEAR FOR OCCATIONS.">
+<meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/products%2F1786715851558_BDCA4CA4_3553_4B67_AEAD_9C926EAA412C.jpeg?alt=media&amp;token=47feab09-3683-41c1-9491-462953e9caaa">
+<meta name="twitter:image" content="https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/products%2F1786715851558_BDCA4CA4_3553_4B67_AEAD_9C926EAA412C.jpeg?alt=media&amp;token=47feab09-3683-41c1-9491-462953e9caaa">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAYAND | GOWN</title>
+    <link rel="icon" type="image/png" href="https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/SAYAND%20Intertwined%20S%26A%20Monogram.png?alt=media&token=4a0c7abb-0150-4d22-94fc-d58f901a45f6">
+    <link rel="apple-touch-icon" href="https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/SAYAND%20Intertwined%20S%26A%20Monogram.png?alt=media&token=4a0c7abb-0150-4d22-94fc-d58f901a45f6">
+    <link rel="stylesheet" href="/css/tailwind-production.css?v=mobile-1">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css?v=site-4">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f9f6f0; color: #1a2e15; overflow-y: auto !important; }
+        #product-detail { transform: none !important; position: relative !important; }
+        .detail-tab { color: #6a7c64; padding-bottom: 0.5rem; border-bottom: 2px solid transparent; transition: all 0.3s; font-weight: 800;}
+        .detail-tab:hover { color: #2c4c23; }
+        .detail-tab.active { color: #1a2e15; border-bottom: 2px solid #d4af37;}
+        .toast { position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%); background: #d4af37; color: #1a2e15; padding: 12px 24px; font-size: 10px; font-weight: 900; letter-spacing: 0.2em; transition: bottom 0.3s; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-transform: uppercase; }
+        .toast.show { bottom: 30px; }
+        #currency-toggle { min-width: 36px; text-align: center; }
+        .zoom-container { cursor: crosshair; }
+        .zoom-container img { transition: transform 0.3s ease; }
+        #cookie-banner { backdrop-filter: blur(8px); }
+        #zoom-toggle-btn { transition: all 0.3s ease; }
+        #detail-image-container.zoom-active { cursor: crosshair; }
+        #detail-image-container.zoom-active #detail-hero-img { transition: transform 0.1s ease; }
+    </style>
+
+    <link rel="stylesheet" href="css/i18n.css?v=site-4">
+    <script src="js/translations.js?v=shipping-admin-1"></script>
+    <script src="js/i18n.js?v=site-4"></script>
+    <link rel="stylesheet" href="css/site-updates.css?v=site-4">
+    <script src="js/consent.js?v=launch-1"></script>
+
+    
+    
+    
+    
+    
+    
+    
+    <script src="js/shopping-analytics.js?v=launch-1"></script>
+    <script src="js/site-updates.js?v=launch-1"></script>
+</head>
+<body class="bg-[#f9f6f0] text-[#1a2e15] antialiased overflow-x-hidden flex flex-col min-h-screen">
+
+    <div id="toast" class="toast z-[100]">ADDED TO BAG</div>
+
+    <!-- 🟢 NAV: FIXED ALIGNMENT & STRIPPED IMAGE LOGO -->
+    <nav class="fixed top-0 left-0 w-full z-[99] bg-[#1a2e15] border-b border-[#d4af37]/30 shadow-md text-white">
+        <div class="w-full px-4 sm:px-6 lg:px-8 xl:px-12">
+            <div class="flex justify-between items-center h-16 md:h-20 relative">
+                <div class="flex items-center flex-1">
+                    <button id="menuBtn" class="md:hidden flex flex-col space-y-1.5 p-2 mr-4 z-50">
+                        <span class="w-6 h-0.5 bg-[#d4af37] transition-all duration-300"></span>
+                        <span class="w-6 h-0.5 bg-[#d4af37] transition-all duration-300"></span>
+                    </button>
+                    <div class="hidden md:flex space-x-8 text-[10px] tracking-[0.2em] font-black">
+                        <a href="/collection-women" target="_self" class="text-white hover:text-[#d4af37] transition-colors duration-300">WOMEN</a>
+                        <a href="/collection-men" target="_self" class="text-white hover:text-[#d4af37] transition-colors duration-300">MEN</a>
+                        <a href="/collection-accessories" target="_self" class="text-white hover:text-[#d4af37] transition-colors duration-300">ACCESSORIES</a>
+                        <a href="collection.html" target="_self" class="text-white hover:text-[#d4af37] transition-colors duration-300">COLLECTIONS</a>
+                        <a href="sales.html" target="_self" class="text-red-400 hover:text-red-300 transition-colors duration-300">SALE</a>
+                        <a href="login.html" target="_self" id="desktop-account-link" class="hidden md:flex items-center justify-center text-white hover:text-[#d4af37] transition-colors">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- 🟢 PERFECTLY CENTERED BOLD TEXT HEADER -->
+                <div class="absolute left-1/2 transform -translate-x-1/2 z-50 pointer-events-none flex items-center justify-center">
+                    <a href="index.html" target="_self" class="text-2xl md:text-3xl lg:text-4xl font-black tracking-tighter leading-none pointer-events-auto text-[#d4af37] hover:text-white transition-colors">SAYAND</a>
+                </div>  
+                
+                <div class="flex items-center justify-end space-x-4 md:space-x-6 flex-1">
+                    <div class="relative group hidden md:block">
+                        <button id="currency-toggle" class="text-[10px] tracking-[0.2em] font-black text-white hover:text-[#d4af37] transition-colors border border-[#d4af37]/30 px-2 py-1">EUR</button>
+                        <div class="absolute right-0 mt-1 w-20 bg-[#1a2e15] border border-[#d4af37]/30 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                            <button onclick="setCurrency('EUR')" class="block w-full text-left px-3 py-2 text-[10px] font-black text-white hover:bg-[#d4af37] hover:text-[#1a2e15] transition-colors tracking-widest">EUR</button>
+                            <button onclick="setCurrency('USD')" class="block w-full text-left px-3 py-2 text-[10px] font-black text-white hover:bg-[#d4af37] hover:text-[#1a2e15] transition-colors tracking-widest">USD</button>
+                            <button onclick="setCurrency('GBP')" class="block w-full text-left px-3 py-2 text-[10px] font-black text-white hover:bg-[#d4af37] hover:text-[#1a2e15] transition-colors tracking-widest">GBP</button>
+                        </div>
+                    </div>
+                    <button onclick="openSearch()" class="flex items-center justify-center text-white hover:text-[#d4af37] transition-colors">                        
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </button>
+                    <button id="wishlist-toggle" class="relative text-white hover:text-[#d4af37] transition-colors flex items-center">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                        <span id="wishlist-count" class="absolute -top-2 -right-3 w-4 h-4 bg-[#d4af37] text-[#1a2e15] text-[9px] flex items-center justify-center rounded-full font-black hidden shadow-md">0</span>
+                    </button>
+                    <button id="cart-toggle" class="relative text-[10px] tracking-[0.2em] font-black text-white hover:text-[#d4af37] transition-colors">
+                        BAG <span id="cart-count" class="absolute -top-2 -right-3 w-4 h-4 bg-[#d4af37] text-[#1a2e15] text-[9px] flex items-center justify-center rounded-full font-black hidden shadow-md">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+      <!-- MOBILE MENU -->
+    <div id="mobileMenu" class="menu-overlay fixed inset-0 bg-[#0f1f0f] text-[#c9a227] z-40 flex flex-col justify-center items-center space-y-6">
+        <a href="/collection-women" target="_self" onclick="toggleMenu();" class="text-3xl font-black tracking-widest hover:text-[#e8d5a3] transition-colors uppercase">WOMEN</a>
+        <a href="/collection-men" target="_self" onclick="toggleMenu();" class="text-3xl font-black tracking-widest hover:text-[#e8d5a3] transition-colors uppercase">MEN</a>
+        <a href="/collection-accessories" target="_self" onclick="toggleMenu();" class="text-3xl font-black tracking-widest hover:text-[#e8d5a3] transition-colors uppercase">ACCESSORIES</a>
+        <a href="collection.html" target="_self" onclick="toggleMenu();" class="text-3xl font-black tracking-widest hover:text-[#e8d5a3] transition-colors uppercase">COLLECTIONS</a>
+        <a href="sales.html" target="_self" onclick="toggleMenu();" class="text-3xl font-black tracking-widest text-red-500 hover:text-red-400 transition-colors uppercase">SALE</a>
+        <div class="w-48 h-px bg-[#c9a227]/30 my-2"></div>
+        <div class="flex flex-col items-center space-y-3">
+            <span class="text-[10px] tracking-[0.3em] font-black text-[#e8d5a3]/60 uppercase">Currency</span>
+            <div class="flex space-x-3">
+                <button onclick="setCurrency('EUR'); toggleMenu();" class="text-[10px] tracking-widest font-black px-4 py-2 border border-[#c9a227]/30 text-[#e8d5a3] hover:bg-[#c9a227] hover:text-[#0f1f0f] transition-colors">EUR</button>
+                <button onclick="setCurrency('USD'); toggleMenu();" class="text-[10px] tracking-widest font-black px-4 py-2 border border-[#c9a227]/30 text-[#e8d5a3] hover:bg-[#c9a227] hover:text-[#0f1f0f] transition-colors">USD</button>
+                <button onclick="setCurrency('GBP'); toggleMenu();" class="text-[10px] tracking-widest font-black px-4 py-2 border border-[#c9a227]/30 text-[#e8d5a3] hover:bg-[#c9a227] hover:text-[#0f1f0f] transition-colors">GBP</button>
+            </div>
+        </div>
+        <div class="w-48 h-px bg-[#c9a227]/30 my-2"></div>
+        <a href="login.html" target="_self" id="mobile-account-link" onclick="toggleMenu();" class="text-3xl font-black tracking-widest hover:text-[#e8d5a3] transition-colors uppercase">LOG IN</a>
+    </div>
+
+    <!-- WISHLIST -->
+    <div id="wishlist-page" class="fixed inset-0 bg-[#f9f6f0] z-[101] transform translate-x-full transition-transform duration-500 overflow-hidden flex flex-col border-l border-[#d4af37]/30">
+        <div class="flex justify-between items-center p-6 border-b border-[#d4af37]/30 bg-[#1a2e15]">
+            <h3 class="text-xl md:text-2xl font-black tracking-widest text-[#d4af37] uppercase">SAVED ITEMS</h3>
+            <button onclick="closeWishlist()" class="text-3xl leading-none text-white hover:text-[#d4af37] transition-colors bg-white/20 hover:bg-white/30 rounded-full w-10 h-10 flex items-center justify-center">&times;</button>
+        </div>
+        <div id="wishlist-content" class="flex-1 overflow-y-auto p-6 hide-scrollbar">
+            <div id="wishlist-empty" class="wishlist-empty">
+                <p class="text-[#6a7c64] text-xs font-bold tracking-widest mb-4 uppercase">You haven't saved any items yet.</p>
+                <button onclick="closeWishlist()" class="bg-[#1a2e15] text-[#d4af37] border border-[#d4af37] px-8 py-4 text-[10px] tracking-widest font-black hover:bg-[#2c4c23] transition-colors shadow-lg">START SHOPPING</button>
+            </div>
+            <div id="wishlist-grid" class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 hidden"></div>
+        </div>
+    </div>
+
+    <!-- SALES -->
+    <div id="sales-page" class="fixed inset-0 bg-[#f9f6f0] z-[75] transform translate-y-full transition-transform duration-500 overflow-hidden flex flex-col">
+        <div class="flex justify-between items-center p-6 border-b border-[#d4af37]/30 bg-[#1a2e15] sticky top-0 z-10">
+            <h3 class="text-2xl md:text-4xl font-black tracking-widest text-red-500">SALE</h3>
+            <button onclick="closeSalesPage()" class="text-4xl leading-none text-[#d4af37] hover:text-white transition-colors">&times;</button>
+        </div>
+        <div id="sales-scroll" class="flex-1 overflow-y-auto hide-scrollbar">
+            <div id="sales-active-section" class="p-6 md:p-12">
+                <p class="text-[10px] font-black tracking-[0.3em] text-[#d4af37] mb-2">LIMITED TIME</p>
+                <h2 class="text-2xl md:text-4xl font-black tracking-tighter mb-8 text-red-500">ON SALE NOW</h2>
+                <div id="sales-grid" class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6"></div>
+            </div>
+            <div id="sales-upcoming-section" class="p-6 md:p-12 border-t border-[#c2c9c0]">
+                <p class="text-[10px] font-black tracking-[0.3em] text-[#6a7c64] mb-2">COMING SOON</p>
+                <h2 class="text-2xl md:text-4xl font-black tracking-tighter mb-8 text-[#1a2e15]">UPCOMING DROPS</h2>
+                <div id="upcoming-sales-grid" class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CART -->
+    <div id="cart-overlay" class="fixed inset-0 bg-[#1a2e15]/40 z-[55] hidden opacity-0 transition-opacity duration-300 backdrop-blur-sm"></div>
+    <div id="shopping-bag" class="fixed top-0 right-0 h-full w-full sm:w-[400px] bg-[#f9f6f0] z-[105] transform translate-x-full transition-transform duration-500 flex flex-col shadow-2xl border-l border-[#d4af37]/30">
+        <div class="flex justify-between items-center p-6 border-b border-[#d4af37]/30 bg-[#1a2e15]">
+            <h3 class="text-[10px] tracking-widest font-black text-[#d4af37]">YOUR SHOPPING BAG</h3>
+            <button id="close-cart" class="text-3xl leading-none text-[#d4af37] hover:text-white transition-colors">&times;</button>
+        </div>
+        <div id="cart-items" class="flex-1 overflow-y-auto p-6 space-y-6 hide-scrollbar bg-[#f9f6f0]">
+            <p class="text-xs text-[#6a7c64] font-bold text-center mt-10 uppercase">Your bag is currently empty.</p>
+        </div>
+        <div class="p-6 border-t border-[#c2c9c0] bg-white">
+            <div class="flex justify-between text-xs font-black mb-6 text-[#1a2e15]">
+                <span>TOTAL:</span>
+                <span id="cart-total">€0.00 EUR</span>
+            </div>
+            <button id="whatsapp-checkout-btn" class="w-full bg-[#1a2e15] text-[#d4af37] border border-[#d4af37] py-4 text-[10px] tracking-widest font-black hover:bg-[#2c4c23] transition-colors shadow-lg">PROCEED TO CHECKOUT</button>
+        </div>
+    </div>
+
+    <!-- EDITORIAL -->
+    <div id="editorial-page" class="fixed inset-0 bg-[#f9f6f0] z-[75] transform translate-y-full transition-transform duration-500 flex flex-col overflow-hidden">
+        <div class="absolute top-0 left-0 w-full flex justify-between items-center p-6 z-20 pointer-events-none">
+            <h3 class="text-xl md:text-2xl font-black tracking-widest text-[#d4af37] pointer-events-auto drop-shadow-md">THE EDIT</h3>
+            <button onclick="closeEditorial()" class="text-4xl leading-none pointer-events-auto text-[#d4af37] hover:text-white transition-colors drop-shadow-md">&times;</button>
+        </div>
+        <div class="flex-1 overflow-y-auto hide-scrollbar bg-[#f9f6f0] pb-24">
+            <div class="relative w-full h-[70vh] md:h-[90vh] bg-[#1a2e15]">
+                <img alt="SAYAND editorial collection" id="editorial-hero-img" src="" class="w-full h-full object-cover opacity-80">
+                <div class="absolute inset-0 bg-gradient-to-t from-[#1a2e15]/90 to-transparent flex flex-col justify-end p-6 md:p-16 text-white text-center md:text-left">
+                    <p class="text-[10px] tracking-[0.4em] font-black mb-3 text-[#d4af37]">SPRING / SUMMER</p>
+                    <h1 class="text-4xl md:text-6xl lg:text-7xl font-black tracking-tighter leading-[0.9] mb-4 text-[#f9f6f0]">ESSENTIAL<br>MODERNITY</h1>
+                    <p class="text-xs md:text-sm text-[#eef2ec] max-w-md mx-auto md:mx-0 font-medium leading-relaxed">Precision cuts, premium textures, designed to transcend seasons.</p>
+                </div>
+            </div>
+            <div class="px-4 sm:px-6 lg:px-8 xl:px-12 py-16 md:py-24 max-w-7xl mx-auto">
+                <div class="text-center mb-16 max-w-2xl mx-auto">
+                    <h2 class="text-2xl md:text-3xl font-black tracking-tighter mb-4 text-[#1a2e15]">SHOP THE LOOKBOOK</h2>
+                    <p class="text-[#6a7c64] text-xs font-bold leading-relaxed">Discover the pieces that define the new standard of minimalism. Carefully curated to build a wardrobe of effortless sophistication.</p>
+                </div>
+                <div id="editorial-grid" class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT: Product Page -->
+    <!-- COLLECTION FOLDER -->
+    <div id="collection-folder" class="fixed inset-0 bg-[#f9f6f0] z-[70] transform translate-y-full transition-transform duration-500 flex flex-col">
+        <div class="flex justify-between items-center p-6 border-b border-[#d4af37]/30 bg-[#1a2e15] sticky top-0 z-10">
+            <h3 id="collection-title" class="text-2xl md:text-4xl font-black tracking-widest text-[#d4af37] uppercase">COLLECTION</h3>
+            <button onclick="closeCollection()" class="text-4xl leading-none text-[#d4af37] hover:text-white transition-colors">&times;</button>
+        </div>
+        <div class="p-6 md:p-12 overflow-y-auto flex-1 hide-scrollbar">
+            <div id="collection-grid" class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6"></div>
+        </div>
+    </div>
+
+    <main id="product-detail" class="flex-1 pt-16 md:pt-20 bg-[#f9f6f0] text-[#1a2e15] w-full">
+        
+
+        <div id="detail-scroll" class="w-full bg-[#f9f6f0]">
+            <div class="relative w-full bg-[#f9f6f0]">
+                <div class="w-full aspect-[3/4] md:aspect-[4/5] relative overflow-hidden border-b border-[#c2c9c0]/30" id="detail-image-container" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEnd(event)" class="zoom-container">
+                    <img alt="Product photograph" id="detail-hero-img" src="" class="w-full h-full object-cover transition-transform duration-300">
+                    <div class="absolute top-4 right-4 z-30 flex items-center gap-2">
+                        <button id="detail-heart" class="heart-btn w-10 h-10 bg-white/90 backdrop-blur-sm border border-[#c2c9c0] rounded-full flex items-center justify-center text-[#1a2e15] hover:bg-[#1a2e15] hover:text-[#d4af37] hover:border-[#d4af37] transition-all duration-300 shadow-lg" onclick="toggleWishlistCurrent()">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                        </button>
+                        <div class="relative">
+                            <button id="detail-share-btn" class="w-10 h-10 bg-white/90 backdrop-blur-sm border border-[#c2c9c0] rounded-full flex items-center justify-center text-[#1a2e15] hover:bg-[#1a2e15] hover:text-[#d4af37] hover:border-[#d4af37] transition-all duration-300 shadow-lg" onclick="toggleShareMenu()">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                            </button>
+                            <div id="detail-share-menu" class="share-menu bg-white border border-[#c2c9c0] text-[#1a2e15] p-4 absolute right-0 mt-2 z-50 shadow-xl hidden">
+                                <button onclick="shareProduct('copy')" class="block w-full text-left py-2 hover:text-[#d4af37] text-[10px] font-black tracking-widest transition-colors">COPY LINK</button>
+                                <button onclick="shareProduct('whatsapp')" class="block w-full text-left py-2 hover:text-[#d4af37] text-[10px] font-black tracking-widest transition-colors">WHATSAPP</button>
+                            </div>
+                        </div>
+                        <button id="zoom-toggle-btn" onclick="toggleProductZoom()" class="w-10 h-10 bg-white/90 backdrop-blur-sm border border-[#c2c9c0] rounded-full hidden md:flex items-center justify-center text-[#1a2e15] hover:bg-[#1a2e15] hover:text-[#d4af37] hover:border-[#d4af37] transition-all duration-300 shadow-lg" title="Toggle Zoom">
+                            <svg id="zoom-icon-magnify" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                            <svg id="zoom-icon-close" class="hidden" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                    </div>
+                    <div class="swipe-hint" id="swipe-hint">SWIPE FOR MORE</div>
+                    <div id="detail-dots" class="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-20"></div>
+                </div>
+                <div id="detail-thumbs" class="flex gap-2 p-4 overflow-x-auto thumb-scroll border-b border-[#c2c9c0]/50 bg-white"></div>
+            </div>
+
+            <div class="px-4 md:px-8 py-8 md:py-12 max-w-4xl mx-auto">
+                <p id="detail-stock" class="text-[10px] tracking-widest mb-2 font-black text-[#6a7c64] uppercase"></p>
+                <h2 id="detail-name" class="text-xl md:text-3xl font-black tracking-tighter mb-2 uppercase text-[#1a2e15]">LOADING...</h2>
+                
+                <div class="mb-4 flex items-center gap-2">
+                    <span id="detail-original-price" class="price-original text-sm hidden text-[#6a7c64]"></span>
+                    <span id="detail-price" class="text-xl font-bold text-[#2c4c23]"></span>
+                </div>
+                
+                <div id="sale-countdown-container" class="hidden mb-4 mt-2">
+                    <span class="inline-block text-[10px] tracking-[0.2em] text-[#d4af37] font-black border border-[#d4af37] px-3 py-1 bg-[#1a2e15]">
+                        SALE ENDS IN: <span id="sale-countdown"></span>
+                    </span>
+                </div>
+
+                <p class="text-[10px] text-[#6a7c64] font-bold mb-8 uppercase tracking-widest">VAT included / excl Shipping cost</p>
+
+                <div class="mb-8"><div id="detail-sizes" class="flex flex-wrap gap-6"></div></div>
+
+                <div class="mb-8 flex items-center justify-between border border-[#c2c9c0]/50 bg-white p-2">
+                    <span class="text-[10px] tracking-widest font-black text-[#6a7c64] ml-2">QTY</span>
+                    <div class="flex items-center text-[#1a2e15]">
+                        <button type="button" onclick="document.getElementById('customer-qty').stepDown()" class="px-3 py-1 hover:text-[#d4af37] transition-colors font-bold">-</button>
+                        <input type="number" id="customer-qty" min="1" value="1" class="w-10 text-center text-sm focus:outline-none hide-scrollbar bg-transparent text-[#1a2e15] font-black">
+                        <button type="button" onclick="document.getElementById('customer-qty').stepUp()" class="px-3 py-1 hover:text-[#d4af37] transition-colors font-bold">+</button>
+                    </div>
+                </div>
+
+                <button id="detail-add-btn" class="w-full bg-[#1a2e15] text-[#d4af37] border border-[#d4af37] py-4 text-xs tracking-[0.2em] font-black hover:bg-[#2c4c23] transition-all duration-300 mb-8 shadow-lg">
+                    ADD TO BAG
+                </button>
+
+                <div class="flex items-center gap-3 mb-10 pb-8 border-b border-[#c2c9c0]/50">
+                    <span id="detail-color" class="text-[10px] font-black tracking-widest text-[#2c4c23]"></span>
+                    <span class="text-[#c2c9c0]">|</span>
+                    <span id="detail-sku" class="text-[10px] font-bold tracking-widest text-[#6a7c64]"></span>
+                </div>
+
+                <div class="flex gap-6 mb-8 text-[10px] tracking-widest uppercase font-bold">
+                    <button class="detail-tab active" onclick="switchDetailTab('description')" data-tab="description">DESCRIPTION</button>
+                    <button class="detail-tab" onclick="switchDetailTab('details')" data-tab="details">DETAILS</button>
+                    <button class="detail-tab" onclick="switchDetailTab('measurements')" data-tab="measurements">MEASUREMENTS</button>
+                </div>
+
+                <div id="tab-description" class="detail-tab-content detail-content-enter">
+                    <p id="detail-description" class="text-sm text-[#1a2e15] font-medium leading-relaxed mb-4"></p>
+                </div>
+                <div id="tab-details" class="detail-tab-content hidden">
+                    <div id="detail-details-list" class="space-y-0"></div>
+                </div>
+                <div id="tab-measurements" class="detail-tab-content hidden">
+                    <div id="detail-measurements-list" class="space-y-4"></div>
+                </div>
+
+                <div id="detail-model-img-container" class="mt-10 mb-6 bg-[#eef2ec] border border-[#c2c9c0]/30">
+                    <img alt="Additional product photograph" id="detail-model-img" src="" class="w-full object-cover" style="display:none;">
+                </div>
+
+   <div class="mt-10 border-t border-[#c2c9c0]/50 pt-8">
+    <div class="mb-4">
+        <button type="button" class="w-full flex justify-between items-center text-left cursor-pointer" onclick="const body = this.nextElementSibling; const icon = this.querySelector('.acc-icon'); body.classList.toggle('hidden'); icon.innerText = body.classList.contains('hidden') ? '+' : '-';">
+            <span class="text-[10px] font-black tracking-widest text-[#1a2e15] uppercase">SHIPPING AND RETURNS</span>
+            <span class="acc-icon text-[#d4af37] font-bold text-lg leading-none">+</span>
+        </button>
+        <div class="hidden mt-4">
+            <p class="text-xs text-[#6a7c64] font-medium leading-relaxed">Delivery within Italy: 3–7 working days. International delivery: 5–14 working days. Free returns within 30 days of purchase.</p>
+        </div>
+    </div>
+</div>
+                <div class="mt-16 mb-10">
+                    <h3 class="text-[10px] font-black tracking-widest text-[#6a7c64] mb-6 uppercase">COMPLETE YOUR LOOK</h3>
+                    <div id="detail-related" class="grid grid-cols-3 gap-3 md:gap-6"></div>
+                </div>
+                <div class="mt-10 mb-10">
+                    <h3 class="text-[10px] font-black tracking-widest text-[#6a7c64] mb-6 uppercase">YOU MIGHT BE INTERESTED IN</h3>
+                    <div id="detail-interested" class="grid grid-cols-3 gap-3 md:gap-6"></div>
+                </div>
+
+                <!-- INSTANT & EDITABLE REVIEWS SECTION -->
+                <div class="mt-12 border-t border-[#c2c9c0]/50 pt-12 pb-24">
+                    <h3 class="text-lg font-black uppercase tracking-widest mb-6 text-[#1a2e15]">CUSTOMER REVIEWS</h3>
+                    
+                    <div class="bg-white p-6 md:p-8 mb-10 border border-[#c2c9c0]/50 shadow-sm" id="review-form-container">
+                        <h4 class="text-[10px] font-black uppercase tracking-widest mb-4 text-[#d4af37]">WRITE A REVIEW</h4>
+                        <form id="review-form" onsubmit="submitReview(event)" class="space-y-4">
+                            <select id="review-rating" required class="w-full border border-[#c2c9c0] p-3 text-xs focus:outline-none focus:border-[#d4af37] bg-white text-[#1a2e15] font-bold shadow-sm">
+                                <option value="5">★★★★★ (5/5)</option>
+                                <option value="4">★★★★☆ (4/5)</option>
+                                <option value="3">★★★☆☆ (3/5)</option>
+                                <option value="2">★★☆☆☆ (2/5)</option>
+                                <option value="1">★☆☆☆☆ (1/5)</option>
+                            </select>
+                            <textarea id="review-text" placeholder="Share your thoughts on the fit, fabric, and feel..." required class="w-full border border-[#c2c9c0] p-4 text-xs h-28 focus:outline-none focus:border-[#d4af37] bg-white text-[#1a2e15] font-medium shadow-sm"></textarea>
+                            <button type="submit" class="bg-[#1a2e15] text-[#d4af37] border border-[#d4af37] font-black tracking-widest text-[10px] px-8 py-4 hover:bg-[#2c4c23] transition-colors w-full md:w-auto shadow-lg mt-2">SUBMIT REVIEW</button>
+                            <p id="review-msg" class="text-[10px] text-green-600 hidden font-black mt-3 uppercase tracking-widest">Review posted successfully!</p>
+                        </form>
+                    </div>
+
+                    <div id="product-reviews-list" class="space-y-8"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- RECENTLY VIEWED -->
+    <section id="recently-viewed-section" class="w-full py-16 md:py-24 px-4 sm:px-6 lg:px-8 xl:px-12 bg-[#f9f6f0] hidden">
+        <div class="flex justify-between items-end mb-8">
+            <div>
+                <p class="text-[10px] font-black tracking-[0.3em] text-[#d4af37] mb-2">YOUR JOURNEY</p>
+                <h2 class="text-3xl md:text-5xl font-black tracking-tighter text-[#1a2e15] uppercase">RECENTLY VIEWED</h2>
+            </div>
+        </div>
+        <div id="recently-viewed-grid" class="flex space-x-4 md:space-x-6 overflow-x-auto hide-scrollbar pb-4 snap-x snap-mandatory"></div>
+    </section>
+
+   <!-- FOOTER -->
+    <footer class="w-full bg-white border-t border-[#d4c9a8] pt-16 pb-8 px-4 sm:px-6 lg:px-8 xl:px-12 mt-auto shadow-inner">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+            <div>
+                <h4 class="text-[10px] tracking-[0.2em] font-black mb-6 text-[#0f1f0f]">HELP</h4>
+                <ul class="space-y-3 text-xs text-[#7a8a6e] font-bold">
+                    <li><a href="#" onclick="showContact();return false;" class="hover:text-[#c9a227] transition-colors">Contact Us</a></li>
+                    <li><a href="shipping.html" class="hover:underline">Shipping Info</a></li>
+                    <li><a href="returns.html" class="hover:underline">Returns &amp; Exchanges</a></li>
+                    <li><a href="track-order.html" class="hover:text-[#c9a227] transition-colors">Track Order</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-[10px] tracking-[0.2em] font-black mb-6 text-[#0f1f0f]">COMPANY</h4>
+                <ul class="space-y-3 text-xs text-[#7a8a6e] font-bold">
+                    <li><a href="#" onclick="openInfoPage('about');return false;" class="hover:text-[#c9a227] transition-colors">About Us</a></li>
+                    <li><a href="#" onclick="openInfoPage('careers');return false;" class="hover:text-[#c9a227] transition-colors">Careers</a></li>
+                    <li><a href="#" onclick="openInfoPage('sustainability');return false;" class="hover:text-[#c9a227] transition-colors">Sustainability</a></li>
+                    <!-- 🟢 ADDED NOTRANSLATE HERE TO LOCK "PRESS" -->
+                    <li><a href="#" onclick="openInfoPage('press');return false;" class="hover:text-[#c9a227] transition-colors">Press</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-[10px] tracking-[0.2em] font-black mb-6 text-[#0f1f0f]">LEGAL</h4>
+                <ul class="space-y-3 text-xs text-[#7a8a6e] font-bold">
+                    <li><a href="#" onclick="openInfoPage('privacy');return false;" class="hover:text-[#c9a227] transition-colors">Privacy Policy</a></li>
+                    <li><a href="#" onclick="openInfoPage('terms');return false;" class="hover:text-[#c9a227] transition-colors">Terms of Use</a></li>
+                    <li><a href="#" onclick="openInfoPage('cookie');return false;" class="hover:text-[#c9a227] transition-colors">Cookie Policy</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-[10px] tracking-[0.2em] font-black mb-6 text-[#0f1f0f]">FOLLOW US</h4>
+                <div class="flex space-x-4">
+                    <a id="social-ig" href="https://instagram.com/thesayand_" target="_blank" class="w-10 h-10 border border-[#d4c9a8] flex items-center justify-center text-[#0f1f0f] font-black text-[10px] hover:bg-[#0f1f0f] hover:border-[#0f1f0f] hover:text-[#c9a227] transition-all duration-300">IG</a>
+                    <a id="social-tk" href="https://tiktok.com/@thesayand_" target="_blank" class="w-10 h-10 border border-[#d4c9a8] flex items-center justify-center text-[#0f1f0f] font-black text-[10px] hover:bg-[#0f1f0f] hover:border-[#0f1f0f] hover:text-[#c9a227] transition-all duration-300">TK</a>
+                    <a id="social-pt" href="https://pinterest.com/thesayand_" target="_blank" class="w-10 h-10 border border-[#d4c9a8] flex items-center justify-center text-[#0f1f0f] font-black text-[10px] hover:bg-[#0f1f0f] hover:border-[#0f1f0f] hover:text-[#c9a227] transition-all duration-300">PT</a>
+                </div>
+                <p id="social-handle" class="text-[10px] font-bold text-[#7a8a6e] mt-4 uppercase">@thesayand_</p>
+            </div>
+        </div>
+        <div class="border-t border-[#d4c9a8] pt-8 flex flex-col md:flex-row justify-between items-center">
+            <p class="text-[9px] font-black tracking-[0.2em] text-[#7a8a6e] uppercase">&copy; 2026 SAYAND. ALL RIGHTS RESERVED.</p>
+            <div class="flex space-x-6 mt-4 md:mt-0">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" class="h-4 opacity-50 grayscale">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" class="h-4 opacity-50 grayscale">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" class="h-4 opacity-50 grayscale">
+            </div>
+        </div>
+    <p style="text-align:center;margin:16px"><a href="/faq" style="text-decoration:underline">FAQ</a></p>
+</footer>
+
+    <!-- MODALS -->
+    <div id="contact-modal" class="fixed inset-0 bg-[#1a2e15]/90 z-[90] hidden items-center justify-center backdrop-blur-sm" onclick="if(event.target===this)closeContact()">
+        <div class="bg-[#f9f6f0] text-[#1a2e15] p-8 max-w-md w-full mx-4 relative border border-[#d4af37] shadow-2xl">
+            <button onclick="closeContact()" class="absolute top-4 right-4 text-3xl text-[#d4af37] hover:text-[#1a2e15]">&times;</button>
+            <h3 class="text-xl font-black tracking-widest mb-6 uppercase text-[#d4af37]">CONTACT US</h3>
+            <div class="space-y-4 text-sm font-bold">
+                <p><span class="text-[#6a7c64]">Email:</span> <a id="contact-email" href="mailto:thesayand0@gmail.com" class="hover:text-[#d4af37] transition-colors">thesayand0@gmail.com</a></p>
+                <p><span class="text-[#6a7c64]">WhatsApp:</span> <a id="contact-whatsapp" href="https://wa.me/393299716798" target="_blank" class="hover:text-[#d4af37] transition-colors">+39 329 971 6798</a></p>
+                <p><span class="text-[#6a7c64]">Instagram:</span> <a id="contact-ig" href="https://instagram.com/thesayand_" target="_blank" class="hover:text-[#d4af37] transition-colors">@thesayand_</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SEARCH OVERLAY -->
+    <div id="search-overlay" class="fixed inset-0 bg-[#f9f6f0] text-[#1a2e15] z-[100] transform -translate-y-full transition-transform duration-500 flex flex-col border-b border-[#d4af37]/30">
+        <div class="flex justify-between items-center p-6 md:p-8 border-b border-[#c2c9c0]/50 bg-white shadow-sm">
+            <input type="text" id="search-input" placeholder="SEARCH PRODUCTS..." class="w-full text-xl md:text-3xl font-black tracking-widest uppercase focus:outline-none placeholder-[#c2c9c0] bg-transparent text-[#1a2e15]" oninput="handleSearch()">
+            <button onclick="closeSearch()" class="text-4xl leading-none text-[#d4af37] hover:text-[#1a2e15] transition-colors ml-4">&times;</button>
+        </div>
+        <div class="p-6 md:p-12 overflow-y-auto flex-1 hide-scrollbar">
+            <div id="search-results-grid" class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
+                <p class="text-[#6a7c64] font-bold text-xs tracking-widest uppercase col-span-full">Start typing to search for products...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- INFO PAGE OVERLAY -->
+    <div id="info-page" class="fixed inset-0 bg-[#f9f6f0] text-[#1a2e15] z-[110] transform translate-y-full transition-transform duration-500 overflow-hidden flex flex-col">
+        <div class="flex justify-between items-center p-6 md:p-8 border-b border-[#d4af37]/30 bg-[#1a2e15] sticky top-0 z-10" style="padding-top: 5rem;">
+            <h3 id="info-title" class="text-xl md:text-3xl font-black tracking-widest text-[#d4af37] uppercase">TITLE</h3>
+            <button onclick="closeInfoPage()" class="text-4xl leading-none text-[#d4af37] hover:text-white transition-colors">&times;</button>
+        </div>
+        <div class="p-6 md:p-12 overflow-y-auto flex-1 hide-scrollbar max-w-4xl mx-auto w-full" style="padding-top: 1.5rem;">
+            <div id="info-content" class="text-sm md:text-base text-[#1a2e15] font-medium leading-relaxed space-y-6"></div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="js/firebase-config.js"></script>
+    
+    <script src="js/main.js?v=launch-1"></script>
+
+<script>
+// Override auto-zoom from main.js — PC zoom is now click-to-activate only
+window.initImageZoom = function() {
+    console.log('[SAYAND] Auto zoom disabled on product page. Click magnifying glass to zoom.');
+};
+
+window.toggleProductZoom = function() {
+    const container = document.getElementById('detail-image-container');
+    const img = document.getElementById('detail-hero-img');
+    const btn = document.getElementById('zoom-toggle-btn');
+    const magnifyIcon = document.getElementById('zoom-icon-magnify');
+    const closeIcon = document.getElementById('zoom-icon-close');
+
+    if (!container || !img) return;
+
+    const isActive = container.classList.toggle('zoom-active');
+
+    if (isActive) {
+        magnifyIcon.classList.add('hidden');
+        closeIcon.classList.remove('hidden');
+        btn.classList.add('bg-[#1a2e15]', 'text-[#d4af37]', 'border-[#d4af37]');
+        btn.classList.remove('bg-white/90', 'text-[#1a2e15]', 'border-[#c2c9c0]');
+
+        container._zoomMove = function(e) {
+            if (window.innerWidth < 768) return;
+            const rect = container.getBoundingClientRect();
+            const x = (e.clientX - rect.left) / rect.width;
+            const y = (e.clientY - rect.top) / rect.height;
+            img.style.transformOrigin = (x * 100) + '% ' + (y * 100) + '%';
+            img.style.transform = 'scale(2)';
+        };
+        container._zoomLeave = function() {
+            img.style.transformOrigin = 'center center';
+            img.style.transform = 'scale(1)';
+        };
+        container.addEventListener('mousemove', container._zoomMove);
+        container.addEventListener('mouseleave', container._zoomLeave);
+    } else {
+        magnifyIcon.classList.remove('hidden');
+        closeIcon.classList.add('hidden');
+        btn.classList.remove('bg-[#1a2e15]', 'text-[#d4af37]', 'border-[#d4af37]');
+        btn.classList.add('bg-white/90', 'text-[#1a2e15]', 'border-[#c2c9c0]');
+
+        if (container._zoomMove) {
+            container.removeEventListener('mousemove', container._zoomMove);
+            container.removeEventListener('mouseleave', container._zoomLeave);
+            img.style.transformOrigin = 'center center';
+            img.style.transform = 'scale(1)';
+        }
+    }
+};
+
+// --- ACCORDION TOGGLE FOR SHIPPING & RETURNS ---
+window.toggleAccordion = function(element) {
+    const body = element.nextElementSibling;
+    const icon = element.querySelector('.accordion-icon');
+    
+    if (body.classList.contains('hidden')) {
+        body.classList.remove('hidden');
+        icon.innerText = '-';
+    } else {
+        body.classList.add('hidden');
+        icon.innerText = '+';
+    }
+};
+</script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const itemName = document.querySelector('meta[name="sayand-product"]')?.content || urlParams.get('item');
+
+        if (!itemName) {
+            document.getElementById('detail-name').innerText = "PRODUCT NOT FOUND";
+            return;
+        }
+
+        const decodedName = decodeURIComponent(itemName).toLowerCase().trim();
+
+        function findProduct(data) {
+            if (!data) return null;
+            let allProducts = [];
+            const keys = ['newArrivals', 'trending', 'sales', 'women', 'men', 'accessories'];
+            keys.forEach(key => {
+                if (Array.isArray(data[key])) { allProducts = allProducts.concat(data[key]); }
+            });
+            for (const key in data) {
+                if (Array.isArray(data[key]) && !keys.includes(key)) { allProducts = allProducts.concat(data[key]); }
+            }
+            const seen = new Set();
+            allProducts = allProducts.filter(p => {
+                if (!p || !p.name) return false;
+                const lower = p.name.toLowerCase().trim();
+                if (seen.has(lower)) return false;
+                seen.add(lower);
+                return true;
+            });
+            let found = allProducts.find(p => p.name.toLowerCase().trim() === decodedName);
+            if (found) return found;
+            found = allProducts.find(p => {
+                const pName = p.name.toLowerCase().trim();
+                return pName.includes(decodedName) || decodedName.includes(pName);
+            });
+            if (found) return found;
+            return null;
+        }
+
+        function renderProduct(p) {
+            const encoded = encodeURIComponent(JSON.stringify(p));
+            window.openProductDetail(encoded);
+            document.body.style.overflow = '';
+            document.title = "SAYAND | " + p.name;
+            if(window.SayandSEO) SayandSEO.details(p.name,p.description,p.images && p.images[0] || p.img);
+        }
+
+        if (typeof window.SAYAND_PRODUCTS !== 'undefined' && window.SAYAND_PRODUCTS) {
+            const found = findProduct(window.SAYAND_PRODUCTS);
+            if (found) { renderProduct(found); return; }
+        }
+
+        let attempts = 0;
+        const memoryTimer = setInterval(() => {
+            attempts++;
+            if (typeof window.SAYAND_PRODUCTS !== 'undefined' && window.SAYAND_PRODUCTS) {
+                clearInterval(memoryTimer);
+                const found = findProduct(window.SAYAND_PRODUCTS);
+                if (found) { renderProduct(found); } 
+                else { tryFirebaseDirect(); }
+            } else if (attempts > 30) {
+                clearInterval(memoryTimer);
+                tryFirebaseDirect();
+            }
+        }, 100);
+
+        function tryFirebaseDirect() {
+            if (typeof firebase === 'undefined' || !firebase.database) {
+                document.getElementById('detail-name').innerText = "PRODUCT NOT FOUND";
+                return;
+            }
+            firebase.database().ref('mainStore').once('value').then(snap => {
+                const data = snap.val();
+                SayandI18n.registerCatalog(data);
+                if (data) {
+                    window.SAYAND_PRODUCTS = data; 
+                    const found = findProduct(data);
+                    if (found) { renderProduct(found); } 
+                    else {
+                        document.getElementById('detail-name').innerText = "PRODUCT NOT FOUND";
+                        document.getElementById('detail-price').innerText = "";
+                        document.getElementById('detail-add-btn').style.display = "none";
+                    }
+                }
+            }).catch(err => {
+                document.getElementById('detail-name').innerText = "ERROR LOADING PRODUCT";
+            });
+        }
+    });
+
+    firebase.auth().onAuthStateChanged((user) => {
+        const desktopLink = document.getElementById('desktop-account-link');
+        const mobileLink = document.getElementById('mobile-account-link');
+        if (user) {
+            if(desktopLink) desktopLink.href = "dashboard.html";
+            if(mobileLink) { mobileLink.href = "dashboard.html"; mobileLink.textContent = "ACCOUNT"; }
+        } else {
+            if(desktopLink) desktopLink.href = "login.html";
+            if(mobileLink) { mobileLink.href = "login.html"; mobileLink.textContent = "LOG IN"; }
+        }
+    });
+</script>
+
+<script>
+    let editingReviewId = null;
+
+    window.submitReview = async function(e) {
+        e.preventDefault();
+        const user = firebase.auth().currentUser;
+        
+        if (!user) {
+            alert("Please log in to write or edit a review.");
+            window.location.href = "login.html";
+            return;
+        }
+
+        const rating = parseInt(document.getElementById('review-rating').value);
+        const text = document.getElementById('review-text').value.trim();
+        
+        const productName = document.getElementById('detail-name').innerText;
+        const prodId = productName.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+
+        const submitBtn = document.querySelector('#review-form button[type="submit"]');
+        const originalBtnText = submitBtn.innerText;
+        submitBtn.innerText = "PROCESSING...";
+        submitBtn.disabled = true;
+
+        let reviewName = "Verified Buyer";
+        try {
+            const userSnap = await firebase.database().ref(`users/${user.uid}`).once('value');
+            const userData = userSnap.val();
+            if (userData) {
+                if (userData.firstName) {
+                    reviewName = userData.firstName + (userData.lastName ? " " + userData.lastName.charAt(0) + "." : "");
+                } else if (userData.address && userData.address.firstName) {
+                    reviewName = userData.address.firstName + (userData.address.lastName ? " " + userData.address.lastName.charAt(0) + "." : "");
+                }
+            }
+        } catch (err) {
+            console.error("Could not fetch user name:", err);
+        }
+        
+        const reviewData = {
+            userId: user.uid, 
+            name: reviewName,
+            rating: rating,
+            text: text,
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+        };
+        
+        if (editingReviewId) {
+            firebase.database().ref(`reviews/${prodId}/${editingReviewId}`).update(reviewData)
+            .then(() => {
+                document.getElementById('review-form').reset();
+                editingReviewId = null;
+                submitBtn.innerText = "SUBMIT REVIEW";
+                submitBtn.disabled = false;
+                const msg = document.getElementById('review-msg');
+                msg.innerText = "Review updated successfully!";
+                msg.classList.remove('hidden', 'text-red-400');
+                msg.classList.add('text-green-600');
+                setTimeout(() => msg.classList.add('hidden'), 3000);
+            })
+            .catch(err => {
+                alert("Error updating review: " + err.message);
+                submitBtn.innerText = originalBtnText;
+                submitBtn.disabled = false;
+            });
+        } else {
+            firebase.database().ref(`reviews/${prodId}`).push(reviewData)
+            .then(() => {
+                document.getElementById('review-form').reset();
+                submitBtn.innerText = "SUBMIT REVIEW";
+                submitBtn.disabled = false;
+                const msg = document.getElementById('review-msg');
+                msg.innerText = "Review posted successfully!";
+                msg.classList.remove('hidden', 'text-red-400');
+                msg.classList.add('text-green-600');
+                setTimeout(() => msg.classList.add('hidden'), 3000);
+            })
+            .catch(err => {
+                alert("Error submitting review: " + err.message);
+                submitBtn.innerText = originalBtnText;
+                submitBtn.disabled = false;
+            });
+        }
+    };
+
+    window.editMyReview = function(reviewId, oldRating, oldText) {
+        editingReviewId = reviewId;
+        document.getElementById('review-rating').value = oldRating;
+        document.getElementById('review-text').value = oldText;
+        
+        document.querySelector('#review-form button[type="submit"]').innerText = "UPDATE REVIEW";
+        document.getElementById('review-form-container').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+
+    window.loadProductReviews = function(productName) {
+        const prodId = productName.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+        const container = document.getElementById('product-reviews-list');
+        
+        firebase.database().ref(`reviews/${prodId}`).on('value', (snapshot) => {
+            container.innerHTML = '';
+            if (!snapshot.exists()) {
+                container.innerHTML = '<p class="text-[10px] font-bold tracking-widest uppercase text-[#6a7c64]">No reviews yet. Be the first to review this piece.</p>';
+                return;
+            }
+            
+            const currentUser = firebase.auth().currentUser;
+            const reviews = [];
+            snapshot.forEach(child => { reviews.push({ id: child.key, ...child.val() }); });
+            reviews.sort((a, b) => b.timestamp - a.timestamp); 
+            
+            reviews.forEach(rev => {
+                const date = new Date(rev.timestamp).toLocaleDateString();
+                const stars = '★'.repeat(rev.rating) + '☆'.repeat(5 - rev.rating);
+                
+                let editBtnHTML = '';
+                if (currentUser && currentUser.uid === rev.userId) {
+                    const safeText = rev.text.replace(/'/g, "\\'").replace(/\n/g, "\\n");
+                    editBtnHTML = `<button onclick="editMyReview('${rev.id}', ${rev.rating}, '${safeText}')" class="text-[9px] text-[#2c4c23] font-black border border-[#2c4c23] px-2 py-1 hover:bg-[#2c4c23] hover:text-[#d4af37] transition-colors ml-3">EDIT</button>`;
+                }
+
+                container.innerHTML += `
+                    <div class="border-b border-[#c2c9c0]/50 pb-6">
+                        <div class="flex justify-between items-center mb-2">
+                            <div class="flex items-center">
+                                <div class="text-[10px] font-black uppercase tracking-widest text-[#1a2e15]">${rev.name}</div>
+                                ${editBtnHTML}
+                            </div>
+                            <div class="text-[9px] font-bold tracking-widest text-[#6a7c64] uppercase">${date}</div>
+                        </div>
+                        <div class="text-[#d4af37] text-sm mb-3 drop-shadow-sm">${stars}</div>
+                        <p class="text-xs text-[#2c4c23] leading-relaxed italic font-medium">"${rev.text}"</p>
+                    </div>
+                `;
+            });
+        });
+    };
+
+    const checkRender = setInterval(() => {
+        const name = document.getElementById('detail-name').innerText;
+        if (name !== 'LOADING...' && name !== 'PRODUCT NOT FOUND' && name !== 'ERROR LOADING PRODUCT') {
+            clearInterval(checkRender);
+            loadProductReviews(name);
+            
+            firebase.auth().onAuthStateChanged(() => {
+                loadProductReviews(name);
+            });
+        }
+    }, 500);
+
+    const checkoutBtn = document.getElementById('whatsapp-checkout-btn');
+    if (checkoutBtn) {
+        checkoutBtn.addEventListener('click', () => {
+            const cart = JSON.parse(localStorage.getItem('sayand_cart') || '[]');
+            if (cart.length === 0) return;
+            const total = cart.reduce((sum, item) => sum + (parseFloat(item.price || item.salePrice || 0) * (item.qty || 1)), 0).toFixed(2);
+            const order = {
+                date: new Date().toISOString(),
+                items: cart.map(i => ({ name: i.name, size: i.size || '-', qty: i.qty || 1, price: i.price || i.salePrice || 0 })),
+                total: total
+            };
+            const orders = JSON.parse(localStorage.getItem('sayand_orders') || '[]');
+            orders.unshift(order);
+            localStorage.setItem('sayand_orders', JSON.stringify(orders));
+            localStorage.removeItem('sayand_cart');
+        });
+    }
+</script>
+<script>
+function handleLogoClick(e) {
+    var path = window.location.pathname;
+    var isHome = path === '/' || path === '/index.html' || path.endsWith('/index.html') || path === '';
+    if (isHome) {
+        e.preventDefault();
+        if (typeof closeWishlist === 'function') closeWishlist();
+        if (typeof closeSalesPage === 'function') closeSalesPage();
+        if (typeof closeEditorial === 'function') closeEditorial();
+        if (typeof closeCollection === 'function') closeCollection();
+        if (typeof closeProductDetail === 'function') closeProductDetail();
+        if (typeof closeInfoPage === 'function') closeInfoPage();
+        if (typeof closeSearch === 'function') closeSearch();
+        if (typeof closeContact === 'function') closeContact();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return false;
+    }
+    return true;
+}
+</script>
+    
+    <!-- COOKIE CONSENT BANNER -->
+    <div id="cookie-banner" class="fixed bottom-0 left-0 w-full z-[100] bg-[#1a2e15]/95 border-t border-[#d4af37]/30 p-4 flex flex-col sm:flex-row items-center justify-between gap-4 transform translate-y-full transition-transform duration-500">
+        <p class="text-[10px] text-[#e8d5a3] font-bold tracking-widest uppercase text-center sm:text-left">We use cookies to enhance your experience.</p>
+        <button onclick="acceptCookies()" class="bg-[#d4af37] text-[#1a2e15] px-6 py-2 text-[10px] font-black tracking-widest uppercase hover:bg-[#e8d5a3] transition-colors">Accept</button>
+    </div>
+
+    <!-- NOTIFY ME MODAL -->
+<div id="notify-modal" class="fixed inset-0 bg-[#1a2e15]/80 z-[200] hidden items-center justify-center backdrop-blur-sm" onclick="if(event.target===this)closeNotifyModal()">
+  <div class="bg-[#f9f6f0] p-6 md:p-8 max-w-md w-full mx-4 border border-[#d4af37] shadow-2xl relative">
+    <button onclick="closeNotifyModal()" class="absolute top-4 right-4 text-2xl text-[#d4af37] hover:text-[#1a2e15]">&times;</button>
+    <h3 class="text-xl font-black tracking-widest mb-2 text-[#1a2e15] uppercase">Back In Stock Alert</h3>
+    <p class="text-[10px] text-[#6a7c64] font-bold tracking-widest uppercase mb-6">We'll email you the moment this piece is available again.</p>
+    
+    <div class="mb-4">
+      <label class="block text-[10px] font-black tracking-widest text-[#1a2e15] mb-3 uppercase">SELECT YOUR SIZE</label>
+      <div id="notify-size-options" class="flex flex-wrap gap-3"></div>
+    </div>
+    
+    <button onclick="submitNotifyRequest()" class="w-full bg-[#1a2e15] text-[#d4af37] border border-[#d4af37] py-4 text-[10px] tracking-[0.2em] font-black hover:bg-[#2c4c23] transition-colors shadow-lg mb-3">NOTIFY ME</button>
+    <p id="notify-error" class="text-[10px] text-red-600 font-black tracking-widest hidden uppercase text-center"></p>
+  </div>
+</div>
+
+<noscript><section style="padding:32px"><h1>GOWN</h1><p>ELEGANT WEAR FOR OCCATIONS.</p><p>Enable JavaScript to see current availability and shop.</p><a href="/collection">Browse collections</a></section></noscript></body>
+</html>

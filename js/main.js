@@ -1,3 +1,4 @@
+const sayandAlt = value => String(value || '').replace(/[&<>\"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]));
 // ==================== PREVENT BROWSER SCROLL RESTORATION ====================
 if ('scrollRestoration' in history) {
     history.scrollRestoration = 'manual';
@@ -77,7 +78,7 @@ async function trackConsentingVisitor() {
         if (localStorage.getItem('sayand_visitor_id')) return;
         visitorTrackingInFlight = true;
         const visitorId = 'v_' + Date.now() + '_' + Math.random().toString(36).slice(2,11);
-        await firebase.database().ref('uniqueVisitors/' + visitorId).set({firstVisit:firebase.database.ServerValue.TIMESTAMP});
+        await firebase.database().ref('uniqueVisitors/' + visitorId).set({firstVisit:firebase.database.ServerValue.TIMESTAMP,userAgent:navigator.userAgent.slice(0,300)});
         if (window.SayandConsent.allowed('analytics')) localStorage.setItem('sayand_visitor_id',visitorId);
     } catch (error) { console.error('Visitor statistics unavailable:',error); }
     finally { visitorTrackingInFlight=false; }
@@ -89,7 +90,22 @@ let announcementCountdownInterval = null;
 
 // Announcement bar is permanent — users cannot dismiss it
 
+// A wrapped mobile announcement must reserve its actual height, not a fixed 32px.
+function announcementText(value, data) {let text=String(value??'');if(data?.isPromo && Number(data.promoMinAmount)>=0)text=text.replace(/\babove\s*€\s*([0-9]+(?:[.,][0-9]{1,2})?)/gi,(match,amount)=>Number(amount.replace(',','.'))===Number(data.promoMinAmount)?'€'+amount+' or more':match);return text.replace(/(€\s*[0-9.,]+)(?=[A-Za-zÀ-ÿ])/g,'$1 ').replace(/([0-9.,]+)(?=AT CHECKOUT\b)/gi,'$1 ');}
+
+function observeAnnouncementLayout() {
+    const bar=document.getElementById('announcement-bar');
+    if(!bar || bar.dataset.layoutObserved)return;
+    bar.dataset.layoutObserved='true';
+    const style=document.createElement('style');
+    style.textContent='#announcement-bar{box-sizing:border-box;overflow-wrap:anywhere;white-space:normal;height:auto;line-height:1.5}#announcement-text{white-space:normal}#announcement-countdown{display:inline-block;white-space:nowrap;margin:2px 0 0 8px}#announcement-countdown.hidden{display:none}nav.announcement-active{top:var(--sayand-announcement-height,32px)!important}.hero-announcement{padding-top:calc(4rem + var(--sayand-announcement-height,32px))!important}@media(min-width:768px){.hero-announcement{padding-top:calc(5rem + var(--sayand-announcement-height,32px))!important}}';
+    document.head.appendChild(style);
+    const measure=()=>document.documentElement.style.setProperty('--sayand-announcement-height',bar.getBoundingClientRect().height+'px');
+    if(typeof ResizeObserver!=='undefined')new ResizeObserver(measure).observe(bar);
+    window.addEventListener('resize',measure);measure();
+}
 function loadAnnouncement() {
+    observeAnnouncementLayout();
     // Bar is permanent — no dismissal allowed
     if (typeof db !== 'undefined' && db.ref) {
         db.ref('mainStore/announcement').once('value').then(snap => {
@@ -120,7 +136,7 @@ function loadAnnouncement() {
                                 if (distance < 0) {
                                     clearInterval(announcementCountdownInterval);
                                     countdownEl.classList.add('hidden');
-                                    txt.innerText = data.text + ' (EXPIRED)';
+                                    txt.innerText = announcementText(data.text, data) + ' (EXPIRED)';
                                     promoExpired = true;
                                     // Hide bar after expiry
                                     setTimeout(() => {
@@ -150,15 +166,15 @@ function loadAnnouncement() {
                             announcementCountdownInterval = setInterval(updateCountdown, 1000);
                             
                             // Update text with promo details
-                            txt.innerText = data.text;
+                            txt.innerText = announcementText(data.text, data);
                         } else {
                             // Promo expired
                             promoExpired = true;
-                            txt.innerText = data.text + ' (ENDED)';
+                            txt.innerText = announcementText(data.text, data) + ' (ENDED)';
                         }
                     } else {
                         // Normal announcement
-                        txt.innerText = data.text;
+                        txt.innerText = announcementText(data.text, data);
                         countdownEl.classList.add('hidden');
                     }
                     
@@ -198,39 +214,7 @@ window.validatePromoCode = function(code) {
     return { valid: false, reason: 'Invalid code' };
 };
 
-window.usePromoCode = async function(code) {
-    const data = window.SAYAND_PRODUCTS;
-    if (!data || !code) return { success: false, error: 'Missing data' };
-    
-    const normalize = (entry) => {
-        if (entry && typeof entry === 'object' && 'value' in entry) return entry;
-        return { value: entry, maxUses: Infinity, uses: 0 };
-    };
-    
-    let source = null;
-    let entry = null;
-    
-    if (data.discountCodes && data.discountCodes[code]) {
-        source = 'discountCodes';
-        entry = normalize(data.discountCodes[code]);
-    } else if (data.fixedCodes && data.fixedCodes[code]) {
-        source = 'fixedCodes';
-        entry = normalize(data.fixedCodes[code]);
-    }
-    
-    if (!entry) return { success: false, error: 'Code not found' };
-    if (entry.uses >= entry.maxUses) return { success: false, error: 'Code fully redeemed' };
-    
-    entry.uses += 1;
-    
-    try {
-        await firebase.database().ref(`mainStore/${source}/${code}`).set(entry);
-        return { success: true, type: source === 'discountCodes' ? 'percent' : 'fixed', value: entry.value };
-    } catch (e) {
-        console.error('Promo use error:', e);
-        return { success: false, error: e.message };
-    }
-};
+window.usePromoCode = async function() { return {success:false,error:'Promo redemption is confirmed only by the payment server.'}; };
 
 // ─── ANNOUNCEMENT PROMO CALCULATOR ───
 window.getActiveAnnouncementPromo = function() {
@@ -287,7 +271,7 @@ window.renderRecentlyViewed = function() {
     section.classList.remove('hidden');
     
     container.innerHTML = items.map(p => {
-        const safeName = encodeURIComponent(p.name);
+        const safeName = encodeURIComponent(p.name).replace(/'/g, '%27');
 
         // Look up live product data to verify current sale status and stock
         let liveProd = null;
@@ -330,9 +314,9 @@ window.renderRecentlyViewed = function() {
         const origDisplay = activeSale ? formatPrice(liveProd.originalPrice || liveProd.price) : '';
 
         return `
-        <div class="flex-none w-64 md:w-72 snap-start group cursor-pointer" onclick="window.location.href='product.html?item=${safeName}'">
+        <div class="flex-none w-64 md:w-72 snap-start group cursor-pointer" onclick="window.location.href=window.SayandSEO.productUrl(decodeURIComponent('${safeName}'))">
             <div class="relative w-full aspect-[4/5] overflow-hidden mb-3 bg-[#eef2ec]">
-                <img src="${p.img}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                <img src="${p.img}" alt="${sayandAlt(p.name)}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
                 ${oosHTML}
             </div>
             <div class="flex flex-col items-start text-left w-full px-1">
@@ -367,14 +351,7 @@ window.initImageZoom = function() {
 // ==================== REFERRAL PROGRAM ====================
 window.validateReferralCode = async function(code) {
     if (!code || code.length < 3) return { valid: false };
-    try {
-        const snap = await firebase.database().ref('users').orderByChild('referralCode').equalTo(code).once('value');
-        if (snap.exists()) {
-            const uid = Object.keys(snap.val())[0];
-            return { valid: true, referrerUid: uid };
-        }
-        return { valid: false };
-    } catch (e) { return { valid: false }; }
+    try { return await SayandServices.call('validateReferral',{code}); } catch (_) {return {valid:false};}
 };
 
 // ==================== WHATSAPP FLOAT ====================
@@ -406,7 +383,7 @@ function getSalePercentage(product) {
     return Math.round(((original - sale) / original) * 100);
 }
 
-firebase.database().ref("mainStore").on("value", (snapshot) => {
+window.SayandPublicStore.on("value", (snapshot) => {
     const data = snapshot.val();
     if (data) {
         window.SAYAND_PRODUCTS = data;
@@ -488,6 +465,8 @@ function setMediaElement(elementId, url) {
         newEl.id = elementId;
         newEl.className = currentClass;
         newEl.src = url;
+        const mediaLabels = {womenImg:"SAYAND women's collection", menImg:"SAYAND men's collection", accImg:'SAYAND accessories collection', heroImage:'SAYAND featured collection', editImg:'SAYAND editorial collection', 'editorial-hero-img':'SAYAND editorial collection'};
+        newEl.alt = el.getAttribute('alt') || mediaLabels[elementId] || 'SAYAND collection';
         parent.replaceChild(newEl, el);
     }
 }
@@ -551,12 +530,12 @@ window.renderEditorialSlide = function(idx) {
                 });
 
              if(foundProduct) {
-                    const safeName = encodeURIComponent(foundProduct.name);
+                    const safeName = encodeURIComponent(foundProduct.name).replace(/'/g, '%27');
                     const activeSale = isSaleActive(foundProduct);
                     const displayPrice = activeSale ? foundProduct.salePrice : foundProduct.price;
                     
                     const spotHTML = `
-                        <div class="absolute w-6 h-6 -ml-3 -mt-3 group pointer-events-auto cursor-pointer flex items-center justify-center" style="left: ${spot.x}%; top: ${spot.y}%;" onclick="window.location.href='product.html?item=${safeName}'">
+                        <div class="absolute w-6 h-6 -ml-3 -mt-3 group pointer-events-auto cursor-pointer flex items-center justify-center" style="left: ${spot.x}%; top: ${spot.y}%;" onclick="window.location.href=window.SayandSEO.productUrl(decodeURIComponent('${safeName}'))">
                             <div class="absolute w-full h-full bg-white/60 rounded-full animate-ping"></div>
                             <div class="relative w-2 h-2 bg-white rounded-full shadow-[0_0_15px_rgba(0,0,0,0.5)] border border-gray-200"></div>
                             
@@ -689,7 +668,7 @@ window.handleVipClick = function(e) {
 function createProductCardHTML(p, isNewArrival = false) {
     const imgArray = p.images ? p.images : (p.img ? [p.img] : []);
     const imgArrayStr = JSON.stringify(imgArray).replace(/"/g, '&quot;');
-    const safeName = encodeURIComponent(p.name);
+    const safeName = encodeURIComponent(p.name).replace(/'/g, '%27');
     const activeSale = isSaleActive(p);
     
     // SAFELY EXTRACT IMAGE URL OR USE TRANSPARENT PIXEL FALLBACK
@@ -700,7 +679,7 @@ function createProductCardHTML(p, isNewArrival = false) {
     
     // VIP LOCK LOGIC
     let isLocked = p.isVipOnly && !window.userIsVip;
-    let clickAction = isLocked ? `handleVipClick(event)` : `window.location.href='product.html?item=${safeName}'`;
+    let clickAction = isLocked ? `handleVipClick(event)` : `window.location.href=window.SayandSEO.productUrl(decodeURIComponent('${safeName}'))`;
 
     let carouselHTML = '';
     if (imgArray.length > 1) {
@@ -764,7 +743,7 @@ function createProductCardHTML(p, isNewArrival = false) {
     return `
         <div class="product-card flex flex-col relative w-full group/card transition-all cursor-pointer" data-images="${imgArrayStr}" data-current-index="0" onmouseenter="${isLocked ? '' : 'hoverCard(this)'}" onmouseleave="${isLocked ? '' : 'unhoverCard(this)'}" onclick="${clickAction}">
             <div class="relative w-full aspect-[4/5] overflow-hidden mb-3 bg-[#eef2ec]">
-                <img src="${safeImgSrc}" class="main-img w-full h-full object-cover transition-transform duration-700 ${isLocked ? '' : 'group-hover/card:scale-105'}">
+                <img src="${safeImgSrc}" alt="${sayandAlt(p.name)}" class="main-img w-full h-full object-cover transition-transform duration-700 ${isLocked ? '' : 'group-hover/card:scale-105'}">
                 ${oosHTML}
                 ${lockHTML}
                 ${carouselHTML}
@@ -905,11 +884,13 @@ window.openProductDetail = function(encodedProd) {
         const activeSale = isSaleActive(p);
         
         document.getElementById('detail-hero-img').src = imgArray[0];
+        document.getElementById('detail-hero-img').alt = p.name + ' — view 1';
+        window.SayandAnalytics?.shopping('view_item', [{...p, quantity: 1, price: activeSale ? p.salePrice : p.price}]);
         
         const thumbsContainer = document.getElementById('detail-thumbs');
         thumbsContainer.innerHTML = imgArray.map((img, i) => `
             <button onclick="setDetailImage(${i})" class="flex-shrink-0 w-16 h-20 border-2 bg-[#eef2ec] ${i === 0 ? 'border-[#d4af37]' : 'border-transparent'} overflow-hidden transition-all">
-                <img src="${img}" class="w-full h-full object-cover">
+                <img src="${img}" alt="${sayandAlt(p.name)} — view ${i + 1}" class="w-full h-full object-cover">
             </button>`).join('');
         
         const dotsContainer = document.getElementById('detail-dots');
@@ -1019,6 +1000,7 @@ window.openProductDetail = function(encodedProd) {
         renderDetailMeasurements(p);
         
         const modelImg = document.getElementById('detail-model-img');
+        if(modelImg) modelImg.alt = p.name + ' — additional view';
         if (imgArray.length > 1) { modelImg.src = imgArray[1]; modelImg.style.display = 'block'; }
         else { modelImg.style.display = 'none'; }
         
@@ -1074,6 +1056,7 @@ window.setDetailImage = function(idx) {
     const imgArray = currentDetailProduct ? (currentDetailProduct.images || [currentDetailProduct.img]) : [];
     currentDetailImageIdx = idx;
     document.getElementById('detail-hero-img').src = imgArray[idx];
+    document.getElementById('detail-hero-img').alt = currentDetailProduct.name + ' — view ' + (idx + 1);
     
     const thumbs = document.getElementById('detail-thumbs').children;
     for (let i = 0; i < thumbs.length; i++) {
@@ -1174,6 +1157,8 @@ window.renderRelatedProducts = function(currentP) {
         if (SAYAND_PRODUCTS.newArrivals) allProducts = allProducts.concat(SAYAND_PRODUCTS.newArrivals);
         if (SAYAND_PRODUCTS.trending) allProducts = allProducts.concat(SAYAND_PRODUCTS.trending);
         if (SAYAND_PRODUCTS.sales) allProducts = allProducts.concat(SAYAND_PRODUCTS.sales);
+        allProducts=allProducts.filter((p,i,list)=>list.findIndex(x=>x.name===p.name)===i);
+        if (SAYAND_PRODUCTS.sales) allProducts = allProducts.concat(SAYAND_PRODUCTS.sales);
     }
     let related = [];
     if (currentP.related && currentP.related.length > 0) {
@@ -1190,10 +1175,10 @@ window.renderRelatedProducts = function(currentP) {
     
     const createMiniCard = (p) => {
         const img = p.images ? p.images[0] : p.img;
-        const safeName = encodeURIComponent(p.name);
-        return `<div class="cursor-pointer flex flex-col group w-full" onclick="window.location.href='product.html?item=${safeName}'">
+        const safeName = encodeURIComponent(p.name).replace(/'/g, '%27');
+        return `<div class="cursor-pointer flex flex-col group w-full" onclick="window.location.href=window.SayandSEO.productUrl(decodeURIComponent('${safeName}'))">
             <div class="w-full aspect-[4/5] bg-[#eef2ec] overflow-hidden mb-3 relative">
-                <img src="${img}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                <img src="${img}" alt="${sayandAlt(p.name)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
             </div>
             <div class="flex flex-col items-start text-left w-full">
                 <p class="text-[11px] font-semibold tracking-wide text-[#1a2e15] truncate uppercase w-full group-hover:text-[#d4af37] transition-colors mb-1">${SayandI18n.productHTML(p)}</p>
@@ -1265,6 +1250,8 @@ window.renderWishlist = function() {
         if (SAYAND_PRODUCTS.newArrivals) allProducts = allProducts.concat(SAYAND_PRODUCTS.newArrivals);
         if (SAYAND_PRODUCTS.trending) allProducts = allProducts.concat(SAYAND_PRODUCTS.trending);
         if (SAYAND_PRODUCTS.sales) allProducts = allProducts.concat(SAYAND_PRODUCTS.sales);
+        allProducts=allProducts.filter((p,i,list)=>list.findIndex(x=>x.name===p.name)===i);
+        if (SAYAND_PRODUCTS.sales) allProducts = allProducts.concat(SAYAND_PRODUCTS.sales);
     }
     
     gridEl.innerHTML = wishlist.map(w => {
@@ -1274,7 +1261,7 @@ window.renderWishlist = function() {
         return `
             <div class="group cursor-pointer relative flex flex-col w-full">
                 <div class="w-full aspect-[4/5] bg-[#eef2ec] overflow-hidden mb-3 relative" onclick="${prodDataStr ? `openProductDetail('${prodDataStr}');closeWishlist();` : ''}">
-                    <img src="${w.img}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    <img src="${w.img}" alt="${sayandAlt(w.name)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                 </div>
                 <div class="flex flex-col items-start text-left w-full px-1">
                     <h4 class="text-[11px] font-semibold tracking-wide text-[#1a2e15] truncate uppercase w-full group-hover:text-[#d4af37] transition-colors mb-1">${SayandI18n.productHTML(w)}</h4>
@@ -1377,14 +1364,7 @@ if (addBtn) {
         // ─── END NOTIFY INTERCEPT ───
 
         if (currentDetailProduct.isPreorder) {
-            const poRef = firebase.database().ref(`preorders/${currentDetailProduct.name}/${user.uid}`);
-            poRef.set({
-                email: user.email,
-                size: currentDetailSize,
-                timestamp: firebase.database.ServerValue.TIMESTAMP
-            }).then(() => {
-                showToast('PRE-ORDER SECURED!');
-            });
+            SayandServices.call('registerPreorder',{productName:currentDetailProduct.name,size:currentDetailSize}).then(()=>showToast('PREORDER INTEREST REGISTERED')).catch(e=>alert(e.message));
             return; 
         }
         
@@ -1404,20 +1384,20 @@ if (addBtn) {
         const itemKey = `${productName}_${currentDetailSize}_${currentDetailColor}`.replace(/[^a-zA-Z0-9]/g, '_');
         const itemRef = firebase.database().ref(`users/${user.uid}/cart/${itemKey}`);
 
-        itemRef.once('value').then((snapshot) => {
+        itemRef.once('value').then(async (snapshot) => {
             if (snapshot.exists()) {
                 const currentQty = snapshot.val().quantity;
                 if (currentQty + selectedQty > sizeMaxQty) {
                     alert(`Sorry, only ${sizeMaxQty} in stock for this size!`);
                     return;
                 }
-                itemRef.update({ quantity: currentQty + selectedQty });
+                await itemRef.update({ quantity: currentQty + selectedQty });
             } else {
                 if (selectedQty > sizeMaxQty) {
                     alert(`Sorry, only ${sizeMaxQty} in stock for this size!`);
                     return;
                 }
-                itemRef.set({
+                await itemRef.set({
                     name: productName,
                     translations: currentDetailProduct.translations || {},
                     price: numericPrice,
@@ -1430,9 +1410,10 @@ if (addBtn) {
                 });
             }
 
+            window.SayandAnalytics?.shopping('add_to_cart', [{name:productName, category:currentDetailProduct.category, price:numericPrice, quantity:selectedQty, size:currentDetailSize, color:currentDetailColor}]);
             showToast('ADDED TO BAG');
             toggleCart(true); 
-        });
+        }).catch(() => showToast('Could not add this item. Please try again.'));
     });
 }
 
@@ -1470,6 +1451,8 @@ window.openCollection = function(categoryFilter, title) {
     if (typeof SAYAND_PRODUCTS !== 'undefined') {
         if (SAYAND_PRODUCTS.newArrivals) allProducts = allProducts.concat(SAYAND_PRODUCTS.newArrivals);
         if (SAYAND_PRODUCTS.trending) allProducts = allProducts.concat(SAYAND_PRODUCTS.trending);
+        if (SAYAND_PRODUCTS.sales) allProducts = allProducts.concat(SAYAND_PRODUCTS.sales);
+        allProducts=allProducts.filter((p,i,list)=>list.findIndex(x=>x.name===p.name)===i);
     }
     const filtered = categoryFilter === 'all' ? allProducts : allProducts.filter(p => p.category === categoryFilter);
     if (filtered.length === 0) {
@@ -1542,6 +1525,8 @@ window.handleSearch = function() {
     if (typeof SAYAND_PRODUCTS !== 'undefined') {
         if (SAYAND_PRODUCTS.newArrivals) allProducts = allProducts.concat(SAYAND_PRODUCTS.newArrivals);
         if (SAYAND_PRODUCTS.trending) allProducts = allProducts.concat(SAYAND_PRODUCTS.trending);
+        if (SAYAND_PRODUCTS.sales) allProducts = allProducts.concat(SAYAND_PRODUCTS.sales);
+        allProducts=allProducts.filter((p,i,list)=>list.findIndex(x=>x.name===p.name)===i);
     }
 
     const uniqueProducts = [];
@@ -1730,7 +1715,7 @@ window.submitNotifyRequest = async function() {
     
     try {
         // Check for duplicate request (same user + same size)
-        const existingSnap = await notifyRef.once('value');
+        const existingSnap = await notifyRef.orderByChild('uid').equalTo(user.uid).once('value');
         let alreadyRequested = false;
         if (existingSnap.exists()) {
             existingSnap.forEach(child => {
@@ -1834,54 +1819,8 @@ window.handleSubscribe = async function(e) {
     const dbRef = (typeof window.db !== 'undefined' && window.db) ? window.db : firebase.database();
 
     try {
-        // Check if email already subscribed
-        const snap = await dbRef.ref('subscribers').orderByChild('email').equalTo(email).once('value');
-        if (snap.exists()) {
-            showToast('YOU ARE ALREADY SUBSCRIBED!');
-            if (subscribeBtn) {
-                subscribeBtn.innerText = originalText;
-                subscribeBtn.disabled = false;
-            }
-            emailInput.value = '';
-            return;
-        }
-
-        // Fetch name if user account exists
-        let subscriberName = "there"; 
-        try {
-            const userSnap = await dbRef.ref('users').orderByChild('email').equalTo(email).once('value');
-            if (userSnap.exists()) {
-                const userData = Object.values(userSnap.val())[0];
-                if (userData.firstName) subscriberName = userData.firstName;
-                else if (userData.address && userData.address.firstName) subscriberName = userData.address.firstName;
-            }
-        } catch (nameErr) {
-            console.error("Could not fetch user name:", nameErr);
-        }
-        
-        // Write new subscriber
-        await dbRef.ref('subscribers').push({
-            email: email,
-            firstName: subscriberName !== "there" ? subscriberName : null, 
-            subscribedAt: firebase.database.ServerValue.TIMESTAMP,
-            consent: {purpose:'newsletter',version:1,granted:true,recordedAt:firebase.database.ServerValue.TIMESTAMP},
-            source: window.location.href
-        });
-
-        // Send welcome email via Brevo Cloud Function
-        try {
-            if (typeof firebase.functions === 'function') {
-                const sendEmailFn = firebase.functions().httpsCallable('sendStoreEmail');
-                await sendEmailFn({ 
-                    type: 'subscriber_welcome', 
-                    payload: { email: email, firstName: subscriberName } 
-                });
-            }
-        } catch (emailErr) {
-            console.error('Brevo email failed (non-critical):', emailErr);
-        }
-
-        showToast('WELCOME TO SAYAND! CHECK YOUR EMAIL');
+        await SayandServices.call('subscribeNewsletter',{email});
+        showToast('CHECK YOUR EMAIL TO CONFIRM YOUR SUBSCRIPTION');
         emailInput.value = '';
         if (subscribeBtn) {
             subscribeBtn.innerText = 'SUBSCRIBED ✓';
@@ -2084,7 +2023,7 @@ firebase.auth().onAuthStateChanged((user) => {
                     
                     html += `
                         <div class="flex relative border-b ${oosClass} pb-6 mb-6 p-3 rounded">
-                            <img src="${item.image}" alt="${item.name}" class="w-20 h-28 object-cover border border-[#c2c9c0]/50 ${imgOpacity}" onclick="goToProduct('${safeName}')">
+                            <img src="${item.image}" alt="${sayandAlt(item.name)}" class="w-20 h-28 object-cover border border-[#c2c9c0]/50 ${imgOpacity}" onclick="goToProduct('${safeName}')">
                             
                             <div class="flex-1 ml-4 flex flex-col justify-between">
                                 <div>
@@ -2216,11 +2155,11 @@ window.goToProduct = function(productName) {
     }
     
     if (foundProduct) {
-        const safeName = encodeURIComponent(foundProduct.name);
-        window.location.href = 'product.html?item=' + safeName;
+        const safeName = encodeURIComponent(foundProduct.name).replace(/'/g, '%27');
+        window.location.href = window.SayandSEO.productUrl(decodeURIComponent(safeName));
     } else {
         const safeName = encodeURIComponent(searchName);
-        window.location.href = 'product.html?item=' + safeName;
+        window.location.href = window.SayandSEO.productUrl(decodeURIComponent(safeName));
     }
 };
 
