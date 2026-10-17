@@ -29,6 +29,7 @@
         .iti input { padding-left: 95px !important; }
         
         .maps-fallback-msg { font-size: 10px; color: #d4af37; font-weight: 800; letter-spacing: 0.05em; margin-top: 4px; display: none; }
+            .checkout-optional-row:not(.hidden) { display: flex; }
     </style>
 
     <link rel="stylesheet" href="css/i18n.css?v=site-4">
@@ -158,22 +159,22 @@
                         <span id="checkout-subtotal">€0.00</span>
                     </div>
                     
-                    <div id="vip-discount-row" class="flex justify-between text-[#d4af37] font-black hidden">
+                    <div id="vip-discount-row" class="checkout-optional-row justify-between text-[#d4af37] font-black hidden">
                         <span id="checkout-vip-label">VIP DISCOUNT</span>
                         <span id="checkout-vip">-€0.00</span>
                     </div>
 
-                    <div id="promo-discount-row" class="flex justify-between text-green-600 font-black hidden">
+                    <div id="promo-discount-row" class="checkout-optional-row justify-between text-green-600 font-black hidden">
                         <span id="checkout-promo-label">PROMO DISCOUNT</span>
                         <span id="checkout-promo">-€0.00</span>
                     </div>
 
-                    <div id="announcement-promo-row" class="flex justify-between text-[#d4af37] font-black hidden">
+                    <div id="announcement-promo-row" class="checkout-optional-row justify-between text-[#d4af37] font-black hidden">
                         <span id="checkout-announcement-label">ANNOUNCEMENT PROMO</span>
                         <span id="checkout-announcement">-€0.00</span>
                     </div>
 
-                    <div id="checkout-gift-row" class="flex justify-between text-[#1a2e15] font-black hidden">
+                    <div id="checkout-gift-row" class="checkout-optional-row justify-between text-[#1a2e15] font-black hidden">
                         <span>GIFT PACKAGING</span>
                         <span id="checkout-gift-amount">+€2.00</span>
                     </div>
