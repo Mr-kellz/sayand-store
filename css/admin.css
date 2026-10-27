@@ -27,3 +27,10 @@
 .sale-card { 
     border-left: 3px solid #dc2626; 
 }
+
+/* Keep each picture removable on touch screens as well as desktop. */
+.product-image-preview { position: relative; width: 72px; height: 96px; flex-shrink: 0; }
+.product-image-preview img { width: 100%; height: 100%; object-fit: cover; border: 1px solid #c2c9c0; }
+.product-image-remove { position: absolute; top: 0; right: 0; width: 32px; height: 32px; border: 1px solid #c2c9c0; background: white; color: #1a2e15; font-size: 24px; line-height: 1; cursor: pointer; }
+.product-image-remove:hover { background: #eef2ec; }
+.product-image-remove:focus-visible { outline: 2px solid #1a2e15; outline-offset: 2px; }

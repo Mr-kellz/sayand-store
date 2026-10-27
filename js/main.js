@@ -366,6 +366,7 @@ function initWhatsAppFloat() {
 
 
 function isSaleActive(product) {
+    if (product?.isPreorder) return false;
     if (!product.salePrice) return false;
     if (product.saleEndDate) {
         const endDate = new Date(product.saleEndDate).getTime();
@@ -415,7 +416,8 @@ window.updateContactInfo = function(data) {
             document.getElementById('social-pt').href = CONTACT.pinterest;
             const handle = CONTACT.instagram.split('/').pop() || 'thesayand_';
             document.getElementById('social-handle').innerText = '@' + handle;
-            document.getElementById('contact-link').href = 'mailto:' + CONTACT.email;
+            const contactLink = document.getElementById('contact-link');
+            if (contactLink) contactLink.href = 'mailto:' + CONTACT.email;
         }
     }
 };
@@ -665,6 +667,23 @@ window.handleVipClick = function(e) {
 }
 
 // 🟢 ALL COLORS UPDATED IN HTML TEMPLATE LITERALS
+function preorderPriceHTML(p) {
+    const launch=Number(p.launchPrice || p.price), payable=Number(p.preorderPrice || p.price);
+    if (!(Number(p.preorderPrice)>0)) return `<span class="block text-xs">Launch price ${formatPrice(launch)}<br>Preorder price coming soon</span>`;
+    return `<span class="block text-xs">Launch price ${formatPrice(launch)}<br><strong>Preorder ${formatPrice(payable)}</strong>${launch>payable ? `<br>Save ${formatPrice(launch-payable)}` : ''}</span>`;
+}
+function preorderDispatchHTML(p) {
+    const raw=p.expectedShipDate || '';
+    const date=/^\d{4}-\d{2}-\d{2}$/.test(raw) && Number.isFinite(Date.parse(raw)) ? new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'long',year:'numeric',timeZone:'UTC'}).format(new Date(raw)) : 'To be confirmed';
+    return `<p class="preorder-dispatch">Estimated dispatch: ${date}<br>Pay in full when you preorder.</p>`;
+}
+function collectionGroupsHTML(products, card) {
+    const current=products.filter(p=>!p.isPreorder), drops=products.filter(p=>p.isPreorder);
+    if (!drops.length) return current.map(card).join('');
+    return (current.length ? `<section class="collection-current"><h2 class="collection-section-title">CURRENT COLLECTION</h2><div class="collection-section-grid">${current.map(card).join('')}</div></section>` : '') +
+        `<section class="collection-preorders" aria-label="Preorder drops"><header><p class="collection-section-kicker">COMING SOON · RESERVE YOUR PIECE</p><h2 class="collection-section-title">PREORDER DROPS</h2><p class="collection-section-description">Pay now for a future release. Each drop shows its preorder price and estimated dispatch date.</p></header><div class="collection-section-grid">${drops.map(card).join('')}</div></section>`;
+}
+function paidPreorderReady(p) { return Number(p.preorderPrice)>0 && Number(p.preorderPrice)<=Number(p.launchPrice || p.price) && /^\d{4}-\d{2}-\d{2}$/.test(p.expectedShipDate || '') && Date.parse(p.expectedShipDate+'T23:59:59Z')>=Date.now(); }
 function createProductCardHTML(p, isNewArrival = false) {
     const imgArray = p.images ? p.images : (p.img ? [p.img] : []);
     const imgArrayStr = JSON.stringify(imgArray).replace(/"/g, '&quot;');
@@ -692,7 +711,9 @@ function createProductCardHTML(p, isNewArrival = false) {
     }
     
     let badgeHTML = '';
-    if (activeSale && !isLocked) {
+    if (p.isPreorder && !isLocked) {
+        badgeHTML = '<span class="preorder-badge">PREORDER</span>';
+    } else if (activeSale && !isLocked) {
         const salePct = getSalePercentage(p);
         const pctText = salePct ? `-${salePct}%` : 'ON SALE';
         badgeHTML = `<div class="absolute top-2 left-2 bg-red-600 text-white text-[9px] tracking-widest px-2 py-1 font-black">${pctText}</div>`;
@@ -718,6 +739,8 @@ function createProductCardHTML(p, isNewArrival = false) {
     let priceHTML = '';
     if (isLocked) {
         priceHTML = `<span class="text-[#6a7c64] italic font-medium">VIP Only</span>`;
+    } else if (p.isPreorder) {
+        priceHTML = preorderPriceHTML(p);
     } else if (activeSale) {
         priceHTML = `<span class="text-[11px] md:text-xs text-[#6a7c64] line-through mr-2 font-medium">${formatPrice(p.originalPrice || p.price)}</span><span class="text-[11px] md:text-xs font-semibold text-red-600">${formatPrice(p.salePrice)}</span>`;
     } else {
@@ -752,6 +775,7 @@ function createProductCardHTML(p, isNewArrival = false) {
             <div class="flex flex-col items-start text-left w-full px-1">
                 <h4 class="text-[11px] md:text-xs font-semibold tracking-wide uppercase mb-1 truncate w-full ${isLocked ? 'text-[#6a7c64]' : 'text-[#1a2e15] group-hover/card:text-[#d4af37] transition-colors'}">${SayandI18n.productHTML(p)}</h4>
                 <div class="text-[11px] md:text-xs ${activeSale && !isLocked ? '' : 'text-[#1a2e15] font-medium'}">${priceHTML}</div>
+                ${p.isPreorder && !isLocked ? preorderDispatchHTML(p) : ''}
             </div>
         </div>`;
 }
@@ -759,6 +783,15 @@ function createProductCardHTML(p, isNewArrival = false) {
 let currentDetailProduct = null;
 let currentDetailSize = '';
 let currentDetailColor = '';
+window.addEventListener('sayand:consentchange', () => {
+    if (!currentDetailProduct || !document.getElementById('product-detail')) return;
+    const panel = document.getElementById('product-detail');
+    const rect = panel.getBoundingClientRect();
+    if (rect.bottom <= 0 || rect.top >= window.innerHeight || !rect.height) return;
+    const p = currentDetailProduct;
+    window.SayandAnalytics?.shopping('view_item', [{...p, quantity:1, price:isSaleActive(p) ? p.salePrice : p.price}]);
+});
+
 let currentDetailImageIdx = 0;
 let countdownInterval = null;
 let wishlist = JSON.parse(localStorage.getItem('sayand_wishlist') || '[]');
@@ -806,18 +839,13 @@ window.updateProductStockUI = function() {
     const stockEl = document.getElementById('detail-stock');
 
     if (currentDetailProduct.isPreorder) {
-        stockEl.innerText = 'PRE-ORDER AVAILABLE';
-        stockEl.style.color = '#d4af37'; 
-        
-        addBtn.innerText = 'PRE-ORDER NOW';
-        addBtn.disabled = false;
-        addBtn.className = "w-full bg-[#1a2e15] border border-[#d4af37] text-[#d4af37] py-4 text-xs tracking-[0.2em] font-black transition-all duration-300 mb-8 hover:bg-[#2c4c23] shadow-lg";
-        
-        if(qtyInput) {
-            qtyInput.disabled = false;
-            qtyInput.max = 99; 
-            qtyInput.value = 1;
-        }
+        const p=currentDetailProduct;
+        const capacity=Number(p.sizeQuantities?.[currentDetailSize] ?? p.quantity ?? 0);
+        const ready=paidPreorderReady(p) && !p.isOutOfStock && capacity>0;
+        stockEl.innerText=ready ? `PREORDER · PAID IN FULL NOW · ESTIMATED DISPATCH ${p.expectedShipDate}` : 'PREORDER CURRENTLY UNAVAILABLE';
+        addBtn.innerText=ready ? 'PREORDER — ADD TO BAG' : 'PREORDER UNAVAILABLE';
+        addBtn.disabled=!ready;
+        if(qtyInput){qtyInput.disabled=!ready;qtyInput.max=capacity;qtyInput.value=ready?1:0;}
         return;
     }
 
@@ -911,7 +939,11 @@ window.openProductDetail = function(encodedProd) {
         const countdownContainer = document.getElementById('sale-countdown-container');
         const countdownSpan = document.getElementById('sale-countdown');
         
-        if (activeSale) {
+        if (p.isPreorder) {
+            priceEl.innerHTML=preorderPriceHTML(p);
+            origPriceEl.classList.add('hidden');
+            countdownContainer.classList.add('hidden');
+        } else if (activeSale) {
             const salePct = getSalePercentage(p);
             priceEl.innerHTML = formatPrice(p.salePrice) + (salePct ? ` <span class="text-red-600 text-sm font-black ml-1">-${salePct}%</span>` : '');
             priceEl.classList.add('text-red-600');
@@ -990,6 +1022,9 @@ window.openProductDetail = function(encodedProd) {
                 setTimeout(() => { if (typeof showToast === 'function') showToast("YOUR FIT PROFILE APPLIED"); }, 600);
             }
         }
+        // A Shopping landing link selects its advertised size instead of a saved preference.
+        const landingSize = new URLSearchParams(window.location.search).get('size');
+        if (document.querySelector('meta[name="sayand-product"]') && sizes.includes(landingSize)) currentDetailSize = landingSize;
         // === END AUTO-SIZING ===
 
         renderDetailSizes(sizes);
@@ -1157,8 +1192,8 @@ window.renderRelatedProducts = function(currentP) {
         if (SAYAND_PRODUCTS.newArrivals) allProducts = allProducts.concat(SAYAND_PRODUCTS.newArrivals);
         if (SAYAND_PRODUCTS.trending) allProducts = allProducts.concat(SAYAND_PRODUCTS.trending);
         if (SAYAND_PRODUCTS.sales) allProducts = allProducts.concat(SAYAND_PRODUCTS.sales);
+        if (SAYAND_PRODUCTS.upcomingSales) allProducts = allProducts.concat(SAYAND_PRODUCTS.upcomingSales);
         allProducts=allProducts.filter((p,i,list)=>list.findIndex(x=>x.name===p.name)===i);
-        if (SAYAND_PRODUCTS.sales) allProducts = allProducts.concat(SAYAND_PRODUCTS.sales);
     }
     let related = [];
     if (currentP.related && currentP.related.length > 0) {
@@ -1250,8 +1285,8 @@ window.renderWishlist = function() {
         if (SAYAND_PRODUCTS.newArrivals) allProducts = allProducts.concat(SAYAND_PRODUCTS.newArrivals);
         if (SAYAND_PRODUCTS.trending) allProducts = allProducts.concat(SAYAND_PRODUCTS.trending);
         if (SAYAND_PRODUCTS.sales) allProducts = allProducts.concat(SAYAND_PRODUCTS.sales);
+        if (SAYAND_PRODUCTS.upcomingSales) allProducts = allProducts.concat(SAYAND_PRODUCTS.upcomingSales);
         allProducts=allProducts.filter((p,i,list)=>list.findIndex(x=>x.name===p.name)===i);
-        if (SAYAND_PRODUCTS.sales) allProducts = allProducts.concat(SAYAND_PRODUCTS.sales);
     }
     
     gridEl.innerHTML = wishlist.map(w => {
@@ -1364,8 +1399,7 @@ if (addBtn) {
         // ─── END NOTIFY INTERCEPT ───
 
         if (currentDetailProduct.isPreorder) {
-            SayandServices.call('registerPreorder',{productName:currentDetailProduct.name,size:currentDetailSize}).then(()=>showToast('PREORDER INTEREST REGISTERED')).catch(e=>alert(e.message));
-            return; 
+            if(!paidPreorderReady(currentDetailProduct) || isOOS) return alert('This preorder is not currently available for payment.');
         }
         
         let sizeMaxQty = 1;
@@ -1391,7 +1425,7 @@ if (addBtn) {
                     alert(`Sorry, only ${sizeMaxQty} in stock for this size!`);
                     return;
                 }
-                await itemRef.update({ quantity: currentQty + selectedQty });
+                await itemRef.update({ quantity: currentQty + selectedQty,price:numericPrice,isPreorder:!!currentDetailProduct.isPreorder,launchPrice:currentDetailProduct.launchPrice || null,expectedShipDate:currentDetailProduct.expectedShipDate || null });
             } else {
                 if (selectedQty > sizeMaxQty) {
                     alert(`Sorry, only ${sizeMaxQty} in stock for this size!`);
@@ -1401,6 +1435,7 @@ if (addBtn) {
                     name: productName,
                     translations: currentDetailProduct.translations || {},
                     price: numericPrice,
+                    ...(currentDetailProduct.isPreorder ? {isPreorder:true,launchPrice:currentDetailProduct.launchPrice,expectedShipDate:currentDetailProduct.expectedShipDate} : {}),
                     quantity: selectedQty,
                     maxStock: sizeMaxQty, 
                     image: productImage,
@@ -1452,18 +1487,14 @@ window.openCollection = function(categoryFilter, title) {
         if (SAYAND_PRODUCTS.newArrivals) allProducts = allProducts.concat(SAYAND_PRODUCTS.newArrivals);
         if (SAYAND_PRODUCTS.trending) allProducts = allProducts.concat(SAYAND_PRODUCTS.trending);
         if (SAYAND_PRODUCTS.sales) allProducts = allProducts.concat(SAYAND_PRODUCTS.sales);
+        if (SAYAND_PRODUCTS.upcomingSales) allProducts = allProducts.concat(SAYAND_PRODUCTS.upcomingSales);
         allProducts=allProducts.filter((p,i,list)=>list.findIndex(x=>x.name===p.name)===i);
     }
     const filtered = categoryFilter === 'all' ? allProducts : allProducts.filter(p => p.category === categoryFilter);
     if (filtered.length === 0) {
         collectionGrid.innerHTML = '<p class="text-xs tracking-widest text-[#6a7c64] font-bold col-span-full uppercase">Products coming soon. Add some via the Admin Dashboard!</p>';
     } else {
-        filtered.forEach(p => {
-            const el = document.createElement('div');
-            el.className = 'group cursor-pointer flex flex-col w-full';
-            el.innerHTML = createProductCardHTML(p, false); 
-            collectionGrid.appendChild(el);
-        });
+        collectionGrid.innerHTML = collectionGroupsHTML(filtered, p=>createProductCardHTML(p, false));
     }
     
     const folder = document.getElementById('collection-folder');
@@ -1526,6 +1557,7 @@ window.handleSearch = function() {
         if (SAYAND_PRODUCTS.newArrivals) allProducts = allProducts.concat(SAYAND_PRODUCTS.newArrivals);
         if (SAYAND_PRODUCTS.trending) allProducts = allProducts.concat(SAYAND_PRODUCTS.trending);
         if (SAYAND_PRODUCTS.sales) allProducts = allProducts.concat(SAYAND_PRODUCTS.sales);
+        if (SAYAND_PRODUCTS.upcomingSales) allProducts = allProducts.concat(SAYAND_PRODUCTS.upcomingSales);
         allProducts=allProducts.filter((p,i,list)=>list.findIndex(x=>x.name===p.name)===i);
     }
 
@@ -1968,7 +2000,7 @@ firebase.auth().onAuthStateChanged((user) => {
                             }
                         }
                         
-                        if (foundProduct && !foundProduct.isPreorder) {
+                        if (foundProduct) {
                             if (foundProduct.isOutOfStock) {
                                 isOOS = true;
                                 stockWarning = 'SOLD OUT';

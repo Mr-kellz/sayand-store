@@ -5,9 +5,9 @@ const vm = require('node:vm');
 const source = fs.readFileSync(__dirname+'/../js/shopping-analytics.js','utf8');
 assert.equal((source.match(/const measurementId = '[^']*';/g) || []).length, 1);
 const file = source.replace(/const measurementId = '[^']*';/, "const measurementId = '';");
-function setup(configured=true) {
+function setup(configured=true, referrer='https://example.org/?email=private@example.org') {
  const values={}, events={}, scripts=[];let consent=false;
- const context={window:null,localStorage:{getItem:k=>values[k]||null,setItem:(k,v)=>values[k]=v,removeItem:k=>delete values[k]},location:{origin:'https://thesayand.com',pathname:'/success',hostname:'thesayand.com'},document:{readyState:'complete',cookie:'',referrer:'https://example.org/?email=private@example.org',title:'SAYAND',head:{appendChild:s=>scripts.push(s)},createElement:()=>({})},Set,Number,Date,URL};
+ const context={window:null,localStorage:{getItem:k=>values[k]||null,setItem:(k,v)=>values[k]=v,removeItem:k=>delete values[k]},location:{origin:'https://thesayand.com',pathname:'/success',hostname:'thesayand.com'},document:{readyState:'complete',cookie:'',referrer,title:'SAYAND',head:{appendChild:s=>scripts.push(s)},createElement:()=>({})},Set,Number,Date,URL};
  context.window=context;context.SayandConsent={allowed:()=>consent};context.addEventListener=(n,fn)=>(events[n]??=[]).push(fn);
  vm.runInNewContext(configured ? file.replace("const measurementId = '';","const measurementId = 'G-TEST123';") : file,context);
  return {c:context,scripts,choose:value=>{consent=value;for(const fn of events['sayand:consentchange']||[])fn();},calls:()=>Array.from(context.dataLayer||[],a=>Array.from(a)).filter(a=>a[0]==='event')};
@@ -33,3 +33,21 @@ env.choose(false);const before=env.calls().length;assert.equal(env.c.SayandAnaly
 env.choose(true);assert.equal(env.c['ga-disable-G-TEST123'],false);assert.equal(env.scripts.length,1);
 env=setup(false);env.choose(true);assert.equal(env.scripts.length,0);
 console.log('PASS: consent gates, missing ID, pending/test/wrong-owner rejection, duplicate protection, full/partial discounts, gift wrapping, withdrawal and no personal data in events.');
+env=setup();env.choose(true);
+const product=[{name:'Gown',price:19.99,quantity:1}];
+assert.equal(env.c.SayandAnalytics.shopping('view_item',product),true);
+assert.equal(env.c.SayandAnalytics.shopping('view_item',product),false);
+assert.equal(env.c.SayandAnalytics.shopping('begin_checkout',product),true);
+assert.equal(env.c.SayandAnalytics.shopping('begin_checkout',product),false);
+assert.equal(env.c.SayandAnalytics.shopping('add_to_cart',product),true);
+assert.equal(env.c.SayandAnalytics.shopping('add_to_cart',product),true);
+assert.equal(env.c.SayandAnalytics.shopping('begin_checkout',[{...product[0],quantity:2}]),true);
+for(const price of [null,undefined,'',NaN,Infinity,-1]) assert.equal(env.c.SayandAnalytics.shopping('add_to_cart',[{name:'Bad',quantity:1,price}]),false);
+assert.equal(env.calls().filter(e=>e[1]==='view_item').length,1);
+console.log('PASS repeated rendering does not duplicate product/checkout events; genuine basket additions remain counted; invalid prices rejected.');
+
+env=setup(true,'https://checkout.stripe.com/c/pay/session-secret');env.choose(true);
+assert.equal(Array.from(env.c.dataLayer).find(args=>args[0]==='config')[2].ignore_referrer,true);
+env=setup(true,'https://search.example.com/');env.choose(true);
+assert.equal(Array.from(env.c.dataLayer).find(args=>args[0]==='config')[2].ignore_referrer,false);
+console.log('PASS Stripe return referrals are excluded without excluding genuine acquisition sources.');

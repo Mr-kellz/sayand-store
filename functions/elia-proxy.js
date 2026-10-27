@@ -65,7 +65,7 @@ function install(functions,s) {
     const provider=require('./elia-provider'),deadline=Date.now()+45000;
     const result=await engine.respond({db,record,message,inputs,request:async(contextInputs,phase)=>{
      try{return await provider.request(timeout=>fetch('https://api.dify.ai/v1/chat-messages',{method:'POST',headers:{Authorization:'Bearer '+process.env.DIFY_ELIA_API_KEY,'Content-Type':'application/json'},body:JSON.stringify({inputs:contextInputs,query:message,user:record.providerUser,conversation_id:'',response_mode:'blocking',auto_generate_name:false}),signal:AbortSignal.timeout(timeout)}),{deadline});}
-     catch(e){console.warn('Elia semantic upstream',phase,e.code==='resource-exhausted'?'rate-limited':'unavailable');fail(e.code==='resource-exhausted'?'resource-exhausted':'unavailable',e.code==='resource-exhausted'?e.message:'Elia is temporarily unavailable. Please try again later.');}
+     catch(e){console.warn('Elia semantic upstream',phase,e.code==='resource-exhausted'?'rate-limited':'unavailable');const error=new functions.https.HttpsError(e.code==='resource-exhausted'?'resource-exhausted':'unavailable',e.code==='resource-exhausted'?e.message:'Elia is temporarily unavailable. Please try again later.'); if(e.code==='resource-exhausted'){error.safeToRetry=true;error.retryAfterMs=e.retryAfterMs||30000;} throw error;}
     }});
     await ref.update({publicTurns:engine.remember(record,message,result),updatedAt:Date.now()});
     return {...result,conversationToken:token};

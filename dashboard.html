@@ -6,7 +6,7 @@
     <title>SAYAND | My Account</title>
     <link rel="stylesheet" href="/css/tailwind-production.css?v=mobile-1">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-   <link rel="stylesheet" href="css/style.css?v=site-4">
+   <link rel="stylesheet" href="css/style.css?v=preorder-sections-1">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f9f6f0; color: #1a2e15;}
         .dashboard-tab { color: #6a7c64; padding: 1rem; border-left: 3px solid transparent; transition: all 0.3s; font-weight: 600;}
@@ -27,6 +27,7 @@
     <link rel="canonical" href="https://thesayand.com/dashboard">
     <meta name="robots" content="noindex, follow">
     <script src="js/site-updates.js?v=site-4"></script>
+<script src="/js/order-workflow.js?v=preorder-orders-1"></script>
 </head>
 <body class="antialiased">
 
@@ -253,7 +254,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-check-compat.js"></script>
 <script src="/js/service-config.js"></script>
 <script src="/js/store-services.js"></script>
-<script src="/js/public-store.js"></script>
+<script src="/js/public-store.js?v=paid-preorders-1"></script>
     <script type="text/javascript" src="//www.17track.net/externalcall.js"></script>
 
     <script>
@@ -561,7 +562,7 @@ const ordersRef = firebase.database().ref('orders').orderByChild('userId').equal
                                         ['Return Requested', 'Return Approved', 'Return Declined'].includes(latestSafeStatus) ? 'text-purple-600' :
                                         latestSafeStatus === 'Refunded' ? 'text-purple-500' : 'text-red-600';
 
-                const latestDisplayStatus = {
+                const latestDisplayStatus = SayandOrderWorkflow.pending(latest) ? 'PREORDERED — AWAITING DISPATCH' : {
                     'Pending': 'PENDING',
                     'Verifying': 'VERIFYING PAYMENT',
                     'Processing': 'PREPARING SHIPMENT',
@@ -589,6 +590,7 @@ const ordersRef = firebase.database().ref('orders').orderByChild('userId').equal
                             <img src="${item.image}" class="w-16 h-20 object-cover border border-[#c2c9c0] bg-white">
                             <div class="flex-1">
                                 <p class="text-[10px] font-black tracking-wider uppercase text-[#1a2e15]">${SayandI18n.productHTML(item)}</p>
+                                ${item.isPreorder ? `<p class="text-[10px] font-bold mt-2">${SayandOrderWorkflow.itemStatus(order,item).replace(/[&<>"']/g,'')}<br>Estimated dispatch: ${String(item.expectedShipDate || '').replace(/[^0-9-]/g,'')}</p>` : ''}
                                 <p class="text-[10px] text-[#2c4c23] font-bold uppercase mt-1">QTY: ${item.quantity} &nbsp;|&nbsp; SIZE: ${item.size}</p>
                             </div>
                             <p class="text-[10px] font-black text-[#1a2e15]">€${(item.price * item.quantity).toFixed(2)}</p>
@@ -603,7 +605,7 @@ const ordersRef = firebase.database().ref('orders').orderByChild('userId').equal
                                       ['Return Requested', 'Return Approved', 'Return Declined'].includes(safeStatus) ? 'text-purple-600' :
                                       safeStatus === 'Refunded' ? 'text-purple-500' : 'text-red-600';
 
-                    const displayStatus = {
+                    const displayStatus = SayandOrderWorkflow.pending(order) ? 'PREORDERED — AWAITING DISPATCH' : {
                         'Pending': 'PENDING',
                         'Verifying': 'VERIFYING PAYMENT',
                         'Processing': 'PREPARING SHIPMENT',
@@ -639,7 +641,7 @@ const ordersRef = firebase.database().ref('orders').orderByChild('userId').equal
                                 <div class="flex justify-between text-[7px] sm:text-[9px] font-black tracking-widest text-[#2c4c23]/50">
                                     <span class="${currentStageIndex >= 0 ? 'text-[#1a2e15]' : ''}">PENDING</span>
                                     <span class="${currentStageIndex >= 1 ? 'text-[#1a2e15]' : ''} text-center">VERIFYING</span>
-                                    <span class="${currentStageIndex >= 2 ? 'text-[#1a2e15]' : ''} text-center">PREPARING</span>
+                                    <span class="${currentStageIndex >= 2 ? 'text-[#1a2e15]' : ''} text-center">${SayandOrderWorkflow.pending(order)?'PREORDERED':'PREPARING'}</span>
                                     <span class="${currentStageIndex >= 3 ? 'text-[#1a2e15]' : ''} text-center">SHIPPED</span>
                                     <span class="${currentStageIndex >= 4 ? 'text-[#1a2e15]' : ''} text-right">DELIVERED</span>
                                 </div>
@@ -1052,7 +1054,7 @@ const ordersRef = firebase.database().ref('orders').orderByChild('userId').equal
     <!-- Google Maps API -->
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD8RHTg2bBV_mclB6RKb_nz_Cdk8C48pls&libraries=places&callback=initMapsWithRetry"></script>
     
-<script src="/js/elia.js?v=20261015-expanded"></script>
+<script src="/js/elia.js?v=20261024-reliability"></script>
 <script src="/js/return-conversation.js"></script>
 </body>
 </html>

@@ -1,0 +1,13 @@
+# SAYAND Google readiness — 23 October 2026
+
+Website changes deployed to sayand-store (Hosting and cataloguePages only).
+
+- Search Console: https://thesayand.com/ verified through HTML meta tag for thesayand0@gmail.com. Sitemap accepted with Success, 22 pages discovered. Live test of /product-crochet-shirt: URL available to Google, valid Product snippets and Merchant listings. Indexing requested and accepted; actual indexing is not yet confirmed.
+- Product pages: server-rendered product name, description, images, current price and availability plus Product/Offer JSON-LD. Category pages have server-rendered product links. Optional structured shipping and return-policy warnings remain.
+- Merchant Center: account 5881047239 (Sayand, Italy), website verified and claimed; confirmed registered address saved. Automatic URL feed https://thesayand.com/merchant-feed.xml, source 10786283802, English, Italy, free listings, daily refresh. All nine products imported with recognized attributes and no file-format problems. No identifiers invented. Hats are unisex; all are new/adult/SAYAND. Standard Italy shipping 5.00 EUR matches checkout and is provided per product. Delivery handling/transit times are omitted because the owner has no confirmed courier schedule yet. Returns account setup is not complete.
+- Analytics: existing measurement ID G-91D7EK03BK matches the active sayand-store web stream. Realtime showed CROCHET SHIRT page_view and view_item. Fixed duplicate view/checkout events, late-consent tracking and Stripe referral attribution. Paid purchase tracking tested locally, not with a fake live order.
+- Validation: full consolidated suite 52 test files passed, zero failures, two emulator-dependent skips; release gate passed. Subsequent shipping feed change passed catalogue-marketing tests and live XML validation for all nine products. Browser preview and live product images/prices checked. Final main.js version shopping-readiness-2 loaded successfully with no new footer error. Homepage editorial video and lookbook hero video played (readyState 4); carousel retains four entries. No editorial media removed.
+
+Screenshots in this directory record the Google live test, sitemap Success, Analytics and feed import.
+
+Final feed refresh: Google processed all nine updated products, all attributes recognized, no file-format problems. Diagnostics still displayed the prior missing-shipping warning immediately after processing; approval is not confirmed. Do not describe the products as approved or already showing in Shopping. Owner says dispatch timing is unknown because this is their first launch; no handling/transit/cutoff promises were invented.

@@ -13,7 +13,7 @@ function orderEmailParams(order, id) {
         if (!Number.isInteger(quantity) || quantity < 1) throw new Error('Invalid receipt quantity');
         const unit = cents(item.price);
         return {name: item.name || '', image: /^https:\/\//i.test(item.image || '') ? item.image : '',
-            variant: [item.size, item.color].filter(Boolean).join(' / '), quantity,
+            variant: [item.size, item.color, item.isPreorder ? 'PREORDER — paid in full; estimated dispatch '+item.expectedShipDate : ''].filter(Boolean).join(' / '), quantity,
             unitPrice: money(unit), lineTotal: money(unit * quantity)};
     });
     const total = cents(order.totalAmount), discount = cents(order.discountAmount);

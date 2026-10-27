@@ -1,0 +1,1 @@
+After purchase, sign in to My Account to view your orders. Preorder items are labelled Preordered. When your order is shipped, its status updates and a shipping email is triggered with tracking information.

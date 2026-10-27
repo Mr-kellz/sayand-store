@@ -42,12 +42,12 @@
  const btn=(text,fn)=>{const n=el('button',text);n.type='button';n.onclick=fn;return n;};
  let owner=null,state=null,busy=false,generation=0,catalogue=[];
  function verifiedCards(value){return (Array.isArray(value)?value:[]).filter(p=>{
-  if(!p||p.inStock!==true||typeof p.name!=='string'||typeof p.price!=='number'||!Number.isFinite(p.price)||p.price<0)return false;
+  if(!p||(p.inStock!==true&&!(p.isPreorder===true&&p.isOrderable===true))||typeof p.name!=='string'||typeof p.price!=='number'||!Number.isFinite(p.price)||p.price<0)return false;
   try{const u=new URL(p.productUrl);return u.protocol==='https:'&&u.hostname==='thesayand.com'&&!u.username&&!u.password&&u.pathname.startsWith('/product-');}catch{return false;}
  }).slice(0,3);}
  const fresh=()=>({owner,expires:Date.now()+TTL,consent:false,open:false,token:null,messages:[]});
  function save(){if(!state)return;try{sessionStorage.setItem(KEY,JSON.stringify(state));}catch{}}
- function restore(){try{const x=JSON.parse(sessionStorage.getItem(KEY));if(x?.owner===owner && x.expires>Date.now() && x.expires<=Date.now()+TTL && Array.isArray(x.messages)){return {...x,token:/^[a-f0-9]{64}$/.test(x.token)?x.token:null,messages:x.messages.filter(m=>['user','assistant'].includes(m.role)&&typeof m.text==='string').slice(-40).map(m=>({role:m.role,text:m.text.slice(0,12000),...(m.role==='user'&&/^[a-f0-9]{64}$/.test(m.requestId)?{requestId:m.requestId,status:m.status==='pending'?'uncertain':m.status,error:m.error||''}:{})})),consent:x.consent===true,open:x.open===true};}}catch{}return fresh();}
+ function restore(){try{const x=JSON.parse(sessionStorage.getItem(KEY));if(x?.owner===owner && x.expires>Date.now() && x.expires<=Date.now()+TTL && Array.isArray(x.messages)){return {...x,token:/^[a-f0-9]{64}$/.test(x.token)?x.token:null,messages:x.messages.filter(m=>['user','assistant'].includes(m.role)&&typeof m.text==='string').slice(-40).map(m=>({role:m.role,text:m.text.slice(0,12000),...(m.role==='assistant'?{products:verifiedCards(m.products)}:{}),...(m.role==='user'&&/^[a-f0-9]{64}$/.test(m.requestId)?{requestId:m.requestId,status:m.status==='pending'?'uncertain':m.status,error:m.error||''}:{})})),consent:x.consent===true,open:x.open===true};}}catch{}return fresh();}
  const root=el('section');root.id='sayand-elia';
  // Preserve Elia's spacing above the existing WhatsApp launcher.
  if(document.getElementById('whatsapp-float'))root.className='elia-with-whatsapp';
@@ -71,8 +71,16 @@
  function card(p){const card=el('a');card.className='elia-product';card.href=p.productUrl;const src=p.image;try{const u=new URL(src);if(u.protocol==='https:'&&!u.username&&!u.password){const img=el('img');img.src=u.href;img.alt=p.name;img.loading='lazy';img.referrerPolicy='no-referrer';img.onerror=()=>img.remove();card.append(img);}}catch{}
   const info=el('div');info.append(el('strong',p.name));const price=number(p.price),original=number(p.originalPrice);
   const fmt=v=>new Intl.NumberFormat('en-IE',{style:'currency',currency:'EUR'}).format(v);
-  if(p.isOnSale===true&&original!==null&&price!==null&&original>price&&(!p.saleEndDate||Date.parse(p.saleEndDate)>Date.now())){const before=el('del',fmt(original));before.setAttribute('aria-label','Original price '+fmt(original));info.append(before);}
+  if(p.isPreorder===true){
+   info.append(el('small','PREORDER · PAY IN FULL NOW'));
+   if(number(p.launchPrice)!==null)info.append(el('small','Launch price '+fmt(p.launchPrice)));
+  }
+  if(p.isPreorder!==true&&p.isOnSale===true&&original!==null&&price!==null&&original>price&&(!p.saleEndDate||Date.parse(p.saleEndDate)>Date.now())){const before=el('del',fmt(original));before.setAttribute('aria-label','Original price '+fmt(original));info.append(before);}
   if(price!==null){const current=el('b',fmt(price));current.setAttribute('aria-label','Current price '+fmt(price));info.append(current);}
+  if(p.isPreorder===true){
+   if(number(p.savings)>0)info.append(el('small','Save '+fmt(p.savings)));
+   if(/^\d{4}-\d{2}-\d{2}$/.test(p.expectedShipDate||'')&&Number.isFinite(Date.parse(p.expectedShipDate)))info.append(el('small','Estimated dispatch: '+new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'long',year:'numeric',timeZone:'UTC'}).format(new Date(p.expectedShipDate))));
+  }
   info.append(el('small',[...(Array.isArray(p.sizes)?p.sizes:[]),...(Array.isArray(p.colors)?p.colors:[])].join(' · ')),el('span','View product ↗'));card.append(info);return card;
  }
  function render(){if(!state)return;panel.hidden=!state.open;toggle.setAttribute('aria-expanded',String(state.open));welcome.hidden=state.consent;log.hidden=!state.consent;form.hidden=!state.consent;reset.disabled=busy;send.disabled=busy;log.replaceChildren();
@@ -93,9 +101,9 @@
   try{
    let result;
    if(retry){result=await SayandServices.call('eliaChat',{operation:'status',requestId:m.requestId});if(version!==generation)return;}
-   if(!result||result.requestStatus==='not_found')result=await SayandServices.call('eliaChat',{message:m.text,conversationToken:state.token,...(m.requestId?{requestId:m.requestId}:{})});
+   if(!result||result.requestStatus==='not_found'||(result.requestStatus==='retryable'&&result.retryAt<=Date.now()))result=await SayandServices.call('eliaChat',{message:m.text,conversationToken:state.token,...(m.requestId?{requestId:m.requestId}:{})});
    if(version!==generation)return;
-   if(['pending','uncertain'].includes(result.requestStatus)){m.status='uncertain';m.error=result.answer||'The reply is still processing. Retry checks its status without sending it again.';}
+   if(['pending','uncertain','retryable'].includes(result.requestStatus)){m.status='uncertain';m.error=result.answer||'The reply is still processing. Retry checks its status without sending it again.';}
    else{if(/^[a-f0-9]{64}$/.test(result.conversationToken))state.token=result.conversationToken;m.status='done';state.messages.push({role:'assistant',text:String(result.answer||'').slice(0,12000),products:result.catalogueVerified===true?verifiedCards(result.products):[]});state.messages=state.messages.slice(-40);}
    save();
   }catch(error){if(version!==generation)return;m.status='uncertain';m.error=error.message||'Reply failed or unconfirmed. Use Retry to check it safely.';status.textContent=m.error;save();}

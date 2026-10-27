@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"/>
-    <link rel="stylesheet" href="css/style.css?v=site-4">
+    <link rel="stylesheet" href="css/style.css?v=preorder-sections-1">
     
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f9f6f0; color: #1a2e15; }
@@ -42,7 +42,7 @@
     <link rel="canonical" href="https://thesayand.com/checkout">
     <meta name="robots" content="noindex, follow">
     <meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/SAYAND%20Intertwined%20S%26A%20Monogram.png?alt=media&token=2afe3106-31a8-4a27-960a-e0d09ee96d4f">
-    <script src="js/shopping-analytics.js?v=launch-1"></script>
+    <script src="js/shopping-analytics.js?v=shopping-readiness-1"></script>
     <script src="js/site-updates.js?v=launch-1"></script>
 </head>
 <body class="antialiased" id="checkout-body">
@@ -206,11 +206,14 @@
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-check-compat.js"></script>
 <script src="/js/service-config.js"></script>
 <script src="/js/store-services.js"></script>
-<script src="/js/public-store.js"></script>
+<script src="/js/public-store.js?v=paid-preorders-1"></script>
     <script>if(typeof firebase!=="undefined"&&firebase.database){window.db=firebase.database();}</script>
     
 <script>
     let orderCartData = null;
+    window.addEventListener('sayand:consentchange', () => {
+        if (orderCartData && Object.keys(orderCartData).length) window.SayandAnalytics?.shopping('begin_checkout', orderCartData);
+    });
     let orderSubtotal = 0;
     let finalOrderTotal = 0;
     let shippingCost = 0;
@@ -264,7 +267,7 @@
                 continue;
             }
 
-            if (foundProduct.isPreorder) continue;
+            if (foundProduct.isPreorder && (!Number(foundProduct.preorderPrice) || !foundProduct.expectedShipDate)) { errors.push(`"${cartItem.name}" is not yet available for paid preorder.`); continue; }
 
             if (foundProduct.isOutOfStock) {
                 errors.push(`"${cartItem.name}" is now SOLD OUT.`);
@@ -694,6 +697,18 @@
                 }
             }
 
+            // Refresh current prices and preorder disclosures before the customer reviews payment.
+            const latestCatalog = (await window.SayandPublicStore.once('value')).val();
+            const latestProducts = ['newArrivals','trending','sales','upcomingSales'].flatMap(section=>Object.values(latestCatalog[section] || {}));
+            for (const item of Object.values(orderCartData || {})) {
+                const product = latestProducts.find(p=>p.name===item.name);
+                if (!product) continue;
+                const sale = !product.isPreorder && product.salePrice && (!product.saleEndDate || Date.parse(product.saleEndDate)>Date.now());
+                item.price = Number(sale ? product.salePrice : product.price);
+                item.isPreorder = !!product.isPreorder;
+                if (product.isPreorder) { item.launchPrice=Number(product.launchPrice); item.expectedShipDate=product.expectedShipDate || ''; }
+                else { delete item.launchPrice; delete item.expectedShipDate; }
+            }
             if (!orderCartData || Object.keys(orderCartData).length === 0) {
                 itemsContainer.innerHTML = '<p class="text-xs text-[#6a7c64] font-bold text-center py-4">Your bag is empty.</p>';
                 orderSubtotal = 0;
@@ -713,6 +728,7 @@
                         </div>
                         <div class="flex-1 min-w-0">
                             <h4 class="text-[10px] font-black tracking-wider truncate uppercase text-[#1a2e15]">${SayandI18n.productHTML(item, 'name', 'Unknown Item')}</h4>
+                            ${item.isPreorder ? `<p class="text-[10px] font-bold mt-1">PREORDER — PAY IN FULL NOW<br>Launch price ${formatPrice(Number(item.launchPrice || item.price))} · Save ${formatPrice(Math.max(0,Number(item.launchPrice || item.price)-itemPrice))}<br>Estimated dispatch: ${String(item.expectedShipDate || '').replace(/[^0-9-]/g,'')}</p>` : ''}
                             <p class="text-[9px] text-[#6a7c64] font-bold mt-1 uppercase">SIZE: ${item.size || 'N/A'} | COLOR: ${item.color || 'N/A'}</p>
                         </div>
                         <div class="text-[10px] font-black text-[#1a2e15]">${formatPrice(itemTotal)}</div>
@@ -1010,6 +1026,6 @@
 
     <!-- Google Maps API -->
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD8RHTg2bBV_mclB6RKb_nz_Cdk8C48pls&libraries=places&callback=initMapsWithRetry"></script>
-<script src="/js/elia.js?v=20261015-expanded"></script>
+<script src="/js/elia.js?v=20261024-reliability"></script>
 </body>
 </html>

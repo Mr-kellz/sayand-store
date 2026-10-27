@@ -1,0 +1,10 @@
+'use strict';
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict'),W=require('../js/order-workflow');
+const source=fs.readFileSync('js/admin.js','utf8'),part=source.slice(source.indexOf('function orderMoney('),source.indexOf('window.updateOrderStatus ='));
+const nodes=Object.fromEntries(['orders-list','preorder-orders-list','preorder-order-count'].map(id=>[id,{innerHTML:'',textContent:''}]));
+const ctx={window:{},document:{getElementById:id=>nodes[id]},SayandOrderWorkflow:W,escapeAdminTranslation:v=>String(v??'').replace(/</g,'&lt;'),returnLabelURL:()=>''};vm.createContext(ctx);vm.runInContext(part,ctx);
+const id='a'.repeat(20),normal='b'.repeat(20),order={status:'Paid',paymentDate:1,items:[{name:'Preorder fixture',isPreorder:true,price:52.99,quantity:1,expectedShipDate:'2099-12-02'}]},data={[id]:order,[normal]:{status:'Paid',items:[{name:'Normal fixture',price:10,quantity:1}]}};
+ctx.window.renderOrders(data);assert(!nodes['orders-list'].innerHTML.includes('Preorder fixture'));assert(nodes['preorder-orders-list'].innerHTML.includes('Preorder fixture'));assert(!nodes['preorder-orders-list'].innerHTML.includes('Normal fixture'));assert.equal(nodes['preorder-order-count'].textContent,'1');
+order.status='Shipped';order.shippedAt=Date.now();ctx.window.renderOrders(data);assert(nodes['orders-list'].innerHTML.includes('Preorder fixture'));assert(!nodes['preorder-orders-list'].innerHTML.includes('Preorder fixture'));assert.equal(nodes['preorder-order-count'].textContent,'0');assert(nodes['orders-list'].innerHTML.includes('PREORDER · SHIPPED'));
+const dashboard=fs.readFileSync('dashboard.html','utf8');assert(dashboard.indexOf('/js/order-workflow.js')<dashboard.indexOf('getSafeStatus'));assert(dashboard.includes('SayandOrderWorkflow.itemStatus(order,item)'));
+console.log('PASS actual admin renderer puts paid preorders only in the preorder folder and moves them on shipment; dashboard uses shared item states.');

@@ -48,6 +48,8 @@ let database = {
 
 let editingTarget = null;
 let uploadedImages = [];
+let productImageSession = 0;
+let productImagesUploading = false;
 let measurementRows = [];
 let tempAiImageBase64 = ''; 
 let stockNotifyCounts = {};
@@ -150,6 +152,7 @@ firebase.auth().onAuthStateChanged((user) => {
     if (!user || !allowedAdmins.includes(user.uid)) {
         const container = document.getElementById('orders-list');
         if (container) container.textContent = '';
+        const preorderContainer=document.getElementById('preorder-orders-list');if(preorderContainer)preorderContainer.textContent='';
         return;
     }
     adminOrdersRef = db.ref('orders');
@@ -224,9 +227,14 @@ window.generateAIDescription = async function() {
     }
 }
 
+function parseAdminPrice(value) {
+    const normalized = String(value).trim().replace(',', '.');
+    return /^\d+(?:\.\d{1,2})?$/.test(normalized) ? Number(normalized) : NaN;
+}
+
 window.calculateSalePercent = function() {
     const originalPrice = parseFloat(document.getElementById('saleOriginalPrice').value.replace('€', ''));
-    const salePrice = parseFloat(document.getElementById('salePriceInput').value);
+    const salePrice = parseAdminPrice(document.getElementById('salePriceInput').value);
     const percentInput = document.getElementById('salePercentInput');
     if (originalPrice && salePrice && salePrice < originalPrice) {
         percentInput.value = Math.round(((originalPrice - salePrice) / originalPrice) * 100);
@@ -317,48 +325,97 @@ function populateMeasurementInputs(measurements) {
     });
 }
 
-document.getElementById('prodImageFile').addEventListener('change', async function(e) {
-    uploadedImages = [];
-    tempAiImageBase64 = ''; 
-    const files = Array.from(e.target.files);
-    if(files.length === 0) return;
-    
-    const reader = new FileReader();
-    reader.onload = (e) => { tempAiImageBase64 = e.target.result; };
-    reader.readAsDataURL(files[0]);
-
+function renderProductImages() {
     const preview = document.getElementById('uploaded-preview');
-    preview.innerHTML = '<p class="text-[10px] text-gray-500 font-bold mt-2">Uploading high-res to cloud...</p>';
-    
+    preview.replaceChildren();
+    uploadedImages.forEach((url, index) => {
+        const thumb = document.createElement('div');
+        thumb.className = 'product-image-preview';
+        const image = document.createElement('img');
+        image.src = url;
+        image.alt = `Product picture ${index + 1}`;
+        const remove = document.createElement('button');
+        remove.type = 'button';
+        remove.className = 'product-image-remove';
+        remove.textContent = '×';
+        remove.setAttribute('aria-label', `Remove picture ${index + 1}`);
+        remove.title = `Remove picture ${index + 1}`;
+        remove.addEventListener('click', () => {
+            uploadedImages.splice(index, 1);
+            tempAiImageBase64 = '';
+            syncProductImageUrls();
+            renderProductImages();
+        });
+        thumb.append(image, remove);
+        preview.appendChild(thumb);
+    });
+    if (productImagesUploading) {
+        const status = document.createElement('p');
+        status.textContent = 'Uploading pictures…';
+        status.setAttribute('role', 'status');
+        preview.appendChild(status);
+    }
+}
+
+function syncProductImageUrls() {
+    // Legacy embedded images contain commas and must stay out of the URL field.
+    document.getElementById('prodImgUrl').value = uploadedImages.some(url => url.startsWith('data:'))
+        ? '' : uploadedImages.join(', ');
+}
+
+function resetProductImageUpload() {
+    productImageSession++;
+    productImagesUploading = false;
+    document.getElementById('prodImageFile').disabled = false;
+    document.getElementById('prodImgUrl').disabled = false;
+}
+
+document.getElementById('prodImageFile').addEventListener('change', async function(e) {
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+    const session = productImageSession;
+    productImagesUploading = true;
+    this.disabled = true;
+    document.getElementById('prodImgUrl').disabled = true;
+    tempAiImageBase64 = '';
+    renderProductImages();
     try {
         for (const file of files) {
+            if (session !== productImageSession) return;
             const fileName = `products/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
             const storageRef = firebase.storage().ref().child(fileName);
             const snapshot = await storageRef.put(file);
             const downloadURL = await snapshot.ref.getDownloadURL();
+            if (session !== productImageSession) return;
             uploadedImages.push(downloadURL);
-            
-            if(preview.innerHTML.includes('Uploading')) preview.innerHTML = '';
-            const thumb = document.createElement('div');
-            thumb.className = 'w-12 h-16 border border-gray-200 overflow-hidden flex-shrink-0';
-            thumb.innerHTML = `<img src="${downloadURL}" class="w-full h-full object-cover">`;
-            preview.appendChild(thumb);
+            const reader = new FileReader();
+            reader.onload = event => {
+                if (session === productImageSession && uploadedImages.includes(downloadURL)) {
+                    tempAiImageBase64 = event.target.result;
+                }
+            };
+            if (uploadedImages.length === 1) reader.readAsDataURL(file);
+            syncProductImageUrls();
+            renderProductImages();
         }
-        document.getElementById('prodImgUrl').value = '';
-        showAdminToast("IMAGES UPLOADED TO CLOUD!");
+        showAdminToast('IMAGES UPLOADED TO CLOUD!');
     } catch (error) {
-        alert("Error uploading image: " + error.message);
-        preview.innerHTML = '';
+        if (session === productImageSession) alert('Error uploading image: ' + error.message);
+    } finally {
+        if (session === productImageSession) {
+            productImagesUploading = false;
+            this.disabled = false;
+            this.value = '';
+            document.getElementById('prodImgUrl').disabled = false;
+            renderProductImages();
+        }
     }
 });
 
 document.getElementById('prodImgUrl').addEventListener('input', function() {
-    if(this.value.length > 0) {
-        document.getElementById('prodImageFile').value = '';
-        uploadedImages = [];
-        tempAiImageBase64 = '';
-        document.getElementById('uploaded-preview').innerHTML = '';
-    }
+    uploadedImages = this.value.split(',').map(url => url.trim()).filter(Boolean);
+    tempAiImageBase64 = '';
+    renderProductImages();
 });
 
 function updateDesignPreviews() {
@@ -406,42 +463,18 @@ window.handleDesignImageUpload = async function(e, targetId) {
     }
 }
 
+const shippingOrders = new Set();
 window.updateOrderTracking = async function(id) {
-    const trackingVal = document.getElementById('track-' + id).value.trim();
-    if (!trackingVal) return alert("Please enter a tracking code first.");
-
+    if(shippingOrders.has(id))return;
+    const trackingVal=document.getElementById('track-'+id)?.value.trim();
+    if(!trackingVal)return alert('Enter the tracking code before marking this order shipped.');
+    shippingOrders.add(id);
     try {
-        if (typeof showAdminToast === 'function') showAdminToast("SAVING & EMAILING...");
-        await db.ref('orders/' + id).update({ tracking: trackingVal, status: 'Shipped' });
-        const snapshot = await db.ref('orders/' + id).once('value');
-        const orderData = snapshot.val();
-
-        if (orderData && orderData.shippingInfo && orderData.shippingInfo.email) {
-            let carrierName = "Premium Carrier";
-            if (trackingVal.toUpperCase().startsWith("1Z")) carrierName = "UPS";
-            else if (trackingVal.length === 12 || trackingVal.length === 15) carrierName = "FedEx";
-            else if (trackingVal.length === 10) carrierName = "DHL";
-
-            const trackingLink = `https://www.17track.net/en/track?nums=${trackingVal}`;
-            const sendEmailFn = firebase.functions().httpsCallable('sendStoreEmail');
-            await sendEmailFn({
-                type: 'order_shipped',
-                payload: {
-                    email: orderData.shippingInfo.email,
-                    firstName: orderData.shippingInfo.firstName || 'there',
-                    orderId: id.slice(-6).toUpperCase(),
-                    trackingNumber: trackingVal,
-                    carrier: carrierName,
-                    trackingUrl: trackingLink,
-                    estimatedDelivery: ['it','ita','italy','italia','italie','italien'].includes(String(orderData.shippingInfo.country || '').trim().toLowerCase()) ? "3–7 working days within Italy" : "5–14 working days internationally"
-                }
-            });
-        }
-        if (typeof showAdminToast === 'function') showAdminToast("TRACKING SAVED & EMAIL SENT!");
-    } catch (error) {
-        alert("Error updating tracking: " + error.message);
-    }
-}
+        await firebase.functions().httpsCallable('shipStoreOrder')({orderId:id,tracking:trackingVal});
+        showAdminToast('ORDER SHIPPED — CUSTOMER EMAIL QUEUED');
+    } catch(error){alert('Unable to ship order: '+error.message);}
+    finally{shippingOrders.delete(id);}
+};
 
 const returnUploadBusy = new Set();
 const returnSendBusy = new Set();
@@ -633,7 +666,10 @@ function renderAdminReturnConversation(order) {
 window.renderOrders = function(data) {
     const container = document.getElementById('orders-list');
     if(!container) return;
+    const preorderContainer=document.getElementById('preorder-orders-list');
     if(!data) {
+        if(preorderContainer)preorderContainer.innerHTML='<p>No paid preorder orders awaiting shipment.</p>';
+        const count=document.getElementById('preorder-order-count');if(count)count.textContent='0';
         container.innerHTML = '<p class="text-[10px] text-gray-400 italic text-center py-10">No orders yet.</p>';
         return;
     }
@@ -641,14 +677,14 @@ window.renderOrders = function(data) {
     const ordersArray = Object.keys(data).filter(key => /^[-A-Za-z0-9_]{20}$/.test(key)).map(key => ({ ...data[key], id: key }));
     ordersArray.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
     
-    container.innerHTML = ordersArray.map(order => {
+    const cards = ordersArray.map(order => {
         if(order.status!=='Refunded'&&['Approved','Declined'].includes(order.returnCase?.status))order={...order,status:'Return '+order.returnCase.status};
         const date = new Date(order.timestamp || order.date).toLocaleString();
         let subtotal = 0;
         const itemsList = Object.values(order.items || {}).map(item => {
             const lineTotal = orderMoney(item.price) * orderMoney(item.quantity);
             subtotal += lineTotal;
-            return `<li>${escapeAdminTranslation(item.quantity)}x ${escapeAdminTranslation(item.name)} (${escapeAdminTranslation(item.size)}/${escapeAdminTranslation(item.color)}) - €${lineTotal.toFixed(2)}</li>`
+            return `<li>${escapeAdminTranslation(item.quantity)}x ${escapeAdminTranslation(item.name)} (${escapeAdminTranslation(item.size)}/${escapeAdminTranslation(item.color)}) ${item.isPreorder ? ' — '+escapeAdminTranslation(SayandOrderWorkflow.itemStatus(order,item))+'; estimated dispatch '+escapeAdminTranslation(item.expectedShipDate) : ''} - €${lineTotal.toFixed(2)}</li>`
         }).join('');
         
         let statusColor = order.status === 'Pending' ? 'text-orange-500' : 
@@ -697,7 +733,7 @@ window.renderOrders = function(data) {
                         <p class="text-[9px] text-gray-400 mt-1">${date}</p>
                     </div>
                     <div class="flex gap-2 items-center">
-                        <select onchange="updateOrderStatus('${order.id}', this.value)" class="text-[10px] border border-gray-300 p-1 font-bold ${statusColor} bg-transparent outline-none max-w-[140px]">
+                        <select onchange="const next=this.value; this.value=Array.from(this.options).find(o=>o.defaultSelected)?.value || 'Pending'; updateOrderStatus('${order.id}', next)" class="text-[10px] border border-gray-300 p-1 font-bold ${statusColor} bg-transparent outline-none max-w-[140px]">
                             <option value="Pending" ${order.status==='Pending'?'selected':''} class="text-black">Pending</option>
                             <option value="Paid" ${order.status==='Paid'?'selected':''} class="text-black">Paid</option>
                             <option value="Payment Review" ${order.status==='Payment Review'?'selected':''} class="text-black">Payment Received — Review Required</option>
@@ -716,6 +752,7 @@ window.renderOrders = function(data) {
                     </div>
                 </div>
                 
+                ${order.shipmentEmail?.state === 'needs_review' ? '<p class="text-xs text-red-700 font-bold">Shipping email needs review. Check email delivery before resending.</p>' : ''}
                 ${order.paymentReviewReason ? `<p class="text-xs text-red-700 font-bold mb-3">Payment review: ${escapeAdminTranslation(order.paymentReviewReason)} Stock was not deducted. Check Stripe and inventory before fulfilling or refunding this order.</p>` : ''}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-[10px] mb-4">
                     <div>
@@ -755,7 +792,7 @@ window.renderOrders = function(data) {
                         <label class="text-[9px] font-bold text-gray-400 tracking-widest uppercase">SHIPPING & TRACKING CODE</label>
                         <div class="flex gap-2">
                             <input type="text" id="track-${order.id}" value="${escapeAdminTranslation(order.tracking || '')}" placeholder="e.g. DHL 123456789" class="flex-1 border border-gray-300 p-1.5 text-[10px] focus:border-black outline-none bg-white font-mono">
-                            <button onclick="updateOrderTracking('${order.id}')" class="bg-black text-white px-3 py-1.5 text-[9px] font-bold tracking-wider hover:bg-gray-800 transition-colors">SAVE TRACKING</button>
+                            <button onclick="updateOrderTracking('${order.id}')" class="bg-black text-white px-3 py-1.5 text-[9px] font-bold tracking-wider hover:bg-gray-800 transition-colors">MARK SHIPPED &amp; EMAIL</button>
                         </div>
                     </div>
                 </div>
@@ -763,10 +800,16 @@ window.renderOrders = function(data) {
                 ${returnAdminAction}
             </div>
         `;
-    }).join('');
+    });
+    const waiting=ordersArray.map(order=>SayandOrderWorkflow.pending(order));
+    container.innerHTML=cards.filter((_,i)=>!waiting[i]).join('') || '<p>No normal orders.</p>';
+    if(preorderContainer)preorderContainer.innerHTML=cards.filter((_,i)=>waiting[i]).join('') || '<p>No paid preorder orders awaiting shipment.</p>';
+    const count=document.getElementById('preorder-order-count');if(count)count.textContent=String(waiting.filter(Boolean).length);
 }
 
+
 window.updateOrderStatus = function(id, status) {
+    if(status==='Shipped')return updateOrderTracking(id);
     db.ref('orders/' + id).transaction(order => {
         if (!order) return;
         const updates = { ...order, status: status };
@@ -787,10 +830,12 @@ window.deleteOrder = function(id) {
 
 document.getElementById('addProductForm').addEventListener('submit', function(e) {
     e.preventDefault();
+    if (productImagesUploading) return alert('Please wait for the pictures to finish uploading.');
     const section = document.getElementById('prodSection').value;
     const category = document.getElementById('prodCategory').value;
     const name = document.getElementById('prodName').value.toUpperCase();
-    const price = parseFloat(document.getElementById('prodPrice').value);
+    const price = parseAdminPrice(document.getElementById('prodPrice').value);
+    if (!Number.isFinite(price) || price < 0) return alert('Please enter a valid price.');
     const description = document.getElementById('prodDesc').value;
     const isOutOfStock = document.getElementById('prodOutOfStock').checked;
     const isVipOnly = document.getElementById('prodVipOnly').checked; 
@@ -815,17 +860,7 @@ document.getElementById('addProductForm').addEventListener('submit', function(e)
         sizeQuantities['OS'] = totalQty;
     }
 
-    const urlInput = document.getElementById('prodImgUrl').value;
-    let finalImages = [];
-
-    if (urlInput.trim().length > 0) {
-        finalImages = urlInput.split(',').map(s => s.trim()).filter(s => s.length > 0);
-    } else if (uploadedImages.length > 0) {
-        finalImages = [...uploadedImages];
-    } else if (editingTarget) {
-        let existingItem = database[editingTarget.section][editingTarget.index];
-        finalImages = existingItem.images ? existingItem.images : [existingItem.img];
-    }
+    const finalImages = [...uploadedImages];
     if (finalImages.length === 0) return alert("Please upload or paste at least one image.");
 
     const details = {};
@@ -864,6 +899,14 @@ document.getElementById('addProductForm').addEventListener('submit', function(e)
             translations[code].details[key] = document.getElementById('detail' + key + suffix).value.trim();
         }
     }
+    const merchant = {};
+    for (const [key, suffix] of [['brand','Brand'],['gender','Gender'],['ageGroup','AgeGroup'],['condition','Condition'],['gtin','Gtin'],['mpn','Mpn']]) {
+        const value = document.getElementById('merchant'+suffix).value.trim();
+        if (value) merchant[key] = value;
+    }
+    const identifiers = document.getElementById('merchantIdentifierExists').value;
+    if (identifiers) merchant.identifierExists = identifiers === 'yes';
+    if (Object.keys(merchant).length) newItem.merchant = merchant;
     newItem.translations = translations;
     if (Object.keys(details).length > 0) newItem.details = details;
     if (measurements) newItem.measurements = measurements;
@@ -882,6 +925,7 @@ document.getElementById('addProductForm').addEventListener('submit', function(e)
     } else {
         database[section].push(newItem);
         this.reset();
+        resetProductImageUpload();
         uploadedImages = [];
         tempAiImageBase64 = '';
         document.getElementById('uploaded-preview').innerHTML = '';
@@ -911,6 +955,11 @@ window.startEdit = function(section, index) {
     document.getElementById('prodName').value = item.name;
     document.getElementById('prodPrice').value = item.price;
     document.getElementById('prodDesc').value = item.description || '';
+    for (const [key, suffix] of [['brand','Brand'],['gender','Gender'],['ageGroup','AgeGroup'],['condition','Condition'],['gtin','Gtin'],['mpn','Mpn']]) {
+        document.getElementById('merchant'+suffix).value = item.merchant?.[key] || '';
+    }
+    document.getElementById('merchantIdentifierExists').value = typeof item.merchant?.identifierExists === 'boolean' ? (item.merchant.identifierExists ? 'yes' : 'no') : '';
+
     for (const [code, suffix] of [['it','It'],['fr','Fr'],['de','De']]) {
         const localized = item.translations && item.translations[code] || {};
         document.getElementById('prodName' + suffix).value = localized.name || '';
@@ -942,21 +991,18 @@ window.startEdit = function(section, index) {
     populateMeasurementInputs(item.measurements);
     document.getElementById('prodRelated').value = item.related ? item.related.join(', ') : '';
     
-    let itemImages = item.images ? item.images : [item.img];
-    if(itemImages[0] && itemImages[0].startsWith('data:image')) {
-        document.getElementById('prodImgUrl').value = '';
-    } else {
-        document.getElementById('prodImgUrl').value = itemImages.join(', ');
-    }
+    resetProductImageUpload();
+    uploadedImages = (item.images ? item.images : [item.img]).filter(Boolean);
+    syncProductImageUrls();
     document.getElementById('prodImageFile').value = '';
-    uploadedImages = [];
     tempAiImageBase64 = '';
-    document.getElementById('uploaded-preview').innerHTML = '';
-    
+    renderProductImages();
+
     switchTab('products');
 }
 
 window.cancelEdit = function() {
+    resetProductImageUpload();
     editingTarget = null;
     document.getElementById('formTitle').innerText = "ADD / EDIT PRODUCT";
     document.getElementById('submitBtn').innerText = "+ ADD PRODUCT";
@@ -1008,10 +1054,10 @@ window.addToSales = function() {
     const select = document.getElementById('saleProductSelect');
     const productName = select.value;
     if (!productName) return alert("Please select a product.");
-    const salePrice = parseFloat(document.getElementById('salePriceInput').value);
+    const salePrice = parseAdminPrice(document.getElementById('salePriceInput').value);
     const salePercent = parseInt(document.getElementById('salePercentInput').value);
     const saleEndDate = document.getElementById('saleEndDateInput').value;
-    if (!salePrice || !salePercent) return alert("Please enter sale price to calculate discount.");
+    if (!Number.isFinite(salePrice) || salePrice <= 0 || !salePercent) return alert("Please enter sale price to calculate discount.");
     
     let foundSection = null;
     let foundIndex = -1;
@@ -1346,41 +1392,51 @@ document.getElementById('upcomingImageFile').addEventListener('change', async fu
     }
 });
 
-window.addUpcomingSale = function() {
-    const name = document.getElementById('upcomingName').value.trim().toUpperCase();
-    const price = parseFloat(document.getElementById('upcomingPrice').value);
-    const sizesRaw = document.getElementById('upcomingSizes').value;
-    const urlRaw = document.getElementById('upcomingImageUrl').value.trim();
-    const category = document.getElementById('upcomingCategory').value;
-    const isVipOnly = document.getElementById('upcomingVipOnly').checked; 
-    
-    let finalImages = [];
-    if (urlRaw && !urlRaw.includes('Uploading')) finalImages = urlRaw.split(',').map(s => s.trim()).filter(s => s.length > 0);
-    else if (upcomingImagesData.length > 0) finalImages = [...upcomingImagesData];
-    
-    if (!name || finalImages.length === 0 || !price) return alert("Please provide a name, an image, and an expected price.");
-    
-    const sizes = sizesRaw ? sizesRaw.split(',').map(s => s.trim().toUpperCase()) : ['OS'];
-    
-    database.upcomingSales.push({ 
-        name, price, sizes, 
-        image: finalImages[0], 
-        images: finalImages,
-        category, 
-        isPreorder: true,
-        isVipOnly: isVipOnly
-    });
-    
-    document.getElementById('upcomingName').value = '';
-    document.getElementById('upcomingPrice').value = '';
-    document.getElementById('upcomingSizes').value = '';
-    document.getElementById('upcomingImageUrl').value = '';
-    document.getElementById('upcomingImageFile').value = '';
+let editingUpcomingName = null;
+let editingUpcomingVersion = null;
+let savingUpcoming = false;
+window.resetUpcomingForm = function() {
+    editingUpcomingName = null; editingUpcomingVersion = null;
+    ['Name','Price','PreorderPrice','Quantity','ExpectedShipDate','Description','Sizes','ImageUrl','ImageFile'].forEach(key => document.getElementById('upcoming'+key).value = '');
+    document.getElementById('upcomingName').readOnly = false;
+    document.getElementById('upcomingVipOnly').checked = false;
     upcomingImagesData = [];
-    renderUpcomingList();
-    renderLists();
-    generateCode();
-}
+    document.getElementById('save-upcoming').textContent = 'POST PRE-ORDER DROP';
+};
+window.editUpcomingSale = function(index) {
+    const p = database.upcomingSales[index]; if (!p) return;
+    editingUpcomingName = p.name; editingUpcomingVersion = JSON.stringify(p);
+    for (const [field,value] of Object.entries({Name:p.name,Price:p.price,PreorderPrice:p.preorderPrice,Quantity:p.quantity,ExpectedShipDate:p.expectedShipDate,Description:p.description,Sizes:(p.sizes || ['OS']).join(', '),ImageUrl:(p.images || [p.image]).filter(Boolean).join(', '),Category:p.category || 'general'})) document.getElementById('upcoming'+field).value = value ?? '';
+    document.getElementById('upcomingName').readOnly = true;
+    document.getElementById('upcomingVipOnly').checked = !!p.isVipOnly;
+    document.getElementById('save-upcoming').textContent = 'SAVE PREORDER CHANGES';
+    document.getElementById('upcomingPreorderPrice').focus();
+};
+window.addUpcomingSale = async function() {
+    if (savingUpcoming) return;
+    const value = key => document.getElementById('upcoming'+key).value.trim();
+    const name = value('Name').toUpperCase(), price = parseAdminPrice(value('Price')), preorderPrice = parseAdminPrice(value('PreorderPrice'));
+    const quantity = Number(value('Quantity')), expectedShipDate = value('ExpectedShipDate');
+    const finalImages = value('ImageUrl').split(',').map(s=>s.trim()).filter(Boolean);
+    if (!name || !finalImages.length || finalImages.some(url=>!/^https:\/\//.test(url))) return alert('Please provide a name and uploaded images or HTTPS image URLs. Wait for uploads to finish.');
+    if (!Number.isFinite(price) || price<=0 || !Number.isFinite(preorderPrice) || preorderPrice<=0 || preorderPrice>price) return alert('Enter valid launch and preorder prices. The preorder price cannot exceed the launch price.');
+    if (!Number.isSafeInteger(quantity) || quantity<1) return alert('Enter the remaining number of preorder units.');
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(expectedShipDate) || !Number.isFinite(Date.parse(expectedShipDate)) || new Date(expectedShipDate).toISOString().slice(0,10)!==expectedShipDate || Date.parse(expectedShipDate+'T23:59:59Z')<Date.now()) return alert('Enter a valid upcoming estimated dispatch date.');
+    const sizes = [...new Set(value('Sizes').split(',').map(s=>s.trim().toUpperCase()).filter(Boolean))];
+    const old = [...(database.upcomingSales || [])];
+    const index = editingUpcomingName === null ? -1 : old.findIndex(p=>p.name===editingUpcomingName);
+    if (editingUpcomingName !== null && index<0) return alert('This drop changed. Refresh admin before editing.');
+    if (index>=0 && JSON.stringify(old[index])!==editingUpcomingVersion) return alert('This drop changed while you were editing. Reopen it to protect current preorder quantities.');
+    if (index<0 && ['newArrivals','trending','sales','upcomingSales'].some(section=>Object.values(database[section] || {}).some(p=>p.name.toUpperCase()===name))) return alert('A product with that name already exists. Edit it instead.');
+    const product = {...(old[index] || {}), name,price,preorderPrice,quantity,expectedShipDate,sizes:sizes.length?sizes:['OS'],description:value('Description'),images:finalImages,image:finalImages[0],category:value('Category'),isPreorder:true,isOutOfStock:false,isVipOnly:document.getElementById('upcomingVipOnly').checked};
+    // The drop editor uses a shared capacity, not per-size inventory.
+    delete product.sizeQuantities;
+    database.upcomingSales = index<0 ? [...old,product] : old.map((p,i)=>i===index?product:p);
+    savingUpcoming = true; document.getElementById('save-upcoming').disabled = true;
+    try { await saveStoreSafely(); resetUpcomingForm(); renderUpcomingList(); renderLists(); showAdminToast('PREORDER SAVED'); }
+    catch(error) { database.upcomingSales=old; alert('Preorder not saved. '+error.message); }
+    finally { savingUpcoming=false; document.getElementById('save-upcoming').disabled=false; }
+};
 
 window.removeUpcomingSale = function(index) {
     database.upcomingSales.splice(index, 1);
@@ -1403,8 +1459,9 @@ function renderUpcomingList() {
                 <img src="${thumb}" class="w-10 h-14 object-cover flex-shrink-0">
                 <div class="flex-1 min-w-0">
                     <p class="text-[10px] font-bold truncate">${u.name} ${vipBadge}</p>
-                    <p class="text-[9px] text-gray-400 uppercase tracking-widest">${u.category} | €${u.price}</p>
+                    <p class="text-[9px] text-gray-400 uppercase tracking-widest">${u.category} | Launch €${u.price} · Preorder €${u.preorderPrice || "not set"}</p>
                 </div>
+                <button onclick="editUpcomingSale(${i})" class="text-[10px] font-bold px-2">EDIT</button>
                 <button onclick="removeUpcomingSale(${i})" class="text-red-500 hover:text-red-700 text-[10px] font-bold px-2">REMOVE</button>
             </div>
         `;
@@ -1422,7 +1479,7 @@ window.launchDrop = async function(index) {
     const sizeQuantities={};
     for(const size of sizes) {
         const prior=item.sizeQuantities?.[size];
-        const value=prompt(`Actual stock for ${item.name} — ${size} (whole units, 0 if unavailable):`, Number.isSafeInteger(prior)&&prior>=0?String(prior):'');
+        const value=prompt(`Available stock AFTER setting aside paid preorders for ${item.name} — ${size} (whole units, 0 if unavailable):`, Number.isSafeInteger(prior)&&prior>=0?String(prior):'');
         if(value===null)return;
         if(!/^\d+$/.test(value.trim()) || !Number.isSafeInteger(Number(value)) || Number(value)>1000000)return alert('Enter a whole stock quantity between 0 and 1,000,000. Nothing was launched.');
         sizeQuantities[size]=Number(value);
@@ -1532,6 +1589,7 @@ function loadDesignForm() {
     document.getElementById('editSubtitle').value = sc.editSubtitle || '';
     document.getElementById('editTitle').value = sc.editTitle || '';
     document.getElementById('editDesc').value = sc.editDesc || '';
+    document.getElementById('editImg').value = sc.editImg || '';
     document.getElementById('lbHeroImg').value = sc.lbHeroImg || '';
     document.getElementById('lbWomenImg').value = sc.lbWomenImg || '';
     document.getElementById('lbMenImg').value = sc.lbMenImg || '';
@@ -1556,7 +1614,7 @@ function loadDesignForm() {
     if (!database.siteContent) database.siteContent = {};
     
     // Safely update properties instead of wiping the whole object
-    database.siteContent.editImg = document.getElementById('editImg') ? document.getElementById('editImg').value : '';
+    // Carousel add/remove actions own editImg; unrelated design edits must preserve it.
     database.siteContent.heroSubtitle = document.getElementById('heroSubtitle') ? document.getElementById('heroSubtitle').value : '';
     database.siteContent.heroTitle = document.getElementById('heroTitle') ? document.getElementById('heroTitle').value : '';
     database.siteContent.heroImg = document.getElementById('heroImg') ? document.getElementById('heroImg').value : '';
@@ -1706,7 +1764,8 @@ function renderLists() {
                     </div>
                     <div class="flex gap-2 flex-shrink-0">
                         <button onclick="launchDrop(${i})" class="text-white bg-black hover:bg-gray-800 text-[9px] font-bold tracking-wider px-3 py-1 transition-colors">🚀 LAUNCH DROP</button>
-                        <button onclick="removeUpcomingSale(${i})" class="text-red-500 hover:text-red-700 text-[9px] font-bold tracking-wider px-2 py-1 border border-red-500 hover:bg-red-50">DEL</button>
+                        <button onclick="editUpcomingSale(${i})" class="text-[10px] font-bold px-2">EDIT</button>
+                <button onclick="removeUpcomingSale(${i})" class="text-red-500 hover:text-red-700 text-[9px] font-bold tracking-wider px-2 py-1 border border-red-500 hover:bg-red-50">DEL</button>
                     </div>
                 </div>
             `}).join('');
@@ -1898,8 +1957,8 @@ window.deleteReview = function(productId, reviewId) {
     }
 };
 
-window.filterOrders = function() {
-    const query = document.getElementById('orderSearchInput').value.toLowerCase().trim();
+window.filterOrders = function(value) {
+    const query = String(value ?? document.getElementById('orderSearchInput').value).toLowerCase().trim();
     const cards = document.querySelectorAll('.order-card');
     cards.forEach(card => {
         const cardText = card.innerText.toLowerCase();

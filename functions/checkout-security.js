@@ -52,13 +52,15 @@ function buildQuote(root, order, orderId, uid, now) {
         const quantity = Number(item.quantity === undefined ? item.qty : item.quantity);
         if (!Number.isInteger(quantity) || quantity < 1 || quantity > 100) fail('Please choose a valid quantity.');
         const {product:p} = catalog(store, name);
-        if (p.isHidden || p.isDraft || p.isPreorder || p.isOutOfStock) fail(`${name} is not available for immediate checkout.`);
+        if (p.isHidden || p.isDraft || p.isOutOfStock) fail(`${name} is not available for immediate checkout.`);
         if (p.isVipOnly && !isVip) fail(`${name} requires VIP membership.`);
         const sizes = Object.keys(p.sizeQuantities || {});
         if (sizes.length ? !own(p.sizeQuantities,size) : (Array.isArray(p.sizes) && !p.sizes.includes(size))) fail(`Please choose a valid size for ${name}.`);
         if (Array.isArray(p.colors) && p.colors.length && !p.colors.includes(color)) fail(`Please choose a valid colour for ${name}.`);
         const sale = p.salePrice && (!p.saleEndDate || Date.parse(p.saleEndDate) > now);
-        const cents = money(sale ? p.salePrice : p.price);
+        if (p.isPreorder && (!Number.isFinite(Number(p.preorderPrice)) || Number(p.preorderPrice)<=0 || Number(p.preorderPrice)>Number(p.price) || !/^\d{4}-\d{2}-\d{2}$/.test(p.expectedShipDate || '') || !Number.isFinite(Date.parse(p.expectedShipDate)) || new Date(p.expectedShipDate).toISOString().slice(0,10)!==p.expectedShipDate || Date.parse(p.expectedShipDate+'T23:59:59Z')<now)) fail(`${name} is not available for paid preorder until its price, capacity and dispatch date are configured. Please contact support.`);
+        if (p.isPreorder && (item.isPreorder !== true || item.expectedShipDate !== p.expectedShipDate)) fail('Preorder details have changed. Refresh checkout and review the dispatch date before paying.');
+        const cents = money(p.isPreorder ? p.preorderPrice : sale ? p.salePrice : p.price);
         if (cents < 1) fail(`${name} has no valid selling price.`);
         const totalQty = (quantities.get(name) || 0) + quantity;
         const sizeKey = JSON.stringify([name,size]);
@@ -68,7 +70,7 @@ function buildQuote(root, order, orderId, uid, now) {
         quantities.set(name,totalQty); sizeQuantities.set(sizeKey,sizeQty);
         subtotal += cents * quantity;
         const image = (p.images && p.images[0]) || p.img || '';
-        items.push({name,size,color,quantity,price:cents/100,image:typeof image === 'string' && /^https:\/\//.test(image) ? image : '', translations:p.translations || {}});
+        items.push({name,size,color,quantity,price:cents/100,...(p.isPreorder ? {isPreorder:true,launchPrice:money(p.price)/100,expectedShipDate:p.expectedShipDate} : {}),image:typeof image === 'string' && /^https:\/\//.test(image) ? image : '', translations:p.translations || {}});
     }
     const shippingInfo = {};
     for (const field of ['firstName','lastName','email','address','apt','city','zip','country','phone']) shippingInfo[field] = text((order.shippingInfo || {})[field] || '', field === 'address' ? 500 : 250);

@@ -47,6 +47,7 @@
                 <button class="tab-btn pb-3 pt-4 px-3 text-[10px] tracking-[0.1em] font-bold whitespace-nowrap" onclick="switchTab('footer')" data-tab="footer">FOOTER</button>
                 <button class="tab-btn pb-3 pt-4 px-3 text-[10px] tracking-[0.1em] font-bold whitespace-nowrap" onclick="switchTab('subscribers')" data-tab="subscribers">SUBSCRIBERS</button>
                 <button class="tab-btn pb-3 pt-4 px-3 text-[10px] tracking-[0.1em] font-black whitespace-nowrap text-[#2c4c23]" onclick="switchTab('orders')" data-tab="orders">ORDERS</button>
+                <button class="tab-btn pb-3 pt-4 px-3 text-[10px] tracking-[0.1em] font-black whitespace-nowrap text-[#2c4c23]" onclick="switchTab('preorders')" data-tab="preorders">PREORDER ORDERS <span id="preorder-order-count">0</span></button>
                 <button class="tab-btn text-[10px] font-bold tracking-widest uppercase px-3 pb-3 pt-4" data-tab="reviews" onclick="switchTab('reviews')">Reviews</button>
             </div>
 
@@ -80,7 +81,7 @@
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold tracking-wider text-[#6a7c64] mb-1">PRICE (€)</label>
-                        <input type="number" id="prodPrice" required placeholder="289" class="input-field p-2.5 text-xs font-bold">
+                        <input type="text" inputmode="decimal" pattern="[0-9]+([.,][0-9]{1,2})?" title="Enter a price such as 19.99 or 19,99" id="prodPrice" required placeholder="289" class="input-field p-2.5 text-xs font-bold">
                     </div>
                     
                     <div class="grid grid-cols-1 gap-4">
@@ -148,6 +149,18 @@
                         <label class="block text-xs font-bold">Origin<input id="detailOriginFr" class="input-field p-2.5 text-xs" type="text"></label>
                     </details>
 
+                    <details class="border border-[#c2c9c0] p-3 space-y-3">
+                        <summary class="text-xs font-black cursor-pointer">GOOGLE SHOPPING DETAILS</summary>
+                        <p class="text-xs text-[#6a7c64]">Use the manufacturer's actual details. Products missing required information stay out of the Shopping feed.</p>
+                        <label class="block text-xs font-bold">Brand<input id="merchantBrand" class="input-field p-2.5 text-xs" maxlength="70"></label>
+                        <label class="block text-xs font-bold">Gender<select id="merchantGender" class="input-field p-2.5 text-xs"><option value="">Use women/men category if applicable</option><option value="female">Female</option><option value="male">Male</option><option value="unisex">Unisex</option></select></label>
+                        <label class="block text-xs font-bold">Age group<select id="merchantAgeGroup" class="input-field p-2.5 text-xs"><option value="">Select</option><option value="adult">Adult</option><option value="kids">Kids</option><option value="toddler">Toddler</option><option value="infant">Infant</option><option value="newborn">Newborn</option></select></label>
+                        <label class="block text-xs font-bold">Condition<select id="merchantCondition" class="input-field p-2.5 text-xs"><option value="">Select</option><option value="new">New</option><option value="used">Used</option><option value="refurbished">Refurbished</option></select></label>
+                        <label class="block text-xs font-bold">Manufacturer identifiers<select id="merchantIdentifierExists" class="input-field p-2.5 text-xs"><option value="">Not confirmed</option><option value="yes">Product has identifiers</option><option value="no">Manufacturer has assigned no barcode or part number</option></select></label>
+                        <label class="block text-xs font-bold">GTIN / EAN barcode<input id="merchantGtin" class="input-field p-2.5 text-xs" inputmode="numeric" pattern="[0-9]{8}|[0-9]{12,14}"></label>
+                        <label class="block text-xs font-bold">Manufacturer part number<input id="merchantMpn" class="input-field p-2.5 text-xs" maxlength="70"></label>
+                    </details>
+
                     <div class="border-t border-[#c2c9c0]/50 pt-3">
                         <button type="button" class="flex justify-between items-center w-full py-2 text-[10px] font-black tracking-widest text-[#1a2e15] hover:text-[#d4af37] transition-colors uppercase" onclick="toggleCollapsible('details-collapsible', this)">
                             <span>PRODUCT DETAILS (MATERIAL, FIT, CARE)</span>
@@ -186,7 +199,7 @@
 
                     <div class="pt-4 border-t border-[#c2c9c0]/50">
                         <label class="block text-[10px] font-black tracking-wider text-[#1a2e15] mb-1 uppercase">IMAGES</label>
-                        <p class="text-[9px] text-[#6a7c64] font-medium mb-3 uppercase tracking-widest">Upload directly to cloud storage for high quality.</p>
+                        <p class="text-[9px] text-[#6a7c64] font-medium mb-3 uppercase tracking-widest">Add pictures in batches. Remove any picture below before saving. The first picture is the cover.</p>
                         <div class="mb-3">
                             <label class="block text-[10px] text-[#2c4c23] font-bold tracking-widest mb-2 uppercase">UPLOAD FROM DEVICE (Multiple)</label>
                             <input type="file" id="prodImageFile" accept="image/*" multiple class="w-full text-[10px] text-[#6a7c64] file:mr-3 file:py-2 file:px-3 file:border border-[#c2c9c0] file:text-[10px] file:font-black file:tracking-widest file:bg-[#eef2ec] file:text-[#1a2e15] hover:file:bg-[#c2c9c0]/30 transition-all cursor-pointer">
@@ -219,6 +232,12 @@
                 <div id="orders-list"></div>
             </div>
 
+            <div id="section-preorders" class="hidden pb-20 p-5">
+                <h2 class="text-xl font-black mb-3">PREORDER ORDERS</h2>
+                <p class="text-xs mb-5">Paid orders awaiting their preorder release. Orders containing both regular and preorder items stay together here. Add tracking and mark the complete order shipped to move it to normal orders and notify the customer.</p>
+                <input type="search" oninput="filterOrders(this.value)" placeholder="Search preorder orders..." class="input-field p-2 mb-4">
+                <div id="preorder-orders-list"></div>
+            </div>
             <!-- SALES SECTION -->
             <div id="section-sales" class="p-5 hidden">
                 <div class="space-y-6 max-h-[75vh] overflow-y-auto hide-scrollbar pr-2">
@@ -236,7 +255,7 @@
                             </div>
                             <div>
                                 <label class="block text-[10px] font-bold tracking-wider text-[#6a7c64] mb-1">SALE PRICE (€)</label>
-                                <input type="number" id="salePriceInput" placeholder="199" class="input-field p-2.5 text-xs font-bold" oninput="calculateSalePercent()">
+                                <input type="text" inputmode="decimal" pattern="[0-9]+([.,][0-9]{1,2})?" title="Enter a price such as 19.99 or 19,99" id="salePriceInput" placeholder="199" class="input-field p-2.5 text-xs font-bold" oninput="calculateSalePercent()">
                             </div>
                         </div>
                         <div class="mb-4">
@@ -280,14 +299,21 @@
                         </div>
                         <div class="grid grid-cols-2 gap-4 mb-3">
                             <div>
-                                <label class="block text-[10px] font-bold tracking-wider text-[#6a7c64] mb-1">EXPECTED PRICE (€)</label>
-                                <input type="number" id="upcomingPrice" placeholder="299" class="input-field p-2.5 text-xs font-bold">
+                                <label class="block text-[10px] font-bold tracking-wider text-[#6a7c64] mb-1">LAUNCH PRICE (€)</label>
+                                <input type="text" inputmode="decimal" pattern="[0-9]+([.,][0-9]{1,2})?" title="Enter a price such as 19.99 or 19,99" id="upcomingPrice" placeholder="299" class="input-field p-2.5 text-xs font-bold">
                             </div>
                             <div>
                                 <label class="block text-[10px] font-bold tracking-wider text-[#6a7c64] mb-1">AVAILABLE SIZES</label>
                                 <input type="text" id="upcomingSizes" placeholder="S, M, L" class="input-field p-2.5 text-xs uppercase font-bold">
                             </div>
                         </div>
+                        <div class="grid grid-cols-2 gap-4 mb-3">
+                            <label class="text-[10px] font-bold">PREORDER PRICE (€)<input id="upcomingPreorderPrice" type="text" inputmode="decimal" placeholder="60.00" class="input-field p-2.5 text-xs"></label>
+                            <label class="text-[10px] font-bold">REMAINING PREORDER UNITS<input id="upcomingQuantity" type="number" min="1" step="1" class="input-field p-2.5 text-xs"></label>
+                        </div>
+                        <label class="block text-[10px] font-bold mb-3">ESTIMATED DISPATCH DATE<input id="upcomingExpectedShipDate" type="date" class="input-field p-2.5 text-xs"></label>
+                        <label class="block text-[10px] font-bold mb-3">DESCRIPTION<textarea id="upcomingDescription" class="input-field p-2.5 text-xs"></textarea></label>
+                        <p class="text-[10px] mb-3">Customers pay the preorder price in full now. Enter the launch price you intend to charge later and a realistic dispatch estimate. Quantity is shared across all sizes.</p>
                         <div class="mb-3">
                             <label class="block text-[10px] font-bold tracking-wider text-[#6a7c64] mb-1">TEASER IMAGES (MULTIPLE SUPPORTED)</label>
                             <input type="file" id="upcomingImageFile" accept="image/*" multiple class="w-full text-[10px] text-[#6a7c64] file:mr-3 file:py-2 file:px-3 file:border border-[#c2c9c0] file:text-[10px] file:font-black file:tracking-widest file:bg-[#eef2ec] file:text-[#1a2e15] hover:file:bg-[#c2c9c0]/30 transition-all cursor-pointer mb-2">
@@ -308,7 +334,8 @@
                             <label for="upcomingVipOnly" class="text-[10px] font-black tracking-widest text-[#d4af37] cursor-pointer uppercase">LOCK DROP FOR VIPs ONLY</label>
                         </div>
 
-                        <button onclick="addUpcomingSale()" class="w-full bg-[#d4af37] text-[#1a2e15] border border-[#1a2e15] py-4 text-[10px] tracking-widest font-black hover:bg-white hover:border-white transition-colors shadow-lg">POST PRE-ORDER DROP</button>
+                        <button id="save-upcoming" onclick="addUpcomingSale()" class="w-full bg-[#d4af37] text-[#1a2e15] border border-[#1a2e15] py-4 text-[10px] tracking-widest font-black hover:bg-white hover:border-white transition-colors shadow-lg">POST PRE-ORDER DROP</button>
+                        <button onclick="resetUpcomingForm()" class="text-xs underline mt-2">Cancel editing / clear form</button>
                         <div id="upcoming-list" class="mt-4 space-y-3"></div>
                     </div>
                 </div>
@@ -739,7 +766,8 @@
             }
         });
     </script>
-    <script src="js/admin.js?v=return-messages-3"></script>
+    <script src="/js/order-workflow.js?v=preorder-orders-1"></script>
+    <script src="js/admin.js?v=preorder-orders-1"></script>
 
 
 <script src="/js/return-conversation.js?v=return-messages-3"></script>

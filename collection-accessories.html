@@ -20,7 +20,7 @@
     <link rel="apple-touch-icon" href="https://firebasestorage.googleapis.com/v0/b/sayand-store.firebasestorage.app/o/SAYAND%20Intertwined%20S%26A%20Monogram.png?alt=media&token=4a0c7abb-0150-4d22-94fc-d58f901a45f6">
     <link rel="stylesheet" href="/css/tailwind-production.css?v=mobile-1">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css?v=site-4">
+    <link rel="stylesheet" href="css/style.css?v=preorder-sections-1">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f9f6f0; color: #1a2e15; }
         .toast { position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%); background: #d4af37; color: #1a2e15; padding: 12px 24px; font-size: 10px; font-weight: 900; letter-spacing: 0.2em; transition: bottom 0.3s; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-transform: uppercase; }
@@ -81,10 +81,10 @@
                     </button>
                     <button id="wishlist-toggle" class="relative text-white hover:text-[#d4af37] transition-colors flex items-center">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                        <span id="wishlist-count" class="absolute -top-2 -right-3 w-4 h-4 bg-[#d4af37] text-[#1a2e15] text-[9px] flex items-center justify-center rounded-full font-black hidden shadow-md">0</span>
+                        <span id="wishlist-count" class="absolute -top-2 -right-3 w-4 h-4 bg-[#d4af37] text-[#1a2e15] text-[9px] layout-flex items-center justify-center rounded-full font-black hidden shadow-md">0</span>
                     </button>
                     <button id="cart-toggle" class="relative text-[10px] tracking-[0.2em] font-black text-white hover:text-[#d4af37] transition-colors">
-                        BAG <span id="cart-count" class="absolute -top-2 -right-3 w-4 h-4 bg-[#d4af37] text-[#1a2e15] text-[9px] flex items-center justify-center rounded-full font-black hidden shadow-md">0</span>
+                        BAG <span id="cart-count" class="absolute -top-2 -right-3 w-4 h-4 bg-[#d4af37] text-[#1a2e15] text-[9px] layout-flex items-center justify-center rounded-full font-black hidden shadow-md">0</span>
                     </button>
                 </div>
             </div>
@@ -120,7 +120,7 @@
                 <p class="text-[#6a7c64] text-xs font-bold tracking-widest mb-4 uppercase">You haven't saved any items yet.</p>
                 <button onclick="closeWishlist()" class="bg-[#1a2e15] text-[#d4af37] border border-[#d4af37] px-8 py-4 text-[10px] tracking-widest font-black hover:bg-[#2c4c23] transition-colors shadow-lg">START SHOPPING</button>
             </div>
-            <div id="wishlist-grid" class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 hidden"></div>
+            <div id="wishlist-grid" class="layout-grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 hidden"></div>
         </div>
     </div>
 

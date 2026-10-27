@@ -46,6 +46,13 @@
     "cleanUrls": true,
     "rewrites": [
       {
+        "source": "/api/public-preorders",
+        "function": {
+          "functionId": "cataloguePages",
+          "region": "us-central1"
+        }
+      },
+      {
         "source": "/product{,.html}",
         "function": {
           "functionId": "cataloguePages",
@@ -68,6 +75,13 @@
       },
       {
         "source": "/sitemap.xml",
+        "function": {
+          "functionId": "cataloguePages",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/merchant-feed.xml",
         "function": {
           "functionId": "cataloguePages",
           "region": "us-central1"

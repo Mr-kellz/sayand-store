@@ -1,0 +1,1 @@
+The preorder page shows the intended launch price, the price you pay now, and the saving. You pay in full at checkout. The displayed dispatch date is an estimate for shipping, not a guaranteed delivery date.

@@ -2,10 +2,11 @@
  * Set measurementId to your own G-... ID, then deploy Hosting. */
 (() => {
   'use strict';
-  const measurementId = 'G-91D7EK03BK'; // Example format only: G-XXXXXXXXXX
+  const measurementId = 'G-91D7EK03BK';
   const enabled = /^G-[A-Z0-9]+$/.test(measurementId);
   let loaded = false;
   const sent = new Set();
+  const lastShopping = new Map();
   const allowed = () => enabled && window.SayandConsent?.allowed('analytics') === true;
   const money = n => Math.round(Number(n) * 100) / 100;
   const read = key => { try { return localStorage.getItem(key); } catch (_) { return null; } };
@@ -22,10 +23,10 @@
     window.gtag = window.gtag || function() { window.dataLayer.push(arguments); };
     gtag('consent', 'default', {analytics_storage: 'granted', ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied'});
     gtag('js', new Date());
-    let referrer = '';
-    try { const url = new URL(document.referrer); referrer = url.origin + url.pathname; } catch (_) {}
+    let referrer = '', paymentReferral = false;
+    try { const url = new URL(document.referrer); referrer = url.origin + url.pathname; paymentReferral = ['checkout.stripe.com','hooks.stripe.com'].includes(url.hostname); } catch (_) {}
     gtag('config', measurementId, {send_page_view: false, allow_google_signals: false,
-      allow_ad_personalization_signals: false, page_location: safeLocation(), page_referrer: referrer});
+      allow_ad_personalization_signals: false, ignore_referrer: paymentReferral, page_location: safeLocation(), page_referrer: referrer});
     const script = document.createElement('script');
     script.async = true;
     script.src = 'https://www.googletagmanager.com/gtag/js?id=' + measurementId;
@@ -48,7 +49,7 @@
   }
   function item(p) {
     const quantity = Number(p.quantity ?? p.qty ?? 1);
-    const price = Number(p.price);
+    const price = (typeof p.price === 'number' || typeof p.price === 'string' && p.price.trim()) ? Number(p.price) : NaN;
     if (!p.name || !Number.isInteger(quantity) || quantity < 1 || !Number.isFinite(price) || price < 0) return null;
     return {item_id: String(p.name), item_name: String(p.name), item_brand: 'SAYAND',
       item_category: String(p.category || ''), item_variant: [p.size, p.color].filter(Boolean).join(' / '), quantity, price: money(price)};
@@ -57,6 +58,9 @@
     if (!['view_item', 'add_to_cart', 'begin_checkout'].includes(name) || !allowed()) return false;
     const items = Object.values(products || {}).map(item);
     if (!items.length || items.some(p => !p) || !start()) return false;
+    const signature = JSON.stringify(items);
+    if (name !== 'add_to_cart' && lastShopping.get(name) === signature) return false;
+    if (name !== 'add_to_cart') lastShopping.set(name, signature);
     gtag('event', name, {currency: 'EUR', value: money(items.reduce((n, p) => n + p.quantity * p.price, 0)), items});
     return true;
   }

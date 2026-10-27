@@ -712,6 +712,7 @@ exports.cataloguePages = functions.runWith({timeoutSeconds:30,maxInstances:10}).
 
 const storeServices = require('./store-services').install(functions,admin,sendBrevoEmail);
 Object.assign(exports,storeServices.exports);
+Object.assign(exports,require('./order-shipping').install(functions,storeServices));
 Object.assign(exports,require('./return-service').install(admin,storeServices));
 
 exports.eliaChat = require('./elia-proxy').install(functions,storeServices);
